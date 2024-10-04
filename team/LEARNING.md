@@ -8,6 +8,6 @@ Since we are going to be working on different parts of the mobile app, we will w
 * Garvin: Basic agile and react experience from cs156 and cs148. Mainly worked on frontend for those courses so I would like to focus on backends esp in regards to allowing users to communicate with one another.
 * Tim: 
 * Meron: 
-* Wesley: 
+* Wesley: I have experience in Java, React but no experience in React Native. I am hoping I am able to learn more about skills such as API development and React Native.
 * David: 
 * Kai: 

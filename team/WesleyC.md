@@ -1,0 +1,1 @@
+My name is Wesley Chiba and I'm a 4th year CS student. I'm not familiar with mobile application development but I have experience in group development (CS156), Java, and React so I am hoping I am able to learn a lot from this class.
