@@ -1,4 +1,4 @@
-LEADERSHIP.md
+# LEADERSHIP.md
 
 ## Sprint01
 ### Roles:
