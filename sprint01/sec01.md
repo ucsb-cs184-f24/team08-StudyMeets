@@ -5,7 +5,7 @@
 * Garvin: Present
 * Tim: Present
 * Meron: Present
-* Wesley: Present
+* Wesley: Absent
 * David: Present
 * Kai: Present
 
