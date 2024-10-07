@@ -1,1 +1,1 @@
-My name is Meron Tesfandrias and I am a fourth year computer science student. I know a little java from CS156 and React but haven't worked with ReactNative and am looking forward to learning.
+My name is Meron Tesfandrias and I am a fourth year computer science student. I know a little java from CS156 and React but haven't worked with ReactNative and am looking forward to learning. In my free time I like to read, hang out with friends, and watch the NBA.
