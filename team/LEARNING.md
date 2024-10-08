@@ -10,4 +10,4 @@ Since we are going to be working on different parts of the mobile app, we will w
 * Meron: Some experience using Java and React mainly from cs156. Looking forward to learning React Native and practicing more Java.
 * Wesley: I have experience in Java, React but no experience in React Native. I am hoping I am able to learn more about skills such as API development and React Native.
 * David: I have touched react a little bit (in cmpsc 156) but not too much. I would also like to learn about using APIs. 
-* Kai: 
+* Kai: I have experience with Java and React, and a little experience with React Native. I hope to further master them and complete a complete mobile project using these technologies.
