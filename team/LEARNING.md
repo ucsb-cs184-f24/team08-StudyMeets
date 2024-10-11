@@ -31,6 +31,6 @@ Benefits:
 - works with ios and android, doesn't need emulator
 
 Challenges:
-- need to use code/componenets that work for ios and android
+- need to use code/components that work for ios and android
 - limitations with very complex projects
 (10/11 10:40)
