@@ -20,3 +20,5 @@ https://reactnative.dev/docs/style
 https://www.youtube.com/watch?v=8ejuHsaXiwU
 
 https://blog.logrocket.com/react-native-styling-tutorial-examples/
+
+https://www.youtube.com/playlist?list=PLC3y8-rFHvwhiQJD1di4eRVN30WWCXkg1
