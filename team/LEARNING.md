@@ -22,3 +22,15 @@ https://www.youtube.com/watch?v=8ejuHsaXiwU
 https://blog.logrocket.com/react-native-styling-tutorial-examples/
 
 https://www.youtube.com/playlist?list=PLC3y8-rFHvwhiQJD1di4eRVN30WWCXkg1
+
+Benefits:
+- easy to get running
+- a lot of documentation
+- most fo us have prior experience with react
+- easily importable components
+- works with ios and android, doesn't need emulator
+
+Challenges:
+- need to use code/componenets that work for ios and android
+- limitations with very complex projects
+(10/11 10:40)
