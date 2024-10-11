@@ -26,7 +26,7 @@ https://www.youtube.com/playlist?list=PLC3y8-rFHvwhiQJD1di4eRVN30WWCXkg1
 Benefits:
 - easy to get running
 - a lot of documentation
-- most fo us have prior experience with react
+- most of us have prior experience with react
 - easily importable components
 - works with ios and android, doesn't need emulator
 
