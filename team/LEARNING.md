@@ -15,3 +15,4 @@ Since we are going to be working on different parts of the mobile app, we will w
 
 Learning Resources:
 https://reactnative.dev/docs/style
+https://www.youtube.com/watch?v=8ejuHsaXiwU
