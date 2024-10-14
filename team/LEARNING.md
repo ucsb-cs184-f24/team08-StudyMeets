@@ -23,6 +23,8 @@ https://blog.logrocket.com/react-native-styling-tutorial-examples/
 
 https://www.youtube.com/playlist?list=PLC3y8-rFHvwhiQJD1di4eRVN30WWCXkg1
 
+https://www.youtube.com/watch?v=HY3O_wrvDsI
+
 Benefits:
 - easy to get running
 - a lot of documentation
