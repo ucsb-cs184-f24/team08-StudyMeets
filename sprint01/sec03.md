@@ -4,7 +4,10 @@ Meeting Time: sec03
 
 Type of meeting: daily scrum
 
-Team: Garvin Young [], Tim Choi [], David Joyner [x], Luis Miguel [x], Wesley Chiba [x], Kai Hann [], Meron Tesfandrias [x] Lead: Meron Scribe: Meron
+Team: Garvin Young [], Tim Choi [], David Joyner [x], Luis Miguel [x], Wesley Chiba [x], Kai Hann [], Meron Tesfandrias [x] 
+
+Lead: Meron 
+Scribe: Meron
 
 Scribed Discussion:
 
