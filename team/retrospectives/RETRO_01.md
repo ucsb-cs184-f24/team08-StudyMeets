@@ -1,15 +1,16 @@
 Date of Retrospective: 10/18/24
 
-* Led by: name-goes-here
-* Present: name1, name2, ... , nameN
-* Absent: name1, name2, ...
+* Led by: Meron
+* Present: Meron, David, Luis, Wesley
+* Absent: Kai, Tim, Garvin
 
 ## Action item
 
-* a goal: identify something the team wants to get better at
-* a change: identify one thing that the team will change about how it works together
-* a measurement: identify at least one way to measure whether the change helped the team achieve the goal, or move closer to it.
+* a goal: Communicate more, helping each other with the project/HW and letting everyone know where you are. Also sharing useful resources with the group.
+* a change: We plan to utilize slack more and the messaging group chat, updating each other on our progress/issues and sending resources or tips to help others.
+* a measurement: We can check if our experiment worked if there have been more messages in the group chat and slack by our next retro.
 
 ## Optional
 
-* Record anything else you think the team might want to remember from this retro
+We want to aim for at least two peer reviews on any Pull Request we have before we merge any code to main.'
+Remember to do the CATME survey and update our experiment's result in this file.
