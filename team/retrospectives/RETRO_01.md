@@ -12,5 +12,5 @@ Date of Retrospective: 10/18/24
 
 ## Optional
 
-We want to aim for at least two peer reviews on any Pull Request we have before we merge any code to main.'
-Remember to do the CATME survey and update our experiment's result in this file.
+*We want to aim for at least two peer reviews on any Pull Request we have before we merge any code to main.
+*Remember to do the CATME survey and update our experiment's result in this file.
