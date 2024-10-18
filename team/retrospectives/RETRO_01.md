@@ -14,3 +14,9 @@ Date of Retrospective: 10/18/24
 
 * We want to aim for at least two peer reviews on any Pull Request we have before we merge any code to main.
 * Remember to do the CATME survey and update our experiment's result in this file.
+
+## Retro Assessment
+
+* We used a group discussion similar to the daily standups where everyone had a chance to speak. Once everyone had spoken I asked if there was anything else anyone wanted to add, when everyone was done with their thoughts we moved on.
+* The retro went well, since we are at the beginning of the project it felt like there wasn't much we wanted to change.
+* For the next retrospective I would recommend giving people more time to think before jumping into discussion, I was speaking first a lot and maybe not giving everyone enough time to formulate their thoughts.
