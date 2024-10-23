@@ -9,7 +9,7 @@ An app tailored for UCSB students that displays study sessions and events based 
 * Garvin Young: GarvinYoung
 * Tim Choi: tim-choi
 * Meron Tesfandrias: MeronDT
-* Wesley Chiba: sockperson
+* Wesley Chiba: jeffsmithepic
 * David Joyner: djoyneruscb
 * Kai Hann: Kai-Hann
 
