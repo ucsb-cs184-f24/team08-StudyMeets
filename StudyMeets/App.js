@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { firestore } from './firebase';  // Import Firestore from your firebase.js
 import { collection, addDoc } from 'firebase/firestore';  // Import Firestore methods
+import CurrentLocation from './components/location/CurrentLocation';
 
 export default function App() {
   const [message, setMessage] = useState("Connecting to Firebase...");
@@ -27,6 +28,7 @@ export default function App() {
     <View style={styles.container}>
       <Text>{message}</Text>
       <StatusBar style="auto" />
+      <CurrentLocation />
     </View>
   );
 }
