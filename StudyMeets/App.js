@@ -1,41 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { useEffect, useState } from 'react';
-import { firestore } from './firebase';  // Import Firestore from your firebase.js
-import { collection, addDoc } from 'firebase/firestore';  // Import Firestore methods
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Login from './app/screens/Login';
+import Info from './app/screens/Info';
+import Account from './app/screens/Account';
 
-export default function App() {
-  const [message, setMessage] = useState("Connecting to Firebase...");
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-  useEffect(() => {
-    const testFirestoreConnection = async () => {
-      try {
-        // Write a test document to the "testCollection" collection in Firestore
-        const docRef = await addDoc(collection(firestore, "testCollection"), {
-          testField: "Hello, Firebase!"
-        });
-        setMessage("Firebase connected! Document written with ID: " + docRef.id);
-      } catch (e) {
-        setMessage("Error adding document: " + e);
-      }
-    };
-
-    testFirestoreConnection();
-  }, []);
-
+// Define the tab navigation component after login
+const MainTabs = () => {
   return (
-    <View style={styles.container}>
-      <Text>{message}</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator initialRouteName='Account'>
+      <Tab.Screen name="Info" component={Info} options={{ title: 'Info' }} />
+      <Tab.Screen name="Account" component={Account} options={{ title: 'Account' }} />
+    </Tab.Navigator>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
