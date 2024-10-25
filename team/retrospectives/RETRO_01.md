@@ -10,6 +10,8 @@ Date of Retrospective: 10/18/24
 * a change: We plan to utilize slack more and the messaging group chat, updating each other on our progress/issues and sending resources or tips to help others.
 * a measurement: We can check if our experiment worked if there have been more messages in the group chat and slack by our next retro.
 
+* Result: There have been more messages in both the group chat and slack including: asking for help, sending resources, updating group on progress, and asking for peer reviews on code.
+
 ## Optional
 
 * We want to aim for at least two peer reviews on any Pull Request we have before we merge any code to main.
