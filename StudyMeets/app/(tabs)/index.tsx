@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { firestore } from '../../firebase';  // Import Firestore from your firebase.js
 import { collection, addDoc } from 'firebase/firestore';  // Import Firestore methods
 import { Link, router } from 'expo-router';
+import CurrentLocation from '../../components/location/CurrentLocation';
 
 export default function App() {
   const [message, setMessage] = useState("Connecting to Firebase...");
@@ -27,6 +28,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>{message}</Text>
+      <CurrentLocation />
       <Link href="/users/1">Go to user 1{'\n'}</Link>
       <Pressable onPress={() => router.push("/users/2")} style={({ pressed }) => [
         styles.button,
