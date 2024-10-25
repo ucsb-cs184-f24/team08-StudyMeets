@@ -6,7 +6,7 @@ import { collection, addDoc } from 'firebase/firestore';  // Import Firestore me
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SignUp from '../StudyMeets/app/.expo/screens/SignUp'; // Adjust the import path accordingly
+import SignUp from './SignUp'; // Adjust the import path accordingly
 
 // Create the Stack Navigator
 const Stack = createNativeStackNavigator();
