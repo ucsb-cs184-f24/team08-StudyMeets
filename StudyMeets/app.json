@@ -2,6 +2,8 @@
   "expo": {
     "name": "StudyMeets",
     "slug": "StudyMeets",
+    "scheme": "StudyMeets",
+    "entryPoint": "./App.js",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

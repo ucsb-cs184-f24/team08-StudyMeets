@@ -21,7 +21,7 @@ const MainTabs = () => {
             </TouchableOpacity>
           ),
         }} />
-      <Tab.Screen name="MyGroups" component={MyGroups}/>
+      {/* <Tab.Screen name="MyGroups" component={MyGroups}/> */}
       <Tab.Screen name="Profiles" component={Profiles} options={{ title: 'Profiles' }} />
     </Tab.Navigator>
   );

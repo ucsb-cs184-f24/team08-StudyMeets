@@ -4,6 +4,10 @@ Tech Stack: React Native
 
 An app tailored for UCSB students that displays study sessions and events based on location and interests, with student ID verification for full access; hosts can create both study and social sessions, set participant limits, and restrict access by distance to keep it local; additional features include friend recommendations, college-specific events, and options for verifying students through email domains, LinkedIn profiles, or existing campus networks.
 
+User Roles:
+- Group creators: Students looking to create study groups in their area. They are verified students.
+- Group joiners: Students looking to join interested study groups in their area
+
 ## Github IDs
 * Luis Miguel: miguel-luis9
 * Garvin Young: GarvinYoung
