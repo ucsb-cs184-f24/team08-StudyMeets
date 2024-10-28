@@ -4,7 +4,7 @@ import { auth } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore'; 
 import { firestore } from '../../firebase'; 
 
-const Account = () => {
+const Profiles = () => {
   const [user, setUser] = useState(null); 
   const [username, setUsername] = useState(null); 
 
@@ -41,7 +41,7 @@ const Account = () => {
   );
 };
 
-export default Account;
+export default Profiles;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Info = () => {
+const Explore = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>This is some random info displayed here.</Text>
@@ -12,7 +12,7 @@ const Info = () => {
   );
 };
 
-export default Info;
+export default Explore;
 
 const styles = StyleSheet.create({
   container: {
