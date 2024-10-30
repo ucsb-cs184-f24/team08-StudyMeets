@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import { auth } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore'; 
-import { firestore } from '../../firebase'; 
+import { firestore } from '../../firebase';
+import { useNavigation } from '@react-navigation/native';
+import { signOut } from 'firebase/auth';
 
 const Profiles = () => {
   const [user, setUser] = useState(null); 
   const [username, setUsername] = useState(null); 
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -26,6 +29,15 @@ const Profiles = () => {
     fetchUserInfo();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigation.navigate('Login'); // Navigate back to the SignIn (Login) page
+    } catch (error) {
+      console.error("Error logging out: ", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {user ? (
@@ -33,6 +45,7 @@ const Profiles = () => {
           <Text style={styles.title}>User Information</Text>
           <Text>Email: {user.email}</Text>
           {username && <Text>Username: {username}</Text>}
+          <Button title="Logout" onPress={handleLogout} />
         </>
       ) : (
         <Text>No user is logged in</Text>
