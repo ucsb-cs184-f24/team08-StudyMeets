@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 'react-native';
+import {Pressable, View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, firestore } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc } from 'firebase/firestore';
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,6 +12,8 @@ const Login = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
+  const [isVisible, setVisible] = useState(false);
+
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -56,6 +57,10 @@ const Login = () => {
     }
   };
 
+  const toggleVisibility = () =>{
+    setVisible(!isVisible);
+  }
+
   return (
     <View style={styles.container}>
       {isSignUp ? (
@@ -77,8 +82,11 @@ const Login = () => {
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={isVisible}
             style={styles.input}
+          />
+          <Button
+            title="show" onPress={toggleVisibility}
           />
           {loading ? (
             <ActivityIndicator size="large" />
@@ -98,12 +106,16 @@ const Login = () => {
             onChangeText={setEmail}
             style={styles.input}
           />
-          <TextInput
+        <TextInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={isVisible}
             style={styles.input}
+          />
+          <Button
+            title='show'
+            onPress={toggleVisibility}
           />
           {loading ? (
             <ActivityIndicator size="large" />
@@ -123,7 +135,7 @@ export default Login;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex:1,
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
