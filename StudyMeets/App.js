@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from './app/screens/Login';
 import Explore from './app/screens/Explore';
 import Profiles from './app/screens/Profiles';
+import MyGroups from './app/screens/MyGroups';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -13,15 +14,8 @@ const Tab = createBottomTabNavigator();
 const MainTabs = () => {
   return (
     <Tab.Navigator initialRouteName='Account'>
-      <Tab.Screen name="Explore" component={Explore} options={{
-          title: 'Explore',
-          headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('CreateItem')} style={{ marginRight: 10 }}>
-              <Text style={{ fontSize: 30, color: 'grey' }}>+</Text>
-            </TouchableOpacity>
-          ),
-        }} />
-      {/* <Tab.Screen name="MyGroups" component={MyGroups}/> */}
+      <Tab.Screen name="Explore" component={Explore} options={{title: 'Explore'}} />
+      <Tab.Screen name="MyGroups" component={MyGroups} options={{title: 'MyGroups'}}/>
       <Tab.Screen name="Profiles" component={Profiles} options={{ title: 'Profiles' }} />
     </Tab.Navigator>
   );
