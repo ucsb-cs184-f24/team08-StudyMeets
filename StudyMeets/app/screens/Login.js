@@ -13,7 +13,7 @@ const Login = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
-  const [isVisible, setVisible] = useState(false);
+  const [isVisible, setVisible] = useState(true);
 
   const handleSignIn = async () => {
     setLoading(true);
