@@ -7,6 +7,7 @@ import Login from './app/screens/Login';
 import Explore from './app/screens/Explore';
 import Profiles from './app/screens/Profiles';
 import MyGroups from './app/screens/MyGroups';
+import CreateProfile from './app/screens/CreateProfile';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -27,6 +28,7 @@ const App = () => {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        <Stack.Screen name="CreateProfile" component={CreateProfile} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
