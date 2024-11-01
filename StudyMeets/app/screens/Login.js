@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 're
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, firestore } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,8 +20,12 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const authenticatedUser = userCredential.user;
       setUser(authenticatedUser);
-      if (authenticatedUser.emailVerified) {
+      const userDoc = await getDoc(doc(firestore, 'users', authenticatedUser.uid));
+
+      if (authenticatedUser.emailVerified && userDoc.data().createdProfile) {
         navigation.navigate('Main');
+      } else if (authenticatedUser.emailVerified && !userDoc.data().createdProfile){
+        navigation.navigate('CreateProfile')
       } else {
         alert("Please verify your email before login!");
       }
@@ -46,6 +50,7 @@ const Login = () => {
         email: user.email,
         username: username,
         createdAt: new Date(),
+        createdProfile: false,
       });
 
       setIsSignUp(false);
