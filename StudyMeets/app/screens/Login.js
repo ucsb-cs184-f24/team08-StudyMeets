@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import {Pressable, View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 'react-native';
+import { Pressable, View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, firestore } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc } from 'firebase/firestore';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +14,6 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
   const [isVisible, setVisible] = useState(false);
-
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -57,7 +57,7 @@ const Login = () => {
     }
   };
 
-  const toggleVisibility = () =>{
+  const toggleVisibility = () => {
     setVisible(!isVisible);
   }
 
@@ -78,16 +78,19 @@ const Login = () => {
             onChangeText={setEmail}
             style={styles.input}
           />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={isVisible}
-            style={styles.input}
-          />
-          <Button
-            title="show" onPress={toggleVisibility}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={isVisible}
+              style={styles.passwordInput}
+            />
+            <Button
+              title="Show"
+              onPress={toggleVisibility}
+            />
+          </View>
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
@@ -106,17 +109,19 @@ const Login = () => {
             onChangeText={setEmail}
             style={styles.input}
           />
-        <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={isVisible}
-            style={styles.input}
-          />
-          <Button
-            title='show'
-            onPress={toggleVisibility}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={isVisible}
+              style={styles.passwordInput}
+            />
+            <Button
+              title='Show'
+              onPress={toggleVisibility}
+            />
+          </View>
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
@@ -131,25 +136,35 @@ const Login = () => {
   );
 };
 
-export default Login;
-
 const styles = StyleSheet.create({
   container: {
-    flex:1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
+    flex: 1,
+    padding: 16,
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 16,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingLeft: 8,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 8,
+    marginRight: 10, // Add space between the input and button
   },
 });
+
+export default Login;
