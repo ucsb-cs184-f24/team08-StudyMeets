@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { firestore } from '../../firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import CreateNewPost from './CreateNewPost';
+import { PlusCircle } from 'lucide-react-native';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -38,7 +39,7 @@ const Explore = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={openModal} style={{ marginRight: 10 }}>
-          <Text style={{ fontSize: 30, color: 'grey' }}>+</Text>
+          <PlusCircle size={40} color="grey" />
         </TouchableOpacity>
       ),
     });
