@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet } from 'react-native';
+import { View, Modal, StyleSheet } from 'react-native';
 import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
+
+import { TextInput, Button, Text, Title } from 'react-native-paper';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -10,7 +12,7 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [description, setDescription] = useState('');
   const [userName, setUserName] = useState('');
 
-  const handleCreateAccount = async () => {
+  const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
@@ -54,7 +56,7 @@ const CreateNewPost = ({ visible, onClose }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-        <Text style={styles.formTitle}>Create New StudyMeet</Text>
+        <Title>Create New StudyMeet</Title>
         <Text style={styles.label}>Title</Text>
           <TextInput
             style={styles.input}
@@ -75,8 +77,12 @@ const CreateNewPost = ({ visible, onClose }) => {
             value={description}
             onChangeText={setDescription}
           />
-          <Button title="Create" onPress={handleCreateAccount} />
-          <Button title="Cancel" onPress={onClose} color="red" />
+          <Button mode="contained" onPress={handleCreatePost} style={[styles.button, styles.createPostButton]}>
+          Create Post
+          </Button>
+          <Button mode="contained" onPress={onClose} style={[styles.button, styles.cancelButton]}>
+            Cancel
+          </Button>
         </View>
       </View>
     </Modal>
@@ -129,4 +135,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center'
   },
+  createPostButton: {
+    marginBottom: 10
+  },
+  cancelButton: {
+    backgroundColor: '#ff7777'
+  }
 });

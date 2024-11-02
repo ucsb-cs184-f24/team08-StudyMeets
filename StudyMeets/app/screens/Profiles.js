@@ -8,7 +8,6 @@ import { firestore } from '../../firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import { signOut, sendPasswordResetEmail } from 'firebase/auth';
-import { Button as ElementsButton } from 'react-native-elements';
 
 const Profiles = () => {
   const [user, setUser] = useState(null);

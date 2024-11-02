@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, Alert } from 'react-native';
+import { View, Modal, StyleSheet, Alert } from 'react-native';
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+
+import { TextInput, Button, Text, Title } from 'react-native-paper';
 
 const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
@@ -77,8 +79,12 @@ const EditPost = ({ visible, onClose, postId }) => {
             value={description}
             onChangeText={setDescription}
           />
-          <Button title="Update" onPress={handleUpdatePost} />
-          <Button title="Cancel" onPress={onClose} color="red" />
+          <Button mode="contained" onPress={handleUpdatePost} style={[styles.button, styles.updatePostButton]}>
+            Update
+          </Button>
+          <Button mode="contained" onPress={onClose} style={[styles.button, styles.cancelButton]}>
+            Cancel
+          </Button>
         </View>
       </View>
     </Modal>
@@ -131,4 +137,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
+  updatePostButton: {
+    marginBottom: 10
+  },
+  cancelButton: {
+    backgroundColor: '#ff7777'
+  }
 });
