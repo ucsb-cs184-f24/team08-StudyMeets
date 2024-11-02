@@ -8,9 +8,9 @@ import CreateNewPost from './CreateNewPost';
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [expandedPostIds, setExpandedPostIds] = useState(new Set());
   const navigation = useNavigation();
 
-  // Function to open the modal
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
@@ -30,7 +30,6 @@ const Explore = () => {
     };
 
     const unsubscribe = fetchPosts();
-
     return () => unsubscribe();
   }, []);
 
@@ -44,15 +43,47 @@ const Explore = () => {
     });
   }, [navigation]);
 
-  const renderPost = ({ item }) => (
-    <View style={styles.postContainer}>
-      <Text style={styles.postTitle}>{item.Title}</Text>
-      <Text style={styles.postLocation}>Location: {item.Location}</Text>
-      <Text style={styles.postDescription}>{item.Description}</Text>
-      <Text style={styles.postOwner}>Created by: {item.OwnerName}</Text>
-      <Text style={styles.postDate}>Date: {item.CreatedAt.toDate().toLocaleString()}</Text>
-    </View>
-  );
+  const toggleTags = (postId) => {
+    setExpandedPostIds((prev) => {
+      const newIds = new Set(prev);
+      if (newIds.has(postId)) {
+        newIds.delete(postId);
+      } else {
+        newIds.add(postId);
+      }
+      return newIds;
+    });
+  };
+
+  const renderPost = ({ item }) => {
+    const isExpanded = expandedPostIds.has(item.id);
+
+    return (
+      <View style={styles.postContainer}>
+        <Text style={styles.postTitle}>{item.Title}</Text>
+        <Text style={styles.postLocation}>Location: {item.Location}</Text>
+        <Text style={styles.postDescription}>{item.Description}</Text>
+        <Text style={styles.postOwner}>Created by: {item.OwnerName}</Text>
+        <Text style={styles.postDate}>Date: {item.CreatedAt.toDate().toLocaleString()}</Text>
+
+        {item.Tags && item.Tags.length > 0 && (
+          <View style={styles.tagsContainer}>
+            <Text style={styles.tagsLabel}>Tags:</Text>
+            <View style={styles.tags}>
+              {item.Tags.slice(0, isExpanded ? item.Tags.length : 4).map((tag, index) => (
+                <Text key={index} style={styles.tag}>{tag}</Text>
+              ))}
+              {item.Tags.length > 4 && (
+                <TouchableOpacity onPress={() => toggleTags(item.id)} style={styles.arrowContainer}>
+                  <Text style={styles.arrow}>{isExpanded ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -103,5 +134,30 @@ const styles = StyleSheet.create({
   postDate: {
     fontSize: 12,
     color: '#aaa',
+  },
+  tagsContainer: {
+    marginTop: 10,
+  },
+  tagsLabel: {
+    fontWeight: 'bold',
+  },
+  tags: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  tag: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 15,
+    padding: 5,
+    margin: 5,
+    fontSize: 12,
+  },
+  arrowContainer: {
+    marginLeft: 5,
+  },
+  arrow: {
+    fontSize: 16,
+    color: 'gray',
   },
 });

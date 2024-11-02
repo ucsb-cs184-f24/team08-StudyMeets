@@ -1,37 +1,68 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
+
+const tagsList = [
+  'Math', 'Economics', 'Reading', 'Calculus', 'Chemistry', 'History', 
+  'Philosophy', 'Computer Science', 'Biology', 'Data Science', 
+  'Statistics', 'Physics', 'Environmental Science', 'Information Technology', 
+  'Mechanical Engineering', 'Electrical Engineering', 'Material Engineering', 
+  'Music Theory', 'Theater & Arts', 'Cultural Studies', 'Undergraduate', 
+  'Graduate', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 
+  'Friday', 'Saturday', 'Sunday', 'Zoom', 'In-Person', 'Discord', 
+  'Slack', 'Discussion Group', 'Tutoring', 'Small group (2-4)', 
+  'Medium group (5-9)', 'Large Group (10+)', 'Knowledge sharing', 
+  'Extracurricular', 'Library', 'Intercollegiate Learning Pavilion'
+];
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [userName, setUserName] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [searchText, setSearchText] = useState('');
 
-  const handleCreateAccount = async () => {
+  const handleTagToggle = (tag) => {
+    setSelectedTags(prevTags => {
+      if (prevTags.includes(tag)) {
+        return prevTags.filter(t => t !== tag);
+      } else {
+        return [...prevTags, tag];
+      }
+    });
+    setSearchText(''); // Clear the search text when a tag is added
+  };
+
+  const handleRemoveTag = (tag) => {
+    setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
+  };
+
+  const filteredTags = tagsList.filter(tag =>
+    tag.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
         throw new Error('User not authenticated');
       }
 
-      console.log('Title:', title);
-      console.log('Location:', location);
-      console.log('Description:', description);
-
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      console.log(userDoc.data().username)
       if (userDoc.exists()) {
-        setUserName(userDoc.data().username)
+        setUserName(userDoc.data().username);
       } else {
         console.log('No such document!');
       }
+
       await addDoc(collection(firestore, 'studymeets'), {
         Title: title,
         Location: location,
         Description: description,
+        Tags: selectedTags,
         OwnerEmail: currentUser.email,
         OwnerName: userName,
         CreatedAt: new Date(),
@@ -44,7 +75,6 @@ const CreateNewPost = ({ visible, onClose }) => {
     }
   };
 
-
   return (
     <Modal
       animationType="slide"
@@ -54,28 +84,70 @@ const CreateNewPost = ({ visible, onClose }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-        <Text style={styles.formTitle}>Create New StudyMeet</Text>
-        <Text style={styles.label}>Title</Text>
+          <Text style={styles.formTitle}>Create New StudyMeet</Text>
+          <Text style={styles.label}>Title</Text>
           <TextInput
             style={styles.input}
             placeholder="Title"
             value={title}
             onChangeText={setTitle}
           />
-        <Text style={styles.label}>Location</Text>
+          <Text style={styles.label}>Location</Text>
           <TextInput
             style={styles.input}
             placeholder="Location"
             value={location}
             onChangeText={setLocation}
           />
-        <Text style={styles.label}>Description</Text>
+          <Text style={styles.label}>Description</Text>
           <TextInput
             style={styles.largeInput}
             value={description}
             onChangeText={setDescription}
           />
-          <Button title="Create" onPress={handleCreateAccount} />
+          
+          <Text style={styles.label}>Search Tags</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Search tags..."
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+
+          {/* Scrollable box for filtered tags */}
+          {searchText && filteredTags.length > 0 && (
+            <View style={styles.tagSuggestions}>
+              <FlatList
+                data={filteredTags}
+                keyExtractor={item => item}
+                renderItem={({ item }) => (
+                  <View style={styles.tagItem}>
+                    <Text style={styles.tagText}>{item}</Text>
+                    <Button 
+                      title={selectedTags.includes(item) ? "Remove" : "Add"} 
+                      onPress={() => handleTagToggle(item)}
+                      color={selectedTags.includes(item) ? 'red' : 'green'}
+                    />
+                  </View>
+                )}
+              />
+            </View>
+          )}
+
+          {/* Display selected tags with remove option */}
+          <Text style={styles.label}>Selected Tags:</Text>
+          <View style={styles.selectedTagsContainer}>
+            {selectedTags.map(tag => (
+              <View key={tag} style={styles.selectedTagContainer}>
+                <Text style={styles.selectedTag}>{tag}</Text>
+                <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
+                  <Text style={styles.removeTag}> X </Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+
+          <Button title="Create" onPress={handleCreatePost} />
           <Button title="Cancel" onPress={onClose} color="red" />
         </View>
       </View>
@@ -109,13 +181,13 @@ const styles = StyleSheet.create({
   },
   largeInput: {
     width: '100%',
-    height: 100, // 增大 Description 部分的高度
+    height: 100,
     padding: 10,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
-    textAlignVertical: 'top', // 多行文本从顶部开始显示
+    textAlignVertical: 'top',
   },
   label: {
     alignSelf: 'flex-start',
@@ -127,6 +199,47 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
-    textAlign: 'center'
+    textAlign: 'center',
+  },
+  tagSuggestions: {
+    width: '100%',
+    maxHeight: 150, // Set a maximum height for the suggestions box
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingVertical: 5,
+    overflow: 'hidden', // Hide overflow to create a clean border
+  },
+  tagItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  tagText: {
+    flex: 1,
+  },
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+  },
+  selectedTagContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 15,
+    padding: 5,
+    margin: 5,
+  },
+  selectedTag: {
+    marginRight: 5,
+  },
+  removeTag: {
+    color: 'red',
+    fontWeight: 'bold',
+    padding: 5,
   },
 });
