@@ -51,6 +51,12 @@ const CreateNewPost = ({ visible, onClose }) => {
         throw new Error('User not authenticated');
       }
 
+      console.log('Title:', title);
+      console.log('Location:', location);
+      console.log('Description:', description);
+      console.log('Tags:', selectedTags);
+
+
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
       if (userDoc.exists()) {
         setUserName(userDoc.data().username);
