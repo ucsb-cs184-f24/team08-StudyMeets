@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore } from '../../firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import CreateNewPost from './CreateNewPost';
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
 
   // Function to open the modal
@@ -44,6 +45,11 @@ const Explore = () => {
     });
   }, [navigation]);
 
+  // Filter posts based on search query
+  const filteredPosts = posts.filter(post =>
+    post.Title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const renderPost = ({ item }) => (
     <View style={styles.postContainer}>
       <Text style={styles.postTitle}>{item.Title}</Text>
@@ -56,8 +62,16 @@ const Explore = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search study groups..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
       <FlatList
-        data={posts}
+        data={filteredPosts}
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
@@ -103,5 +117,18 @@ const styles = StyleSheet.create({
   postDate: {
     fontSize: 12,
     color: '#aaa',
+  },
+  searchContainer: {
+    padding: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  searchInput: {
+    height: 40,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
 });
