@@ -3,11 +3,29 @@ import { View, Text, TextInput, Button, Modal, StyleSheet, Alert, FlatList, Touc
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
+import { tagsList } from '../../definitions/Definitions.js';
+
 const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState([]); // New state for tags
+  const [searchText, setSearchText] = useState('');
+
+  const handleTagToggle = (tag) => {
+    setTags(prevTags => {
+      if (prevTags.includes(tag)) {
+        return prevTags.filter(t => t !== tag);
+      } else {
+        return [...prevTags, tag];
+      }
+    });
+    setSearchText(''); // Clear the search text when a tag is added
+  };
+
+  const filteredTags = tagsList.filter(tag =>
+    tag.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -84,6 +102,33 @@ const EditPost = ({ visible, onClose, postId }) => {
             value={description}
             onChangeText={setDescription}
           />
+          <Text style={styles.label}>Search Tags</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Search tags..."
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+
+          {/* Scrollable box for filtered tags */}
+          {searchText && filteredTags.length > 0 && (
+            <View style={styles.tagSuggestions}>
+              <FlatList
+                data={filteredTags}
+                keyExtractor={item => item}
+                renderItem={({ item }) => (
+                  <View style={styles.tagItem}>
+                    <Text style={styles.tagText}>{item}</Text>
+                    <Button 
+                      title={tags.includes(item) ? "Remove" : "Add"} 
+                      onPress={() => handleTagToggle(item)}
+                      color={tags.includes(item) ? 'red' : 'green'}
+                    />
+                  </View>
+                )}
+              />
+            </View>
+          )}
           
           <Text style={styles.label}>Tags:</Text>
           <View style={styles.selectedTagsContainer}>
@@ -172,4 +217,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: 5,
   },
+  tagSuggestions: {
+    width: '100%',
+    maxHeight: 150, // Set a maximum height for the suggestions box
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingVertical: 5,
+    overflow: 'hidden', // Hide overflow to create a clean border
+  },
+  tagItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  tagText: {
+    flex: 1,
+  }
 });

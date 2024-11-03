@@ -4,18 +4,7 @@ import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 
-const tagsList = [
-  'Math', 'Economics', 'Reading', 'Calculus', 'Chemistry', 'History', 
-  'Philosophy', 'Computer Science', 'Biology', 'Data Science', 
-  'Statistics', 'Physics', 'Environmental Science', 'Information Technology', 
-  'Mechanical Engineering', 'Electrical Engineering', 'Material Engineering', 
-  'Music Theory', 'Theater & Arts', 'Cultural Studies', 'Undergraduate', 
-  'Graduate', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 
-  'Friday', 'Saturday', 'Sunday', 'Zoom', 'In-Person', 'Discord', 
-  'Slack', 'Discussion Group', 'Tutoring', 'Small group (2-4)', 
-  'Medium group (5-9)', 'Large Group (10+)', 'Knowledge sharing', 
-  'Extracurricular', 'Library', 'Intercollegiate Learning Pavilion'
-];
+import { tagsList } from '../../definitions/Definitions.js';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
