@@ -45,14 +45,17 @@ const Explore = () => {
   }, [navigation]);
 
   const renderPost = ({ item }) => (
-    <View style={styles.postContainer}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('GroupDetails', { group: item })}style={styles.postContainer}>
+      
       <Text style={styles.postTitle}>{item.Title}</Text>
       <Text style={styles.postLocation}>Location: {item.Location}</Text>
       <Text style={styles.postDescription}>{item.Description}</Text>
       <Text style={styles.postOwner}>Created by: {item.OwnerName}</Text>
       <Text style={styles.postDate}>Date: {item.CreatedAt.toDate().toLocaleString()}</Text>
-    </View>
+    </TouchableOpacity>
   );
+
 
   return (
     <View style={styles.container}>
