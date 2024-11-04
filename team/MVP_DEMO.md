@@ -2,10 +2,10 @@
 
 # Installation
 # Prerequisites
-TODO: List what a user needs to have installed before following your installation instructions (e.g. which version(s) of what framework(s), if any). The challenge is to eventually deploy a mobile app from your GitHub repo on the press of a button. For the near term, you can decide to make an off-line generated package (apk for Android or ipa for IOS) available as the latest binary distribution, but at some point during this class, there will be a requirement to generate this package from your current code base automatically.
+Users will need to install the Expo framework (51.0.28) before installing the project, along with the dependencies listed in the [Dependencies](#dependencies) section. In the future, binary distributions (.apk, .ipa) will be provided to directly install the app on Android and iOS devices.
 
 # Dependencies
-These are the following libraries used in the project.  
+These are the following dependencies used in the project.  
 * @react-native-async-storage/async-storage ^1.24.0  
   - A simple, unencrypted, asynchronous, persistent, key-value storage system for React Native.
 * @react-native-firebase/app ^21.2.0  
@@ -50,21 +50,47 @@ These are the following libraries used in the project.
   - Provides access to the file system on the device.
 
 # Installation Steps
-TODO: Describe the installation process (making sure you give complete instructions to get your project going from scratch). Instructions need to be such that a user can just copy/paste the commands to get things set up and running. Note that with the use of GitHub Actions, these instructions can eventually be fully automated (e.g. with actLinks to an external site., you can run GitHub Actions locally).
+1. Clone the repository: `git clone https://github.com/ucsb-cs184-f24/team08-StudyMeets.git`
+2. Navigate to the StudyMeets directory: `cd StudyMeets`
+3. Install dependencies: `npm i`, `npm install`
+4. Start the Expo project: `npx expo start`
+5. A QR code should pop up in the console; scan it with a mobile device and the application should start up. Alternatively, connect a device via USB or start up a mobile device emulator for the application.
+
+In the future, .apk, .ipa files will be provided for users to directly install the app.
+
 
 # Functionality
-
+* Sign up / Sign in
+  - Users can create an account with a username (optional), email, and password combination
+  - A verification email is sent to the submitted email when signing up to unlock the new account
+* Explore Study Groups
+  - Users can browse through a list of study groups to join
+  - Each study groups shows their name, location, creation date, and tags that describe what the study group is about
+  - Users can search for a study group by name
+* Create Study Group
+  - Users can create a study group by inputting a title, location, and description
+  - Users can also add tags to the study group that describe what the study group is about (ex: Math, Computer Science, Group Development)
+* My Study Groups
+  - Users can browse through the study groups they created
+  - Users can edit their own study groups and change their title, location, description, and tags
+* Profile
+  - Users can change their profile picture by submitting an image file
+  - Users can submit a request email to change their password
+  - Users can log out
+  - Displays the user's email and username
 
 # Known Problems
-TODO: Describe any known issues, bugs, odd behaviors or code smells. Provide steps to reproduce the problem and/or name a file or a function where the problem lives.
+- Some permission errors can occur when trying to sign in
+- Changing the profile picture repeatedly can cause a visual error
+- App goes blank when an internal error occurs, and needs to be force stopped
 
 # Contributing
 To contribute to the project, follow these steps:
 
-Create your feature branch: `git checkout -b my-new-feature`  
-Commit your changes: `git commit -am 'Add some feature'`  
-Push to the branch: `git push origin my-new-feature`  
-Submit a pull request :D
+1. Create your feature branch: `git checkout -b my-new-feature`  
+2. Commit your changes: `git commit -am 'Add some feature'`  
+3. Push to the branch: `git push origin my-new-feature`  
+4. Submit a pull request for the branch
 
 # License
-The app license can be found at LICENSE.md
+The app license can be found in LICENSE.md of this repository.
