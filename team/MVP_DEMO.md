@@ -2,6 +2,7 @@
 
 * MVP Video Link  
   - [[link]](https://youtu.be/LbpE6GTkf_A?feature=shared)
+  - Updated video:[[link]] (https://youtu.be/0CzQFbeV8fI)
 * Additional information
   - The following features are not implemented in the MVP release, but are planned to be added in the future:
     - Google OAuth sign in, link LinkedIn profile
