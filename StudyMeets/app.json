@@ -17,23 +17,16 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to select profile images."
-      },
-      "bundleIdentifier": "com.wchiba.StudyMeets"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.wchiba.StudyMeets"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "2146b7fe-9273-4827-a535-83dd3ce6a9bc"
-      }
     }
   }
 }
