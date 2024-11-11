@@ -1,8 +1,8 @@
 # Date of Retrospective: November 10, 2024
 
 * Led by: Garvin
-* Present: Garvin, David, Meron, Kai, Wesley, Tim
-* Absent: Luis
+* Present: Garvin, David, Meron, Kai, Wesley, Tim, Luis
+* Absent:
 
 ## Action item
 
