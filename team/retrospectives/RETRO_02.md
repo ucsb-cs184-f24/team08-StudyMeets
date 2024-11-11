@@ -1,22 +1,19 @@
-# Date of Retrospective: DD/MM/YY
+# Date of Retrospective: November 10, 2024
 
-* Led by: 
-* Present: 
-* Absent: 
+* Led by: Garvin
+* Present: Garvin, David, Meron, Kai, Wesley, Tim
+* Absent: Luis
 
 ## Action item
 
-* a goal: identify something the team wants to get better at
-* a change: identify one thing that the team will change about how it works together
-* a measurement: identify at least one way to measure whether the change helped the team achieve the goal, or move closer to it.
+* a goal: communicate more especially when people's work are dependent on others'
+* a change: be more active approving pull requests, properly making pull requests and using the kanban board
+* a measurement: see how long each pull request stays up (timestamps)
 
-## Optional
 
-* Record anything else you think the team might want to remember from this retro
 
 ## Retro Assessment
 
-* A brief description of what retro outline or process you used.
-* A brief assessment of how it went.
-* What advice would you give to the next person leading a retro
-  based on what you learned today?
+* goal, change, measurement method
+* discussion was productive and made sure everyone was on board with the same things
+* Make sure everyone can speak openly and hear all ideas from all team members
