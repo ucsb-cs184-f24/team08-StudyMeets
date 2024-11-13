@@ -6,11 +6,11 @@ Time/Wesley
 
 David/Kai
 
-Garvin/Luis/Meron
-
+Garvin -> Luis -> Meron
+(arrow means left is reviewing right)
 **Planned Contributions:**
 
-Garvin:
+Garvin: friend related stuff
 
 Luis:
 
