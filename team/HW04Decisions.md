@@ -23,4 +23,4 @@ Tim: unit testing
 
 Wesley:
 
-Kai:
+Kai: Documents stuff and process tracking
