@@ -9,25 +9,29 @@ const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Function to open the modal
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
+  const fetchPosts = () => {
+    setRefreshing(true);
+    const postsQuery = query(collection(firestore, 'studymeets'), orderBy('CreatedAt', 'desc'));
+
+    const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
+      const postsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(postsData);
+      setRefreshing(false);
+    });
+
+    return unsubscribe;
+  };
+
   useEffect(() => {
-    const fetchPosts = () => {
-      const postsQuery = query(collection(firestore, 'studymeets'), orderBy('CreatedAt', 'desc'));
-
-      const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
-        const postsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPosts(postsData);
-      });
-
-      return unsubscribe;
-    };
 
     const unsubscribe = fetchPosts();
 
@@ -54,6 +58,10 @@ const Explore = () => {
     </View>
   );
 
+  const handleRefresh = () =>{
+    fetchPosts();
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -61,6 +69,8 @@ const Explore = () => {
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
       />
       <CreateNewPost visible={isModalVisible} onClose={closeModal} />
     </View>
