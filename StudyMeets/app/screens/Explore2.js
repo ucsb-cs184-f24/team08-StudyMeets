@@ -67,32 +67,30 @@ const Explore = () => {
 
     return (
       <View style={styles.postContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('GroupDetails', { group: item })}style={styles.postContainer}>
-          <Text style={styles.postTitle}>{item.Title}</Text>
-          <Text style={styles.postLocation}>Location: {item.Location}</Text>
-          <Text style={styles.postDescription}>{item.Description}</Text>
-          <Text style={styles.postOwner}>Created by: {item.OwnerName}</Text>
-          <Text style={styles.postDate}>Date: {item.CreatedAt.toDate().toLocaleString()}</Text>
-        </TouchableOpacity>
+        <Text style={styles.postTitle}>{item.Title}</Text>
+        <Text style={styles.postLocation}>Location: {item.Location}</Text>
+        <Text style={styles.postDescription}>{item.Description}</Text>
+        <Text style={styles.postOwner}>Created by: {item.OwnerName}</Text>
+        <Text style={styles.postDate}>Date: {item.CreatedAt.toDate().toLocaleString()}</Text>
 
-      {item.Tags && item.Tags.length > 0 && (
-        <View style={styles.tagsContainer}>
-          <Text style={styles.tagsLabel}>Tags:</Text>
-          <View style={styles.tags}>
-            {item.Tags.slice(0, isExpanded ? item.Tags.length : 4).map((tag, index) => (
-              <Text key={index} style={styles.tag}>{tag}</Text>
-            ))}
-            {item.Tags.length > 4 && (
-              <TouchableOpacity onPress={() => toggleTags(item.id)} style={styles.arrowContainer}>
-                <Text style={styles.arrow}>{isExpanded ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-            )}
+        {item.Tags && item.Tags.length > 0 && (
+          <View style={styles.tagsContainer}>
+            <Text style={styles.tagsLabel}>Tags:</Text>
+            <View style={styles.tags}>
+              {item.Tags.slice(0, isExpanded ? item.Tags.length : 4).map((tag, index) => (
+                <Text key={index} style={styles.tag}>{tag}</Text>
+              ))}
+              {item.Tags.length > 4 && (
+                <TouchableOpacity onPress={() => toggleTags(item.id)} style={styles.arrowContainer}>
+                  <Text style={styles.arrow}>{isExpanded ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        </View>
-      )}
-    </View>
-  );
-};
+        )}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -103,7 +101,7 @@ const Explore = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-    </View>
+      </View>
       <FlatList
         data={filteredPosts}
         renderItem={renderPost}
