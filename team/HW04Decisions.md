@@ -21,6 +21,6 @@ David: component testing
 
 Tim: unit testing
 
-Wesley:
+Wesley:　Design/UX: implementing a dark theme for the app
 
 Kai: Documents stuff and process tracking
