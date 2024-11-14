@@ -11,7 +11,7 @@ Garvin -> Luis -> Meron
 
 **Planned Contributions:**
 
-Garvin: friend related stuff
+Garvin: friend/ user interaction related stuff
 
 Luis:
 
