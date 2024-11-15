@@ -15,7 +15,7 @@ Garvin: friend/ user interaction related stuff
 
 Luis: group information expanded when clicking on group on explore page
 
-Meron:
+Meron: Update sorting for groups, incorporate UCSB classes
 
 David: component testing
 
