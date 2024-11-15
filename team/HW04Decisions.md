@@ -13,7 +13,7 @@ Garvin -> Luis -> Meron
 
 Garvin: friend/ user interaction related stuff
 
-Luis:
+Luis: group information expanded when clicking on group on explore page
 
 Meron:
 
