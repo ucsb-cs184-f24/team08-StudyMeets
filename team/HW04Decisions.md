@@ -11,16 +11,16 @@ Garvin -> Luis -> Meron
 
 **Planned Contributions:**
 
-Garvin: friend related stuff
+Garvin: friend/ user interaction related stuff
 
-Luis:
+Luis: group information expanded when clicking on group on explore page
 
-Meron:
+Meron: Update sorting for groups, incorporate UCSB classes
 
 David: component testing
 
 Tim: unit testing
 
-Wesley:
+Wesley:　Design/UX: implementing a dark theme for the app
 
 Kai: Documents stuff and process tracking
