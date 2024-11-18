@@ -71,18 +71,22 @@ const Login = () => {
       {isSignUp ? (
         <>
           <Text style={styles.header}>Create Account</Text>
-          <TextInput
-            placeholder="Username"
-            value={username || ''}
-            onChangeText={setUsername}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Username"
+              value={username || ''}
+              onChangeText={setUsername}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -108,12 +112,14 @@ const Login = () => {
       ) : (
         <>
           <Text style={styles.header}>Sign In</Text>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -145,12 +151,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    backgroundColor: 'white', 
   },
   header: {
     fontSize: 24,
     marginBottom: 16,
   },
   input: {
+    flex: 1,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
