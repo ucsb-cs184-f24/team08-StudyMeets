@@ -56,7 +56,7 @@ const Explore = () => {
   );
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <View style={{ flex: 1, padding: 10, paddingTop: 30 }}>
       <PaperTextInput
         mode="outlined"
         placeholder="Search study groups..."
