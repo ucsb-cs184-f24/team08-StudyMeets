@@ -1,39 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Button } from 'react-native';
-import { firestore } from '../../firebase';
-import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
-import { auth } from '../../firebase';
-import EditPost from './EditPost'; 
+import { View, FlatList, Alert } from 'react-native';
+import { firestore, auth } from '../../firebase';
+import { collection, query, where, onSnapshot, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import EditPost from './EditPost';
+import GroupCard from './GroupCard';
+import { Text } from 'react-native-paper';
 
 const MyGroups = () => {
-  const [myPosts, setMyPosts] = useState([]);
+  const [createdPosts, setCreatedPosts] = useState([]);
+  const [joinedPosts, setJoinedPosts] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState(null);
 
   useEffect(() => {
-    const fetchMyPosts = () => {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        const postsQuery = query(
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return;
+
+    // Listener for created groups
+    const createdQuery = query(
+      collection(firestore, 'studymeets'),
+      where('OwnerEmail', '==', currentUser.email)
+    );
+    const unsubscribeCreated = onSnapshot(createdQuery, (snapshot) => {
+      const createdData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        isCreator: true,
+      }));
+      setCreatedPosts(createdData);
+    });
+
+    // Listener for joined groups
+    const userGroupsQuery = query(
+      collection(firestore, 'userGroups'),
+      where('userId', '==', currentUser.uid)
+    );
+    const unsubscribeJoined = onSnapshot(userGroupsQuery, async (userGroupsSnapshot) => {
+      const joinedGroupIds = userGroupsSnapshot.docs.map((doc) => doc.data().postId);
+
+      if (joinedGroupIds.length > 0) {
+        const joinedPostsQuery = query(
           collection(firestore, 'studymeets'),
-          where('OwnerEmail', '==', currentUser.email)
+          where('__name__', 'in', joinedGroupIds)
         );
-
-        const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
-          const postsData = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setMyPosts(postsData);
-        });
-
-        return unsubscribe;
+        const joinedPostsSnapshot = await getDocs(joinedPostsQuery);
+        const joinedData = joinedPostsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          isCreator: false,
+        }));
+        setJoinedPosts(joinedData);
+      } else {
+        setJoinedPosts([]);
       }
+    });
+
+    return () => {
+      unsubscribeCreated();
+      unsubscribeJoined();
     };
-
-    const unsubscribe = fetchMyPosts();
-
-    return () => unsubscribe && unsubscribe();
   }, []);
 
   const handleEditPost = (id) => {
@@ -51,36 +77,61 @@ const MyGroups = () => {
     }
   };
 
-  const closeEditModal = () => {
-    setIsEditModalVisible(false);
-    setSelectedPostId(null);
+  const handleLeaveGroup = async (postId) => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        const userGroupQuery = query(
+          collection(firestore, 'userGroups'),
+          where('userId', '==', currentUser.uid),
+          where('postId', '==', postId)
+        );
+        const userGroupSnapshot = await getDocs(userGroupQuery);
+        if (!userGroupSnapshot.empty) {
+          await deleteDoc(userGroupSnapshot.docs[0].ref);
+          Alert.alert('Left Group', 'You have successfully left the group.');
+        }
+      } catch (error) {
+        console.error('Error leaving group:', error);
+        Alert.alert('Error', 'Failed to leave the group.');
+      }
+    }
   };
 
-  const renderPost = ({ item }) => (
-    <View style={styles.postContainer}>
-      <Text style={styles.postTitle}>{item.Title}</Text>
-      <Text style={styles.postLocation}>Location: {item.Location}</Text>
-      <Text style={styles.postDescription}>{item.Description}</Text>
-      <View style={styles.buttonContainer}>
-        <Button title="Edit" onPress={() => handleEditPost(item.id)} />
-        <Button title="Delete" onPress={() => handleDeletePost(item.id)} color="red" />
-      </View>
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, padding: 10 }}>
+      <Text variant="titleLarge" style={{ marginVertical: 10 }}>Groups You Created</Text>
       <FlatList
-        data={myPosts}
-        renderItem={renderPost}
+        data={createdPosts}
+        renderItem={({ item }) => (
+          <GroupCard
+            item={item}
+            onPrimaryAction={handleEditPost}
+            primaryActionLabel="Edit"
+            secondaryActionLabel="Delete"
+            onSecondaryAction={handleDeletePost}
+          />
+        )}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
       />
-      
+
+      <Text variant="titleLarge" style={{ marginVertical: 10 }}>Groups You Joined</Text>
+      <FlatList
+        data={joinedPosts}
+        renderItem={({ item }) => (
+          <GroupCard
+            item={item}
+            onPrimaryAction={handleLeaveGroup}
+            primaryActionLabel="Leave Group"
+          />
+        )}
+        keyExtractor={(item) => item.id}
+      />
+
       {isEditModalVisible && (
         <EditPost 
           visible={isEditModalVisible} 
-          onClose={closeEditModal} 
+          onClose={() => setIsEditModalVisible(false)} 
           postId={selectedPostId} 
         />
       )}
@@ -89,37 +140,3 @@ const MyGroups = () => {
 };
 
 export default MyGroups;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  listContainer: {
-    padding: 20,
-  },
-  postContainer: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 10,
-  },
-  postTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  postLocation: {
-    fontSize: 16,
-    color: '#555',
-  },
-  postDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginVertical: 5,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-});
