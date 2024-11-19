@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore, auth } from '../../firebase';
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
 import CreateNewPost from './CreateNewPost';
 import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
 import GroupCard from './GroupCard'; // Import the shared component
+import { PlusCircle } from 'lucide-react-native';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -34,6 +35,16 @@ const Explore = () => {
     const unsubscribe = fetchPosts();
     return () => unsubscribe();
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={openModal} style={{ marginRight: 10 }}>
+          <PlusCircle size={40} color="grey" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   const handleJoinGroup = async (postId) => {
     const currentUser = auth.currentUser;
