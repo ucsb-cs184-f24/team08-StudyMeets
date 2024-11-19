@@ -187,13 +187,13 @@ export default CreateProfile;
 const styles = StyleSheet.create({
   scrollContainer: {
       flexGrow: 1,
-      backgroundColor: '#007BFF',
+      backgroundColor: '#FFFFFF',
   },
   container: {
     flex: 1,
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#007BFF',
+    backgroundColor: '#000000',
   },
   title: {
     marginTop: 20,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     borderWidth: 1,
-    borderColor: '##FFC107',
+    borderColor: '#000000',
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
