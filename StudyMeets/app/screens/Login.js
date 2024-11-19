@@ -137,8 +137,16 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <Button title="Sign In" onPress={handleSignIn} />
-              <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
+              <View style={styles.buttonContainer}>
+                <View style={styles.buttonWrapper}>
+                  <Button title="Sign In" onPress={handleSignIn} />
+                </View>
+              </View>
+              <View style={styles.buttonContainer}>
+                <View style={styles.buttonWrapper}>
+                  <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
+                </View>
+              </View>
             </>
           )}
         </>
@@ -180,6 +188,15 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     marginRight: 10, // Add space between the input and button
   },
+  createAccountButton: {
+    marginTop: 20
+  },
+  buttonContainer: {
+    marginBottom: 10
+  },
+  buttonWrapper: {
+    width: 300
+  }
 });
 
 export default Login;
