@@ -70,7 +70,7 @@ const Login = () => {
     <View style={styles.container}>
       {isSignUp ? (
         <>
-          <Text style={styles.header}>Create Account</Text>
+          <Text testID='HeaderCreateAccount' style={styles.header}>Create Account</Text>
           <TextInput
             placeholder="Username"
             value={username || ''}
@@ -100,14 +100,14 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <Button title="Create Account" onPress={handleCreateAccount} />
+              <Button testID='CreateAccountButton' title="Create Account" onPress={handleCreateAccount} />
               <Button title="Back to Sign In" onPress={() => setIsSignUp(false)} />
             </>
           )}
         </>
       ) : (
         <>
-          <Text style={styles.header}>Sign In</Text>
+          <Text testID='HeaderSignIn' style={styles.header}>Sign In</Text>
           <TextInput
             placeholder="Email"
             value={email}
@@ -131,7 +131,7 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <Button title="Sign In" onPress={handleSignIn} />
+              <Button testID='SignInButton' title="Sign In" onPress={handleSignIn} />
               <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
             </>
           )}
