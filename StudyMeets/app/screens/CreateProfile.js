@@ -39,7 +39,7 @@ const CreateProfile = () => {
             const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
             if (userDoc.exists()) {
               setUsername(userDoc.data()?.username || 'No username found');
-              setImageUri(userDoc.data()?.photoURL || 'https://via.placeholder.com/80');
+              setImageUri(userDoc.data()?.profileImageURL || 'https://via.placeholder.com/80');
             } else {
               console.log('No user document found!');
             }
@@ -78,7 +78,7 @@ const CreateProfile = () => {
             const userRef = doc(firestore, "users", currentUser.uid);
             await updateDoc(userRef, {
                 createdProfile: true,
-                profileImage: downloadURL,
+                profileImageURL: downloadURL,
                 university,
                 major,
                 year,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginBottom: 20,
   },
-  profileImage: {
+  profileImageURL: {
     width: 150,
     height: 150,
     borderRadius: 75,
