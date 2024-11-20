@@ -21,7 +21,9 @@ const CreateProfile = () => {
     const [bio, setBio] = useState(null);
     const [loading, setLoading] = useState(false);
     const [interests, setInterests] = useState([]);
-    // const placeholderImage = 'https://via.placeholder.com/80';
+    const [yearError, setYearError] = useState(null);
+    const defaultProfileImage = 'https://via.placeholder.com/80';
+    const [interestInput, setInterestInput] = useState('');
 
     useEffect(() => {
         setUser(currentUser);
@@ -59,21 +61,47 @@ const CreateProfile = () => {
         }
     };
 
+    const validateYear = (value) => {
+        const currentYear = new Date().getFullYear();
+        const year = parseInt(value);
+        
+        if (isNaN(year) || value.length !== 4) {
+            setYearError('Please enter a valid 4-digit year');
+            return false;
+        }
+        if (year < currentYear - 5 || year > currentYear + 5) {
+            setYearError(`Year must be between ${currentYear - 5} and ${currentYear + 5}`);
+            return false;
+        }
+        
+        setYearError(null);
+        return true;
+    };
+
     const handleCreateProfile = async () => {
-        if (!imageUri || !university || !major || !year || !bio || interests.length === 0) {
-            alert('Please fill in all fields');
+        if (!university || !major || !year) {
+            alert('Please fill in all required fields (university, major, and graduation year)');
+            return;
+        }
+
+        if (!validateYear(year)) {
+            alert(yearError);
             return;
         }
 
         setLoading(true);
         try {
-            const storage = getStorage();
-            const imageRef = ref(storage, `profile-images/${currentUser.uid}`);
+            let downloadURL = defaultProfileImage;
             
-            const response = await fetch(imageUri);
-            const blob = await response.blob();
-            await uploadBytes(imageRef, blob);
-            const downloadURL = await getDownloadURL(imageRef);
+            if (imageUri && imageUri !== defaultProfileImage) {
+                const storage = getStorage();
+                const imageRef = ref(storage, `profile-images/${currentUser.uid}`);
+                
+                const response = await fetch(imageUri);
+                const blob = await response.blob();
+                await uploadBytes(imageRef, blob);
+                downloadURL = await getDownloadURL(imageRef);
+            }
 
             const userRef = doc(firestore, "users", currentUser.uid);
             await updateDoc(userRef, {
@@ -82,8 +110,8 @@ const CreateProfile = () => {
                 university,
                 major,
                 year,
-                bio,
-                interests,
+                bio: bio || '',
+                interests: interests || [],
             });
             
             navigation.navigate('Main');
@@ -98,6 +126,7 @@ const CreateProfile = () => {
     const addInterest = (interest) => {
         if (interest.trim() && !interests.includes(interest.trim())) {
             setInterests([...interests, interest.trim()]);
+            setInterestInput('');
         }
     };
 
@@ -111,16 +140,16 @@ const CreateProfile = () => {
                 <Text style={styles.title}>Create Profile</Text>
 
                 <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-                    {imageUri ? (
-                        <Image 
-                            source={{ uri: imageUri }} 
-                            style={styles.imagePlaceholder}
-                        />
-                    ) : (
-                        <View style={styles.imagePlaceholder}>
+                    <View style={styles.imagePlaceholder}>
+                        {imageUri ? (
+                            <Image 
+                                source={{ uri: imageUri }} 
+                                style={styles.profileImage}
+                            />
+                        ) : (
                             <MaterialIcons name="camera-alt" size={65} color="#757575" />
-                        </View>
-                    )}
+                        )}
+                    </View>
                 </TouchableOpacity>
 
                 <TextInput
@@ -138,12 +167,19 @@ const CreateProfile = () => {
                 />
 
                 <TextInput
-                    style={styles.input}
-                    placeholder="Grad Year"
+                    style={[styles.input, yearError && styles.inputError]}
+                    placeholder="Graduation Year (YYYY)"
                     value={year}
-                    onChangeText={setYear}
+                    onChangeText={(text) => {
+                        setYear(text);
+                        if (text.length === 4) {
+                            validateYear(text);
+                        }
+                    }}
                     keyboardType="numeric"
+                    maxLength={4}
                 />
+                {yearError && <Text style={styles.errorText}>{yearError}</Text>}
 
                 <TextInput
                     style={[styles.input, styles.bioInput]}
@@ -157,7 +193,9 @@ const CreateProfile = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Add interests"
-                        onSubmitEditing={(e) => addInterest(e.nativeEvent.text)}
+                        value={interestInput}
+                        onChangeText={setInterestInput}
+                        onSubmitEditing={(e) => addInterest(interestInput)}
                     />
                     <View style={styles.interestTags}>
                         {interests.map((interest, index) => (
@@ -193,7 +231,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   title: {
     marginTop: 20,
@@ -203,12 +241,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginBottom: 20,
   },
-  profileImageURL: {
+  profileImage: {
     width: 150,
     height: 150,
     borderRadius: 75,
-    borderWidth: 5,
-    borderColor: '#000000',
   },
   imagePlaceholder: {
     width: 150,
@@ -250,5 +286,20 @@ const styles = StyleSheet.create({
   },
   interestText: {
     fontSize: 14,
+  },
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+  },
+  optionalText: {
+    position: 'absolute',
+    bottom: -20,
+    color: '#666',
+    fontSize: 12,
   },
 });
