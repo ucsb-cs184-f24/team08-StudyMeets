@@ -172,13 +172,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 12,
     paddingLeft: 8,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
   passwordInput: {
     flex: 1,
@@ -192,10 +191,10 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   buttonContainer: {
-    marginBottom: 10
+    marginBottom: 10,
   },
   buttonWrapper: {
-    width: 300
+    width: 330
   }
 });
 
