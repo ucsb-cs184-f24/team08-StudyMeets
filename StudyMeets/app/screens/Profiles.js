@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Alert } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Alert, Switch, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Avatar, Button as PaperButton, Text, Divider } from 'react-native-paper';
 import { auth } from '../../firebase';
@@ -8,6 +8,7 @@ import { firestore } from '../../firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import { signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const Profiles = () => {
   const [user, setUser] = useState(null);
@@ -18,6 +19,8 @@ const Profiles = () => {
   const storage = getStorage();
 
   const placeholderImage = 'https://via.placeholder.com/80';
+
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -125,9 +128,13 @@ const Profiles = () => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+    <View style={[{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: theme.colors.background }]}>
       {user ? (
         <>
+        <View style={styles.switchContainer}>
+          <Text style={[styles.text, { color: theme.colors.text }]}>Dark Mode</Text>
+          <Switch value={isDarkTheme} onValueChange={toggleTheme} style={styles.switch}/>
+        </View>
           {/* Increase Avatar Image size */}
           <Avatar.Image
             size={120} // Larger size for the profile image
@@ -152,14 +159,14 @@ const Profiles = () => {
           <PaperButton
             mode="contained"
             onPress={handleChangePassword}
-            style={{ marginVertical: 5 }}
+            style={{ marginVertical: 5, color: theme.colors.primary }}
           >
             Change Password
           </PaperButton>
           <PaperButton
-            mode="outlined"
+            mode="contained"
             onPress={handleLogout}
-            style={{ marginVertical: 5 }}
+            style={{ marginVertical: 5, color: theme.colors.secondary }}
           >
             Logout
           </PaperButton>
@@ -170,5 +177,28 @@ const Profiles = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    top: 20,
+    left: 20,
+    position: 'absolute'
+  },
+  switch: {
+    marginBottom: 12
+  }
+});
 
 export default Profiles;
