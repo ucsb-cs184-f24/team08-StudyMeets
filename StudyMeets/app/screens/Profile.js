@@ -9,7 +9,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import { signOut, sendPasswordResetEmail } from 'firebase/auth';
 
-const Profiles = () => {
+const Profile = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
   const [imageUri, setImageUri] = useState(null);
@@ -125,7 +125,7 @@ const Profiles = () => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, paddingTop: 30 }}>
       {user ? (
         <>
           {/* Increase Avatar Image size */}
@@ -171,4 +171,4 @@ const Profiles = () => {
   );
 };
 
-export default Profiles;
+export default Profile;
