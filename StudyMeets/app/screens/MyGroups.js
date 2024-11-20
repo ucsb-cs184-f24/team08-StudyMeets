@@ -99,7 +99,7 @@ const MyGroups = () => {
   };
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <View style={{ flex: 1, padding: 10, paddingTop: 30 }}>
       <Text variant="titleLarge" style={{ marginVertical: 10 }}>Groups You Created</Text>
       <FlatList
         data={createdPosts}
