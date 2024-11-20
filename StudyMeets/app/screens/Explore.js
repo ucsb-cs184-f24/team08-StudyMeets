@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, Alert, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore, auth } from '../../firebase';
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
 import CreateNewPost from './CreateNewPost';
 import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupCard from './GroupCard'; // Import the shared component
 
 const Explore = () => {
@@ -56,13 +57,13 @@ const Explore = () => {
   );
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <SafeAreaView style={styles.container}>
       <PaperTextInput
         mode="outlined"
         placeholder="Search study groups..."
         value={searchQuery}
         onChangeText={setSearchQuery}
-        style={{ marginBottom: 10 }}
+        style={styles.searchBar}
       />
       <FlatList
         data={filteredPosts}
@@ -76,8 +77,18 @@ const Explore = () => {
         keyExtractor={(item) => item.id}
       />
       <CreateNewPost visible={isModalVisible} onClose={closeModal} />
-    </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff', // Optional background color
+  },
+  searchBar: {
+    margin: 10,
+  },
+});
 
 export default Explore;
