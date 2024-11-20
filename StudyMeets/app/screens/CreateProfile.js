@@ -23,6 +23,7 @@ const CreateProfile = () => {
     const [interests, setInterests] = useState([]);
     const [yearError, setYearError] = useState(null);
     const defaultProfileImage = 'https://via.placeholder.com/80';
+    const [interestInput, setInterestInput] = useState('');
 
     useEffect(() => {
         setUser(currentUser);
