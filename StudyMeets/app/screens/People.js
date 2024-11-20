@@ -47,7 +47,7 @@ const People = () => {
       try {
         const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
         if (userDoc.exists()) {
-          setImageUri(userDoc.data()?.photoURL || placeholderImage);
+          setImageUri(userDoc.data()?.profileImageURL || placeholderImage);
         } else {
           console.log('No user document found!');
         }

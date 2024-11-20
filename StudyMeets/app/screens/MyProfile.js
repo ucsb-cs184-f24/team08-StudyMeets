@@ -80,7 +80,7 @@ const MyProfile = ({ imageUri, setImageUri }) => {
       await uploadBytes(imageRef, blob);
 
       const downloadURL = await getDownloadURL(imageRef);
-      await updateDoc(doc(firestore, 'users', user.uid), { photoURL: downloadURL });
+      await updateDoc(doc(firestore, 'users', user.uid), { profileImageURL: downloadURL });
       setImageUri(downloadURL);
 
       blob.close();
