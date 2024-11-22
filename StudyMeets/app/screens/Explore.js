@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { firestore, auth } from '../../firebase';
+import { firestore } from '../../firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { TextInput as PaperTextInput, Button } from 'react-native-paper';
 import GroupCard from './GroupCard';
@@ -14,15 +14,29 @@ const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagsList, setTagsList] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
+
+  const API_KEY = 'APIKEY'; // Put API key here DO NOT PUSH TO GITHUB
+  const BASE_URL = 'https://api.ucsb.edu/academics/curriculums/v3';
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
-  const openFilterModal = () => setFilterModalVisible(true);
+
+  const openFilterModal = () => {
+    fetchSubjectsAndClasses();
+    setFilterModalVisible(true);
+  };
+
   const closeFilterModal = () => setFilterModalVisible(false);
 
   useEffect(() => {
     const fetchPosts = () => {
-      const postsQuery = query(collection(firestore, 'studymeets'), orderBy('CreatedAt', 'desc'));
+      const postsQuery = query(
+        collection(firestore, 'studymeets'),
+        orderBy('CreatedAt', 'desc')
+      );
 
       const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
         const postsData = snapshot.docs.map((doc) => ({
@@ -31,7 +45,6 @@ const Explore = () => {
         }));
         setPosts(postsData);
 
-        // Extract unique tags from all posts
         const allTags = new Set();
         postsData.forEach((post) => {
           if (post.Tags && Array.isArray(post.Tags)) {
@@ -48,6 +61,59 @@ const Explore = () => {
     return () => unsubscribe();
   }, []);
 
+  const fetchSubjectsAndClasses = async () => {
+    setIsLoadingSubjects(true);
+    try {
+      const subjectResponse = await fetch(
+        `${BASE_URL}/classes/search?quarter=20244&pageSize=500`,
+        {
+          headers: {
+            'ucsb-api-key': API_KEY,
+          },
+        }
+      );
+  
+      if (!subjectResponse.ok)
+        throw new Error(`Error fetching subjects: ${subjectResponse.status}`);
+  
+      const subjectData = await subjectResponse.json();
+      const uniqueSubjects = new Set(subjectData.classes.map((cls) => cls.subjectArea.trim()));
+      setSubjects(Array.from(uniqueSubjects));
+  
+      const classPromises = Array.from(uniqueSubjects).map(async (subject) => {
+        try {
+          const classResponse = await fetch(
+            `${BASE_URL}/classes/search?quarter=20244&subjectCode=${encodeURIComponent(subject)}&pageSize=500`,
+            {
+              headers: {
+                'ucsb-api-key': API_KEY,
+              },
+            }
+          );
+  
+          if (!classResponse.ok) {
+            console.warn(`Skipping subject ${subject} due to fetch error.`);
+            return [];
+          }
+  
+          const classData = await classResponse.json();
+          return classData.classes.map((cls) => cls.courseId);
+        } catch (error) {
+          console.error(`Error fetching classes for ${subject}:`, error.message);
+          return [];
+        }
+      });
+  
+      const classResults = await Promise.all(classPromises);
+      setClasses(classResults.flat());
+    } catch (error) {
+      console.error('Failed to fetch subjects and classes:', error.message);
+    } finally {
+      setIsLoadingSubjects(false);
+    }
+  };
+  
+
   const toggleTagSelection = (tag) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter((t) => t !== tag));
@@ -63,7 +129,8 @@ const Explore = () => {
   const filteredPosts = posts.filter((post) => {
     const matchesSearch = post.Title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTags =
-      selectedTags.length === 0 || selectedTags.some((tag) => post.Tags?.includes(tag));
+      selectedTags.length === 0 ||
+      selectedTags.some((tag) => post.Tags?.includes(tag));
     return matchesSearch && matchesTags;
   });
 
@@ -77,7 +144,11 @@ const Explore = () => {
           onChangeText={setSearchQuery}
           style={styles.searchBar}
         />
-        <Button mode="contained" onPress={openFilterModal} style={styles.filterButton}>
+        <Button
+          mode="contained"
+          onPress={openFilterModal}
+          style={styles.filterButton}
+        >
           Filter
         </Button>
       </View>
@@ -105,26 +176,50 @@ const Explore = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter by Tags</Text>
+
             <FlatList
-              data={tagsList}
-              keyExtractor={(tag) => tag}
-              renderItem={({ item: tag }) => (
-                <TouchableOpacity
-                  style={[
-                    styles.tagContainer,
-                    selectedTags.includes(tag) && styles.tagSelected,
-                  ]}
-                  onPress={() => toggleTagSelection(tag)}
-                >
-                  <Text style={styles.tagText}>{tag}</Text>
-                </TouchableOpacity>
+              data={[
+                { type: 'Tags', data: tagsList },
+                { type: 'Subjects', data: subjects },
+                { type: 'Classes', data: classes },
+              ]}
+              keyExtractor={(item, index) => `${item.type}-${index}`}
+              renderItem={({ item }) => (
+                <>
+                  <Text style={styles.subheading}>{item.type}</Text>
+                  <FlatList
+                    data={item.data}
+                    keyExtractor={(tag) => tag}
+                    renderItem={({ item: tag }) => (
+                      <TouchableOpacity
+                        style={[
+                          styles.tagContainer,
+                          selectedTags.includes(tag) && styles.tagSelected,
+                        ]}
+                        onPress={() => toggleTagSelection(tag)}
+                      >
+                        <Text style={styles.tagText}>{tag}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </>
               )}
+              contentContainerStyle={styles.scrollableContent}
             />
+
             <View style={styles.buttonRow}>
-              <Button mode="contained" onPress={clearFilters} style={styles.clearButton}>
+              <Button
+                mode="contained"
+                onPress={clearFilters}
+                style={styles.clearButton}
+              >
                 Clear Filters
               </Button>
-              <Button mode="contained" onPress={closeFilterModal} style={styles.applyButton}>
+              <Button
+                mode="contained"
+                onPress={closeFilterModal}
+                style={styles.applyButton}
+              >
                 Apply
               </Button>
             </View>
@@ -157,6 +252,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -165,15 +266,22 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
+    maxHeight: '80%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
   },
-  modalTitle: {
-    fontSize: 18,
+  scrollableModal: {
+    maxHeight: '70%',
+  },
+  subheading: {
+    fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 20,
     marginBottom: 10,
+    alignSelf: 'flex-start',
+    color: '#674fa3',
   },
   tagContainer: {
     paddingVertical: 10,
