@@ -5,11 +5,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from './app/screens/Login';
 import Explore from './app/screens/Explore';
-import Profile from './app/screens/Profile';
+import SettingsNavigation from './app/screens/SettingsNavigation';
 import MyGroups from './app/screens/MyGroups';
 import People from './app/screens/People';
 import CreateProfile from './app/screens/CreateProfile';
-import { UserCircle2, Search, Users, LayoutGrid } from 'lucide-react-native';
+import { Settings, Search, Users, LayoutGrid } from 'lucide-react-native';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -20,7 +20,7 @@ const MainTabs = () => {
       <Tab.Screen name="Explore" component={Explore} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Search color={color} size={size} />}} />
       <Tab.Screen name="MyGroups" component={MyGroups} options={{headerShown: false, tabBarIcon: ({ color, size }) => <LayoutGrid color={color} size={size} />}}/>
       <Tab.Screen name="People" component={People} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}/>
-      <Tab.Screen name="Profile" component={Profile} options={{headerShown: false, tabBarIcon: ({ color, size }) => <UserCircle2 color={color} size={size} /> }} />
+      <Tab.Screen name="Settings" component={SettingsNavigation} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Settings color={color} size={size} /> }} />
     </Tab.Navigator>
   );
 };
