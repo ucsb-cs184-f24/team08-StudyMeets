@@ -130,6 +130,7 @@ const Profiles = () => {
         <>
           {/* Increase Avatar Image size */}
           <Avatar.Image
+            testID='profilePic'
             size={120} // Larger size for the profile image
             source={{ uri: imageUri || placeholderImage }}
           />

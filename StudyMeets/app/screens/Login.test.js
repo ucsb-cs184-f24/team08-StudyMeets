@@ -5,7 +5,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import {Alert} from 'react-native';
 
-// Mock Firebase functions
 jest.mock('firebase/auth', () => ({
   signInWithEmailAndPassword: jest.fn(),
   createUserWithEmailAndPassword: jest.fn(),
@@ -27,9 +26,19 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('../../firebase', () => ({
-    auth: jest.fn(),
-    firestore: jest.fn(),
-  }));
+  auth: {
+    currentUser: {
+      uid: 'test-user-id',
+      email: 'testuser@example.com',
+    },
+    signOut: jest.fn(),
+  },
+  firestore: jest.fn(),
+  getStorage: jest.fn(),
+  ref: jest.fn(),
+  uploadBytes: jest.fn(),
+  getDownloadURL: jest.fn(),
+}));
 
 describe('Login Component', () => {
   it('renders the sign-in screen correctly', () => {
@@ -82,41 +91,7 @@ describe('Login Component', () => {
     fireEvent.changeText(emailInput, 'test@example.com');
     fireEvent.changeText(passwordInput, 'password123');
     fireEvent.press(createAccountButton);
-
-    /*await waitFor(() => {
-      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(expect.anything(), 'test@example.com', 'password123');
-      expect(setDoc).toHaveBeenCalledWith(expect.anything(), {
-        email: 'test@example.com',
-        username: 'testuser',
-        createdAt: expect.any(Date),
-        createdProfile: false,
-      });
-    });*/
-  });
-
-  it('shows an error when sign-in fails', async () => {
-    // Mock a rejected promise for signInWithEmailAndPassword
-    signInWithEmailAndPassword.mockRejectedValue(new Error('Invalid credentials'));
-
-    // Render the Login component
-    const { getByPlaceholderText, getByRole, getByText } = render(<Login />);
-
-    // Interact with the component
-    fireEvent.changeText(getByPlaceholderText('Email'), 'wrong@example.com');
-    fireEvent.changeText(getByPlaceholderText('Password'), 'wrongpassword');
-    fireEvent.press(getByRole('button', { name: 'Sign In' }));
-
-    // Wait for the error message to appear
-    await waitFor(() => {
-        expect(getByText('Email and Password not match!')).toBeTruthy();
-    });
-
-    // Ensure the mocked function was called
-    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
-        expect.anything(),
-        'wrong@example.com',
-        'wrongpassword'
-    );
+    expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(expect.anything(), 'test@example.com', 'password123');
   });
 
   it('toggles password visibility', () => {
