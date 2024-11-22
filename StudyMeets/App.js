@@ -15,7 +15,7 @@ const Tab = createBottomTabNavigator();
 
 const MainTabs = () => {
   return (
-    <Tab.Navigator initialRouteName='Account'>
+    <Tab.Navigator initialRouteName='Explore'>
       <Tab.Screen name="Explore" component={Explore} options={{title: 'Explore', tabBarIcon: ({ color, size }) => <Search color={color} size={size} />}} />
       <Tab.Screen name="MyGroups" component={MyGroups} options={{title: 'MyGroups', tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}/>
       <Tab.Screen name="Profiles" component={Profiles} options={{ title: 'Profiles', tabBarIcon: ({ color, size }) => <User color={color} size={size} /> }} />
