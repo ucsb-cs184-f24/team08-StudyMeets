@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Alert } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Alert, Switch, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Avatar, Button as PaperButton, Text, Divider } from 'react-native-paper';
 import { auth } from '../../firebase';
@@ -8,6 +8,7 @@ import { firestore } from '../../firebase';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import { signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const MyProfile = ({ imageUri, setImageUri }) => {
   const [user, setUser] = useState(null);
@@ -15,6 +16,7 @@ const MyProfile = ({ imageUri, setImageUri }) => {
   const [uploading, setUploading] = useState(false);
   const navigation = useNavigation();
   const storage = getStorage();
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   const placeholderImage = 'https://via.placeholder.com/80';
 
@@ -113,7 +115,14 @@ const MyProfile = ({ imageUri, setImageUri }) => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, paddingTop: 30 }}>
+    <View style={{ 
+      flex: 1, 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      padding: 20, 
+      paddingTop: 30, 
+      backgroundColor: theme.colors.background 
+    }}>
       {user ? (
         <>
           <Avatar.Image
@@ -139,14 +148,18 @@ const MyProfile = ({ imageUri, setImageUri }) => {
           <PaperButton
             mode="contained"
             onPress={handleChangePassword}
+            buttonColor={theme.colors.primary}
             style={{ marginVertical: 5 }}
+            textColor={theme.colors.text}
           >
             Change Password
           </PaperButton>
           <PaperButton
-            mode="outlined"
+            mode="contained"
             onPress={handleLogout}
+            buttonColor={theme.colors.secondary}
             style={{ marginVertical: 5 }}
+            textColor={theme.colors.text}
           >
             Logout
           </PaperButton>
@@ -157,5 +170,18 @@ const MyProfile = ({ imageUri, setImageUri }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 16,
+  }
+});
 
 export default MyProfile;

@@ -1,20 +1,24 @@
-import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import React, { useContext } from "react";
+import { View, TouchableOpacity, Text, StyleSheet, Switch } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Mail } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemeContext } from "../../theme/ThemeContext";
 
 const SettingsTab = () => {
     
     const navigation = useNavigation();
+    const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container}
+          backgroundColor={theme.colors.background}
+        >
 
-          <Text style={styles.title}>Settings</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>Settings</Text>
 
           <TouchableOpacity style={styles.mailIcon} onPress={() => navigation.navigate('Notifications')}>
-            <Mail size={40} color="black" />
+            <Mail size={40} color={theme.colors.icon} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -34,6 +38,11 @@ const SettingsTab = () => {
             onPress={() => navigation.navigate('General Settings')}>
             <Text style={styles.settingText}>General Settings</Text>
           </TouchableOpacity>
+
+          <View style={styles.switchContainer}>
+            <Text style={[styles.settingText, { color: theme.colors.text }]}>Dark Mode</Text>
+            <Switch value={isDarkTheme} onValueChange={toggleTheme} style={styles.switch}/>
+          </View>
 
         </SafeAreaView>
     );
@@ -70,5 +79,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#000',
     },
+    switchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    switch: {
+      marginBottom: 0
+    }
 });
     

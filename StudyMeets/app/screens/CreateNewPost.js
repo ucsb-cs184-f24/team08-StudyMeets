@@ -79,36 +79,40 @@ const CreateNewPost = ({ visible, onClose }) => {
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer} backgroundColor = {theme.colors.background} >
-        <View style={styles.modalContent}>
-          <Text style={styles.formTitle}>Create New StudyMeet</Text>
-          <Text style={styles.label}>Title</Text>
+      <View style={styles.modalContainer}>
+        <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+        <Text style={[styles.formTitle, { color: theme.colors.text }]}>Create New StudyMeet</Text>
+        <Text style={[styles.label, { color: theme.colors.text }]}>Title</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: theme.colors.text }]}
             placeholder="Title"
             value={title}
             onChangeText={setTitle}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
-          <Text style={styles.label}>Location</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Location</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: theme.colors.text }]}
             placeholder="Location"
             value={location}
             onChangeText={setLocation}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
-          <Text style={styles.label}>Description</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
           <TextInput
-            style={styles.largeInput}
+            style={[styles.largeInput, { color: theme.colors.text }]}
             value={description}
             onChangeText={setDescription}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
           
-          <Text style={styles.label}>Search Tags</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Search Tags</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: theme.colors.text }]}
             placeholder="Search tags..."
             value={searchText}
             onChangeText={setSearchText}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
 
           {/* Scrollable box for filtered tags */}
@@ -119,7 +123,7 @@ const CreateNewPost = ({ visible, onClose }) => {
                 keyExtractor={item => item}
                 renderItem={({ item }) => (
                   <View style={styles.tagItem}>
-                    <Text style={styles.tagText}>{item}</Text>
+                    <Text style={[styles.tagText, { color: theme.colors.text }]}>{item}</Text>
                     <Button 
                       title={selectedTags.includes(item) ? "Remove" : "Add"} 
                       onPress={() => handleTagToggle(item)}
@@ -132,7 +136,7 @@ const CreateNewPost = ({ visible, onClose }) => {
           )}
 
           {/* Display selected tags with remove option */}
-          <Text style={styles.label}>Selected Tags:</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Selected Tags:</Text>
           <View style={styles.selectedTagsContainer}>
             {selectedTags.map(tag => (
               <View key={tag} style={styles.selectedTagContainer}>

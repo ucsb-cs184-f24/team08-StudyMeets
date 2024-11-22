@@ -14,7 +14,8 @@ export const lightTheme = {
     borderColor: '#ccc',
     cardBackgroundColor: '#fbf0ff',
     warning: '#dc3545',
-    placeholderTextColor: '#8c8c8c'
+    placeholderTextColor: '#8c8c8c',
+    icon: '#000000'
   },
 };
 
@@ -30,8 +31,9 @@ export const darkTheme = {
     text: '#ffffff',
     secondary: '#75b8ff',
     borderColor: '#555',
-    cardBackgroundColor: '#7d7880',
+    cardBackgroundColor: '#474547',
     warning: '#dc3545',
-    placeholderTextColor: '#f5f5f5'
+    placeholderTextColor: '#a6a6a6',
+    icon: '#ffffff'
   },
 };
