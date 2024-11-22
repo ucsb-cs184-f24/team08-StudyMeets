@@ -117,7 +117,8 @@ const MyProfile = ({ imageUri, setImageUri }) => {
       {user ? (
         <>
           <Avatar.Image
-            size={120}
+            testID='profilePic'
+            size={120} // Larger size for the profile image
             source={{ uri: imageUri || placeholderImage }}
           />
           <PaperButton
