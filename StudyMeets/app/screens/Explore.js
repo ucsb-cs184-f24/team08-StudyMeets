@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import { View, FlatList, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore, auth } from '../../firebase';
@@ -6,6 +6,7 @@ import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firesto
 import CreateNewPost from './CreateNewPost';
 import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
 import GroupCard from './GroupCard'; // Import the shared component
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -15,6 +16,8 @@ const Explore = () => {
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
+
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetchPosts = () => {
@@ -56,7 +59,7 @@ const Explore = () => {
   );
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <View style={{ flex: 1, padding: 10, backgroundColor: theme.colors.background }}>
       <PaperTextInput
         mode="outlined"
         placeholder="Search study groups..."

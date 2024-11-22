@@ -159,14 +159,18 @@ const Profiles = () => {
           <PaperButton
             mode="contained"
             onPress={handleChangePassword}
-            style={{ marginVertical: 5, color: theme.colors.primary }}
+            buttonColor={theme.colors.primary}
+            style={{ marginVertical: 5 }}
+            textColor={theme.colors.text}
           >
             Change Password
           </PaperButton>
           <PaperButton
             mode="contained"
             onPress={handleLogout}
-            style={{ marginVertical: 5, color: theme.colors.secondary }}
+            buttonColor={theme.colors.secondary}
+            style={{ marginVertical: 5 }}
+            textColor={theme.colors.text}
           >
             Logout
           </PaperButton>

@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, Alert } from 'react-native';
 import { firestore, auth } from '../../firebase';
 import { collection, query, where, onSnapshot, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import EditPost from './EditPost';
 import GroupCard from './GroupCard';
 import { Text } from 'react-native-paper';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const MyGroups = () => {
   const [createdPosts, setCreatedPosts] = useState([]);
   const [joinedPosts, setJoinedPosts] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState(null);
+
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const currentUser = auth.currentUser;
@@ -99,7 +102,7 @@ const MyGroups = () => {
   };
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
+    <View style={{ flex: 1, padding: 10, backgroundColor: theme.colors.background }}>
       <Text variant="titleLarge" style={{ marginVertical: 10 }}>Groups You Created</Text>
       <FlatList
         data={createdPosts}

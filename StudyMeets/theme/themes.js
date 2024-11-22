@@ -5,13 +5,16 @@ export const lightTheme = {
   colors: {
     ...MD3LightTheme.colors,
     primary: '#007BFF',
-    tabBar: '#ededed',
+    tabBar: '#f0f0f0',
     tabBarActive: '#007BFF',
     tabBarInactive: '#7d868e',
     background: '#ffffff',
     text: '#000000',
-    secondary: '#6c757d',
+    secondary: '#75b8ff',
     borderColor: '#ccc',
+    cardBackgroundColor: '#fbf0ff',
+    warning: '#dc3545',
+    placeholderTextColor: '#8c8c8c'
   },
 };
 
@@ -25,7 +28,10 @@ export const darkTheme = {
     tabBarInactive: '#7d868e',
     background: '#333333',
     text: '#ffffff',
-    secondary: '#6c757d',
+    secondary: '#75b8ff',
     borderColor: '#555',
+    cardBackgroundColor: '#7d7880',
+    warning: '#dc3545',
+    placeholderTextColor: '#f5f5f5'
   },
 };

@@ -1,11 +1,14 @@
 // GroupCard.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { Card, Button, Text, Divider } from 'react-native-paper';
 import { View } from 'react-native';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const GroupCard = ({ item, onPrimaryAction, primaryActionLabel, secondaryActionLabel, onSecondaryAction }) => {
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
+
   return (
-    <Card style={{ marginVertical: 10 }}>
+    <Card style={{ marginVertical: 10, backgroundColor: theme.colors.cardBackgroundColor }}>
       <Card.Title title={item.Title} subtitle={`Location: ${item.Location}`} />
       <Card.Content>
         <Text variant="bodyMedium" style={{ marginBottom: 5 }}>{item.Description}</Text>
@@ -18,9 +21,19 @@ const GroupCard = ({ item, onPrimaryAction, primaryActionLabel, secondaryActionL
       </Card.Content>
       <Divider />
       <Card.Actions>
-        <Button onPress={() => onPrimaryAction(item.id)}>{primaryActionLabel}</Button>
+        <Button 
+          onPress={() => onPrimaryAction(item.id)}
+          buttonColor = {theme.colors.primary}
+          textColor = {theme.colors.text}
+        >
+            {primaryActionLabel}
+        </Button>
         {secondaryActionLabel && onSecondaryAction && (
-          <Button onPress={() => onSecondaryAction(item.id)} textColor="red">
+          <Button 
+            onPress={() => onSecondaryAction(item.id)} 
+            buttonColor = {theme.colors.warning}
+            textColor = {theme.colors.text}
+          >
             {secondaryActionLabel}
           </Button>
         )}

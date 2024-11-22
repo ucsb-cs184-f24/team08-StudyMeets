@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 import { tagsList } from '../../definitions/Definitions.js';
 
@@ -13,6 +14,7 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   const handleTagToggle = (tag) => {
     setSelectedTags(prevTags => {
@@ -77,7 +79,7 @@ const CreateNewPost = ({ visible, onClose }) => {
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer}>
+      <View style={styles.modalContainer} backgroundColor = {theme.colors.background} >
         <View style={styles.modalContent}>
           <Text style={styles.formTitle}>Create New StudyMeet</Text>
           <Text style={styles.label}>Title</Text>

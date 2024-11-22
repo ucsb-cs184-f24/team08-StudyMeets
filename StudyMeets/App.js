@@ -22,8 +22,8 @@ const MainTabs = () => {
     <Tab.Navigator
       initialRouteName='Profiles'
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.secondary,
+        tabBarActiveTintColor: theme.colors.tabBarActive,
+        tabBarInactiveTintColor: theme.colors.tabBarInactive,
         tabBarStyle: { backgroundColor: theme.colors.tabBar },
         headerStyle: { backgroundColor: theme.colors.tabBar },
         headerTintColor: theme.colors.text

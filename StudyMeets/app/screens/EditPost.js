@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { View, Text, TextInput, Button, Modal, StyleSheet, Alert, FlatList, TouchableOpacity } from 'react-native';
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { tagsList } from '../../definitions/Definitions.js';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
@@ -11,6 +12,7 @@ const EditPost = ({ visible, onClose, postId }) => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState([]); // New state for tags
   const [searchText, setSearchText] = useState('');
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   const handleTagToggle = (tag) => {
     setTags(prevTags => {
@@ -79,35 +81,39 @@ const EditPost = ({ visible, onClose, postId }) => {
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.formTitle}>Edit StudyMeet</Text>
-          <Text style={styles.label}>Title</Text>
+      <View style={[styles.modalContainer]}>
+        <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+          <Text style={[styles.formTitle, { color: theme.colors.text }]}>Edit StudyMeet</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Title</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: theme.colors.text }]}
             placeholder="Title"
             value={title}
             onChangeText={setTitle}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
-          <Text style={styles.label}>Location</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Location</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: theme.colors.text }]}
             placeholder="Location"
             value={location}
             onChangeText={setLocation}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
-          <Text style={styles.label}>Description</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
           <TextInput
-            style={styles.largeInput}
+            style={[styles.largeInput, { color: theme.colors.text }]}
             value={description}
             onChangeText={setDescription}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
-          <Text style={styles.label}>Search Tags</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Search Tags</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: theme.colors.text }]}
             placeholder="Search tags..."
             value={searchText}
             onChangeText={setSearchText}
+            placeholderTextColor={theme.colors.placeholderTextColor}
           />
 
           {/* Scrollable box for filtered tags */}
@@ -118,7 +124,7 @@ const EditPost = ({ visible, onClose, postId }) => {
                 keyExtractor={item => item}
                 renderItem={({ item }) => (
                   <View style={styles.tagItem}>
-                    <Text style={styles.tagText}>{item}</Text>
+                    <Text style={[styles.tagText, { color: theme.colors.text }]}>{item}</Text>
                     <Button 
                       title={tags.includes(item) ? "Remove" : "Add"} 
                       onPress={() => handleTagToggle(item)}
@@ -130,7 +136,7 @@ const EditPost = ({ visible, onClose, postId }) => {
             </View>
           )}
           
-          <Text style={styles.label}>Tags:</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Tags:</Text>
           <View style={styles.selectedTagsContainer}>
             {tags.map(tag => (
               <View key={tag} style={styles.selectedTagContainer}>
