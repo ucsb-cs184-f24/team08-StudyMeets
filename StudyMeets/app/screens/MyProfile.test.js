@@ -1,7 +1,7 @@
 import { getDownloadURL, uploadBytes } from 'firebase/storage';
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import Profiles from './Profiles';
+import Profiles from './MyProfile';
 import { NavigationContainer } from '@react-navigation/native';
 import { sendPasswordResetEmail, signOut } from 'firebase/auth';
 //import { useNavigation } from '@react-navigation/native';
