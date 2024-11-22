@@ -71,18 +71,22 @@ const Login = () => {
       {isSignUp ? (
         <>
           <Text testID='HeaderCreateAccount' style={styles.header}>Create Account</Text>
-          <TextInput
-            placeholder="Username"
-            value={username || ''}
-            onChangeText={setUsername}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Username"
+              value={username || ''}
+              onChangeText={setUsername}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -108,12 +112,14 @@ const Login = () => {
       ) : (
         <>
           <Text testID='HeaderSignIn' style={styles.header}>Sign In</Text>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
