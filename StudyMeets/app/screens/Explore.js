@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore, auth } from '../../firebase';
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
 import CreateNewPost from './CreateNewPost';
 import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
-import GroupCard from './GroupCard'; // Import the shared component
 import { ThemeContext } from '../../theme/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import GroupCard from './GroupCard';
+import { PlusCircle } from 'lucide-react-native';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -59,13 +61,13 @@ const Explore = () => {
   );
 
   return (
-    <View style={{ flex: 1, padding: 10, backgroundColor: theme.colors.background }}>
+    <SafeAreaView style={{ flex: 1, padding: 10, backgroundColor: theme.colors.background }}>
       <PaperTextInput
         mode="outlined"
         placeholder="Search study groups..."
         value={searchQuery}
         onChangeText={setSearchQuery}
-        style={{ marginBottom: 10 }}
+        style={styles.searchBar}
       />
       <FlatList
         data={filteredPosts}
@@ -79,8 +81,42 @@ const Explore = () => {
         keyExtractor={(item) => item.id}
       />
       <CreateNewPost visible={isModalVisible} onClose={closeModal} />
-    </View>
+      <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
+        <View style={styles.circleBackground}>
+          <PlusCircle size={40} color="white" />
+        </View>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  searchBar: {
+    margin: 10,
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,        
+    left: 20,        
+    zIndex: 10,        
+  },
+  circleBackground: {
+    width: 50,         
+    height: 50,        
+    borderRadius: 25,   
+    backgroundColor: '#6495ed', 
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,       
+  },
+});
 
 export default Explore;

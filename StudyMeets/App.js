@@ -5,10 +5,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from './app/screens/Login';
 import Explore from './app/screens/Explore';
-import Profiles from './app/screens/Profiles';
+import SettingsNavigation from './app/screens/SettingsNavigation';
 import MyGroups from './app/screens/MyGroups';
+import People from './app/screens/People';
 import CreateProfile from './app/screens/CreateProfile';
-import { User, Search, Users } from 'lucide-react-native';
+import { Settings, Search, Users, LayoutGrid } from 'lucide-react-native';
 import { ThemeProvider, ThemeContext } from './theme/ThemeContext';
 import { Provider as PaperProvider } from 'react-native-paper';
 
@@ -20,7 +21,7 @@ const MainTabs = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName='Profiles'
+      initialRouteName='People'
       screenOptions={{
         tabBarActiveTintColor: theme.colors.tabBarActive,
         tabBarInactiveTintColor: theme.colors.tabBarInactive,
@@ -45,13 +46,15 @@ const MainTabs = () => {
           tabBarIcon: ({ color, size }) => <Users color={color} size={size} />,
         }}
       />
-      <Tab.Screen
-        name="Profiles"
-        component={Profiles}
-        options={{
-          title: 'Profiles',
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
-        }}
+      <Tab.Screen 
+        name="People" 
+        component={People} 
+        options={{headerShown: false, tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}
+      />
+      <Tab.Screen 
+        name="Settings" 
+        component={SettingsNavigation} 
+        options={{headerShown: false, tabBarIcon: ({ color, size }) => <Settings color={color} size={size} /> }} 
       />
     </Tab.Navigator>
   );
