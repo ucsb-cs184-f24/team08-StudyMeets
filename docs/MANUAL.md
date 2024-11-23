@@ -16,10 +16,15 @@ UCSB students interested in joining study groups that match their location and i
 
 
 ## User Authentication  ##
-
+### Create Account ###
+### Sign In ###
 
 ## Functions  ##
-
+### Create New StudyMeet ###
+### Search StudyMeet ###
+### Join StudyMeet ###
+### Delete StudyMeet ###
+### Leave StudyMeet ###
 
 ## Profile Management  ##
 
