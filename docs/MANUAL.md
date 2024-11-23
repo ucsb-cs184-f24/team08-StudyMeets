@@ -9,17 +9,25 @@ UCSB students looking to create local study or social groups. These users are ve
 ### Group Joiners: ###
 UCSB students interested in joining study groups that match their location and interests. These users can search for groups and join them after reviewing details such as tags.
 
-## Sections ##
-### Introduction  ###
-### Installation  ###
-### Getting Started  ###
-### Explore Study Groups  ###
-### Create Study Groups  ###
-### Profile Management  ###
-### Known Issues  ###
-### Troubleshooting  ###
+## Introduction  ##
 
 
+## Installation  ##
+
+
+## User Authentication  ##
+
+
+## Functions  ##
+
+
+## Profile Management  ##
+
+
+## Known Issues  ##
+- Some permission errors can occur when trying to sign in
+- Changing the profile picture repeatedly can cause a visual error
+- App goes blank when an internal error occurs, and needs to be force stopped
 
 
 MANUAL doc Link:
