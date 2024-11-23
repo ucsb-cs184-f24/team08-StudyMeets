@@ -17,32 +17,32 @@ UCSB students interested in joining study groups that match their location and i
 
 ## User Authentication  ##
 ### Create Account ###
-![image](https://github.com/user-attachments/assets/d3f6fa31-8683-4b6c-a87c-6c04c089692e)
+<img src="https://github.com/user-attachments/assets/d3f6fa31-8683-4b6c-a87c-6c04c089692e" alt="Create Account" width="500"/>
 
 
 ### Sign In ###
-![image](https://github.com/user-attachments/assets/57020f7e-d918-4d6a-8a6d-5da31fe2ee71)
+<img src="https://github.com/user-attachments/assets/57020f7e-d918-4d6a-8a6d-5da31fe2ee71" alt="Sign In" width="500"/>
 
 ## Functions  ##
 ### Create New StudyMeet ###
-![image](https://github.com/user-attachments/assets/fac0afb6-4dbd-4a20-8d69-91e358318109)
+<img src="https://github.com/user-attachments/assets/fac0afb6-4dbd-4a20-8d69-91e358318109" alt="Create New StudyMeet" width="500"/>
 
 ### Explore StudyMeets ###
-![image](https://github.com/user-attachments/assets/1f7e58a5-626d-4ef2-806e-60152736c67d)
+<img src="https://github.com/user-attachments/assets/1f7e58a5-626d-4ef2-806e-60152736c67d" alt="Explore StudyMeets" width="500"/>
 
 ### Search StudyMeet ###
-![image](https://github.com/user-attachments/assets/194b1a3a-b4fe-42fb-a3e1-ccde9d0b840b)
+<img src="https://github.com/user-attachments/assets/194b1a3a-b4fe-42fb-a3e1-ccde9d0b840b" alt="Search StudyMeet" width="500"/>
 
 ### Join StudyMeet ###
-![image](https://github.com/user-attachments/assets/c332eca2-eb81-4bf1-b37b-fb1e226a54da)
+<img src="https://github.com/user-attachments/assets/c332eca2-eb81-4bf1-b37b-fb1e226a54da" alt="Join StudyMeet" width="500"/>
 
 ### Delete StudyMeet ###
-![image](https://github.com/user-attachments/assets/e8b8d9c7-49e2-4075-980e-6a2c9d7bf5c2)
-![image](https://github.com/user-attachments/assets/17767d85-582c-4a34-a1fc-bec89a49a519)
+<img src="https://github.com/user-attachments/assets/e8b8d9c7-49e2-4075-980e-6a2c9d7bf5c2" alt="Delete StudyMeet" width="500"/>
+<img src="https://github.com/user-attachments/assets/17767d85-582c-4a34-a1fc-bec89a49a519" alt="Delete StudyMeet Step 2" width="500"/>
 
 ### Leave StudyMeet ###
-![image](https://github.com/user-attachments/assets/4ef35afd-c3af-4bb4-a0c6-7795d9d5e353)
-![image](https://github.com/user-attachments/assets/73e979c0-f31e-4f39-ae83-05a8568e61b2)
+<img src="https://github.com/user-attachments/assets/4ef35afd-c3af-4bb4-a0c6-7795d9d5e353" alt="Leave StudyMeet" width="500"/>
+<img src="https://github.com/user-attachments/assets/73e979c0-f31e-4f39-ae83-05a8568e61b2" alt="Leave StudyMeet Step 2" width="500"/>
 
 ## Profile Management  ##
 
