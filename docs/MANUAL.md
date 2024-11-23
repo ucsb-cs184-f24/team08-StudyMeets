@@ -24,11 +24,13 @@ In the future, .apk, .ipa files will be provided for users to directly install t
 ## User Authentication  ##
 ### Create Account ###
 If the user does not have an account yet, he needs to register an account, enter the email address, username, and password to register the account. After registration, the corresponding email address will receive a verification email. Click the verification email, then log in and you can enter the App.
+
 <img src="https://github.com/user-attachments/assets/d3f6fa31-8683-4b6c-a87c-6c04c089692e" alt="Create Account" width="500"/>
 
 
 ### Sign In ###
 If the user already has an account, he can directly enter the email address and password to enter the App.
+
 <img src="https://github.com/user-attachments/assets/57020f7e-d918-4d6a-8a6d-5da31fe2ee71" alt="Sign In" width="500"/>
 
 ## Functions  ##
