@@ -7,7 +7,7 @@ import Login from './app/screens/Login';
 import Explore from './app/screens/Explore';
 import SettingsNavigation from './app/screens/SettingsNavigation';
 import MyGroups from './app/screens/MyGroups';
-import People from './app/screens/People';
+import PeopleNavigation from './app/screens/PeopleNavigation';
 import CreateProfile from './app/screens/CreateProfile';
 import { Settings, Search, Users, LayoutGrid } from 'lucide-react-native';
 
@@ -19,7 +19,7 @@ const MainTabs = () => {
     <Tab.Navigator>
       <Tab.Screen name="Explore" component={Explore} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Search color={color} size={size} />}} />
       <Tab.Screen name="MyGroups" component={MyGroups} options={{headerShown: false, tabBarIcon: ({ color, size }) => <LayoutGrid color={color} size={size} />}}/>
-      <Tab.Screen name="People" component={People} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}/>
+      <Tab.Screen name="People" component={PeopleNavigation} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}/>
       <Tab.Screen name="Settings" component={SettingsNavigation} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Settings color={color} size={size} /> }} />
     </Tab.Navigator>
   );
