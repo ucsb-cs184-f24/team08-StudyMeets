@@ -13,14 +13,22 @@ UCSB students interested in joining study groups that match their location and i
 
 
 ## Installation  ##
+1. Clone the repository: `git clone https://github.com/ucsb-cs184-f24/team08-StudyMeets.git`
+2. Navigate to the StudyMeets directory: `cd StudyMeets`
+3. Install dependencies: `npm i`, `npm install`
+4. Start the Expo project: `npx expo start`
+5. A QR code should pop up in the console; scan it with a mobile device and the application should start up. Alternatively, connect a device via USB or start up a mobile device emulator for the application.
 
+In the future, .apk, .ipa files will be provided for users to directly install the app.
 
 ## User Authentication  ##
 ### Create Account ###
+If the user does not have an account yet, he needs to register an account, enter the email address, username, and password to register the account. After registration, the corresponding email address will receive a verification email. Click the verification email, then log in and you can enter the App.
 <img src="https://github.com/user-attachments/assets/d3f6fa31-8683-4b6c-a87c-6c04c089692e" alt="Create Account" width="500"/>
 
 
 ### Sign In ###
+If the user already has an account, he can directly enter the email address and password to enter the App.
 <img src="https://github.com/user-attachments/assets/57020f7e-d918-4d6a-8a6d-5da31fe2ee71" alt="Sign In" width="500"/>
 
 ## Functions  ##
