@@ -15,7 +15,7 @@ User Roles:
 * Meron Tesfandrias: MeronDT
 * Wesley Chiba: jeffsmithepic
 * David Joyner: djoyneruscb
-* Kai Han: Kai-Hann
+* Kai Hann: Kai-Hann
 
 ==========================================================
 

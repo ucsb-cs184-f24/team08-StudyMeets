@@ -5,7 +5,6 @@ import { collection, query, where, onSnapshot, getDocs, doc, deleteDoc } from 'f
 import EditPost from './EditPost';
 import GroupCard from './GroupCard';
 import { Text } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MyGroups = () => {
   const [createdPosts, setCreatedPosts] = useState([]);
@@ -100,7 +99,7 @@ const MyGroups = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 10, paddingTop: 30 }}>
+    <View style={{ flex: 1, padding: 10 }}>
       <Text variant="titleLarge" style={{ marginVertical: 10 }}>Groups You Created</Text>
       <FlatList
         data={createdPosts}
@@ -136,7 +135,7 @@ const MyGroups = () => {
           postId={selectedPostId} 
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

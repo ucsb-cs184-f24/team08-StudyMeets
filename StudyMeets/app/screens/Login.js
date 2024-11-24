@@ -71,22 +71,18 @@ const Login = () => {
       {isSignUp ? (
         <>
           <Text style={styles.header}>Create Account</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Username"
-              value={username || ''}
-              onChangeText={setUsername}
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.input}
-            />
-          </View>
+          <TextInput
+            placeholder="Username"
+            value={username || ''}
+            onChangeText={setUsername}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -112,14 +108,12 @@ const Login = () => {
       ) : (
         <>
           <Text style={styles.header}>Sign In</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.input}
-            />
-          </View>
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -137,16 +131,8 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <View style={styles.buttonContainer}>
-                <View style={styles.buttonWrapper}>
-                  <Button title="Sign In" onPress={handleSignIn} />
-                </View>
-              </View>
-              <View style={styles.buttonContainer}>
-                <View style={styles.buttonWrapper}>
-                  <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
-                </View>
-              </View>
+              <Button title="Sign In" onPress={handleSignIn} />
+              <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
             </>
           )}
         </>
@@ -159,25 +145,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    backgroundColor: 'white', 
   },
   header: {
     fontSize: 24,
     marginBottom: 16,
   },
   input: {
-    flex: 1,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
+    marginBottom: 12,
     paddingLeft: 8,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   passwordInput: {
     flex: 1,
@@ -187,15 +170,6 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     marginRight: 10, // Add space between the input and button
   },
-  createAccountButton: {
-    marginTop: 20
-  },
-  buttonContainer: {
-    marginBottom: 10,
-  },
-  buttonWrapper: {
-    width: 330
-  }
 });
 
 export default Login;

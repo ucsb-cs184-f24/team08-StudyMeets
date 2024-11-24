@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { firestore, auth } from '../../firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { TextInput as PaperTextInput, Button } from 'react-native-paper';
 import GroupCard from './GroupCard';
 import CreateNewPost from './CreateNewPost';
-import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import GroupCard from './GroupCard';
-import { PlusCircle } from 'lucide-react-native';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -99,10 +95,7 @@ const Explore = () => {
       />
 
       <CreateNewPost visible={isModalVisible} onClose={closeModal} />
-      <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
-        <View style={styles.circleBackground}>
-          <PlusCircle size={40} color="white" />
-    
+
       <Modal
         visible={isFilterModalVisible}
         animationType="slide"
@@ -137,41 +130,10 @@ const Explore = () => {
             </View>
           </View>
         </View>
-      </TouchableOpacity>
-    </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  searchBar: {
-    margin: 10,
-  },
-  floatingButton: {
-    position: 'absolute',
-    bottom: 20,        
-    left: 20,        
-    zIndex: 10,        
-  },
-  circleBackground: {
-    width: 50,         
-    height: 50,        
-    borderRadius: 25,   
-    backgroundColor: '#6495ed', 
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,       
-  },
-});
 
 const styles = StyleSheet.create({
   container: {

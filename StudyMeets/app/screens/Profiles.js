@@ -9,9 +9,10 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import { signOut, sendPasswordResetEmail } from 'firebase/auth';
 
-const MyProfile = ({ imageUri, setImageUri }) => {
+const Profiles = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
+  const [imageUri, setImageUri] = useState(null);
   const [uploading, setUploading] = useState(false);
   const navigation = useNavigation();
   const storage = getStorage();
@@ -33,6 +34,7 @@ const MyProfile = ({ imageUri, setImageUri }) => {
         const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
         if (userDoc.exists()) {
           setUsername(userDoc.data()?.username || 'No username found');
+          setImageUri(userDoc.data()?.photoURL || placeholderImage);
         } else {
           console.log('No user document found!');
         }
@@ -58,9 +60,14 @@ const MyProfile = ({ imageUri, setImageUri }) => {
       quality: 1,
     });
 
+    console.log("ImagePicker result:", result);
+
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedUri = result.assets[0].uri;
+      console.log("Selected Image URI:", selectedUri);
       await uploadImage(selectedUri);
+    } else {
+      console.log("Image selection was canceled or failed");
     }
   };
 
@@ -71,6 +78,8 @@ const MyProfile = ({ imageUri, setImageUri }) => {
     try {
       if (!user) throw new Error("User not authenticated.");
 
+      console.log("Uploading image from URI:", uri);
+
       const response = await fetch(uri);
       if (!response.ok) throw new Error("Failed to fetch image from URI");
 
@@ -80,7 +89,7 @@ const MyProfile = ({ imageUri, setImageUri }) => {
       await uploadBytes(imageRef, blob);
 
       const downloadURL = await getDownloadURL(imageRef);
-      await updateDoc(doc(firestore, 'users', user.uid), { profileImageURL: downloadURL });
+      await updateDoc(doc(firestore, 'users', user.uid), { photoURL: downloadURL });
       setImageUri(downloadURL);
 
       blob.close();
@@ -98,8 +107,11 @@ const MyProfile = ({ imageUri, setImageUri }) => {
         await sendPasswordResetEmail(auth, user.email);
         Alert.alert("Password Reset", "Check your email for password reset instructions.");
       } catch (error) {
+        console.error("Error sending password reset email:", error);
         Alert.alert("Error", "Unable to send password reset email.");
       }
+    } else {
+      Alert.alert("Error", "No user email found.");
     }
   };
 
@@ -113,19 +125,21 @@ const MyProfile = ({ imageUri, setImageUri }) => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, paddingTop: 30 }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
       {user ? (
         <>
+          {/* Increase Avatar Image size */}
           <Avatar.Image
-            size={120}
+            size={120} // Larger size for the profile image
             source={{ uri: imageUri || placeholderImage }}
           />
           <PaperButton
             mode="text"
             onPress={pickImage}
             loading={uploading}
+            style={{ marginVertical: 10, width: 200, paddingVertical: 0 }} // Smaller button size
+            
             disabled={uploading}
-            style={{ marginVertical: 10, width: 200 }}
           >
             {uploading ? "Uploading..." : "Change Profile Image"}
           </PaperButton>
@@ -157,4 +171,4 @@ const MyProfile = ({ imageUri, setImageUri }) => {
   );
 };
 
-export default MyProfile;
+export default Profiles;

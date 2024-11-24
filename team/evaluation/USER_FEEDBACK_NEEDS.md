@@ -1,4 +1,1 @@
-# Feedback ideas:
-- It would help if we got feedback on what parts of the UI are easy to use and intuitive from a user perspective. For example, whether the UI to create a group is intuitive, or whether the UI for searching for a study group a user might want is easy to use.
-- It would help if we got feedback on whether our app has enough profile customization options. We currently support the ability to set a profile picture and username along with information relating to your school such as grad year and major, but having user feedback relating to whether more customization options would be appreciated.
-- It would help if we got user satisfaction feedback on the group chatting feature we are planning to implement in the project, and whether it has enough features to be usable as a study discussion chat room.
+
