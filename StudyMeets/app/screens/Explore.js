@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { firestore } from '../../firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { TextInput as PaperTextInput, Button } from 'react-native-paper';
 import GroupCard from './GroupCard';
 import CreateNewPost from './CreateNewPost';
+import { PlusCircle } from 'lucide-react-native';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -18,7 +19,7 @@ const Explore = () => {
   const [classes, setClasses] = useState([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
 
-  const API_KEY = 'APIKEY'; // Put API key here DO NOT PUSH TO GITHUB
+  const API_KEY = '4N67Suy0261kD1AWSVvBOP0jdMS7E1PY'; // Put API key here DO NOT PUSH TO GITHUB
   const BASE_URL = 'https://api.ucsb.edu/academics/curriculums/v3';
 
   const openModal = () => setModalVisible(true);
@@ -72,14 +73,14 @@ const Explore = () => {
           },
         }
       );
-  
+
       if (!subjectResponse.ok)
         throw new Error(`Error fetching subjects: ${subjectResponse.status}`);
-  
+
       const subjectData = await subjectResponse.json();
       const uniqueSubjects = new Set(subjectData.classes.map((cls) => cls.subjectArea.trim()));
       setSubjects(Array.from(uniqueSubjects));
-  
+
       const classPromises = Array.from(uniqueSubjects).map(async (subject) => {
         try {
           const classResponse = await fetch(
@@ -90,12 +91,12 @@ const Explore = () => {
               },
             }
           );
-  
+
           if (!classResponse.ok) {
             console.warn(`Skipping subject ${subject} due to fetch error.`);
             return [];
           }
-  
+
           const classData = await classResponse.json();
           return classData.classes.map((cls) => cls.courseId);
         } catch (error) {
@@ -103,7 +104,7 @@ const Explore = () => {
           return [];
         }
       });
-  
+
       const classResults = await Promise.all(classPromises);
       setClasses(classResults.flat());
     } catch (error) {
@@ -112,7 +113,6 @@ const Explore = () => {
       setIsLoadingSubjects(false);
     }
   };
-  
 
   const toggleTagSelection = (tag) => {
     if (selectedTags.includes(tag)) {
@@ -135,7 +135,7 @@ const Explore = () => {
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
         <PaperTextInput
           mode="outlined"
@@ -166,6 +166,12 @@ const Explore = () => {
       />
 
       <CreateNewPost visible={isModalVisible} onClose={closeModal} />
+
+      <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
+        <View style={styles.circleBackground}>
+          <PlusCircle size={40} color="white" />
+        </View>
+      </TouchableOpacity>
 
       <Modal
         visible={isFilterModalVisible}
@@ -239,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   searchBar: {
     flex: 1,
@@ -251,12 +257,21 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 10, // Ensure the filter button is above other elements
   },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    zIndex: 10,
+  },
+  circleBackground: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#674fa3',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalOverlay: {
     flex: 1,
@@ -266,21 +281,15 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    maxHeight: '80%',
+    maxHeight: '85%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
-  },
-  scrollableModal: {
-    maxHeight: '70%',
   },
   subheading: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 20,
-    marginBottom: 10,
-    alignSelf: 'flex-start',
     color: '#674fa3',
   },
   tagContainer: {
@@ -288,21 +297,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 5,
     marginVertical: 5,
-    backgroundColor: '#f5f5f5',
-    width: '100%',
+    backgroundColor: '#ededed',
     alignItems: 'center',
   },
   tagSelected: {
     backgroundColor: '#674fa3',
   },
-  tagText: {
-    color: '#000',
-    fontWeight: 'bold',
-  },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
     marginTop: 20,
   },
   clearButton: {
