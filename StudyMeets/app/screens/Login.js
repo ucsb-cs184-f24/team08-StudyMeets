@@ -70,19 +70,23 @@ const Login = () => {
     <View style={styles.container}>
       {isSignUp ? (
         <>
-          <Text style={styles.header}>Create Account</Text>
-          <TextInput
-            placeholder="Username"
-            value={username || ''}
-            onChangeText={setUsername}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
+          <Text testID='HeaderCreateAccount' style={styles.header}>Create Account</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Username"
+              value={username || ''}
+              onChangeText={setUsername}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -100,20 +104,22 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <Button title="Create Account" onPress={handleCreateAccount} />
+              <Button testID='CreateAccountButton' title="Create Account" onPress={handleCreateAccount} />
               <Button title="Back to Sign In" onPress={() => setIsSignUp(false)} />
             </>
           )}
         </>
       ) : (
         <>
-          <Text style={styles.header}>Sign In</Text>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
+          <Text testID='HeaderSignIn' style={styles.header}>Sign In</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Password"
@@ -131,8 +137,16 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <Button title="Sign In" onPress={handleSignIn} />
-              <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
+              <View style={styles.buttonContainer}>
+                <View style={styles.buttonWrapper}>
+                  <Button testID='SignInButton' title="Sign In" onPress={handleSignIn} />
+                </View>
+              </View>
+              <View style={styles.buttonContainer}>
+                <View style={styles.buttonWrapper}>
+                  <Button title="Back to Create Account" onPress={() => setIsSignUp(true)} />
+                </View>
+              </View>
             </>
           )}
         </>
@@ -144,13 +158,17 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
   },
   header: {
     fontSize: 24,
     marginBottom: 16,
   },
   input: {
+    flex: 1,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
