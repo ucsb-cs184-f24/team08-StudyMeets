@@ -19,7 +19,7 @@ const Explore = () => {
   const [classes, setClasses] = useState([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
 
-  const API_KEY = '4N67Suy0261kD1AWSVvBOP0jdMS7E1PY'; // Put API key here DO NOT PUSH TO GITHUB
+  const API_KEY = 'APIKEY'; // Put API key here DO NOT PUSH TO GITHUB
   const BASE_URL = 'https://api.ucsb.edu/academics/curriculums/v3';
 
   const openModal = () => setModalVisible(true);
