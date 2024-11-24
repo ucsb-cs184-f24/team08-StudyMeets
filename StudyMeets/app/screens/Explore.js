@@ -286,6 +286,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
   },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+    alignSelf: 'center',
+    color: '#674fa3',
+  },
   subheading: {
     fontSize: 16,
     fontWeight: 'bold',
