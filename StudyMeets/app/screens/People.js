@@ -7,26 +7,11 @@ import { firestore } from '../../firebase';
 import { Avatar } from 'react-native-paper';
 import MyProfile from './MyProfile';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Friends from './Friends';
+import Following from './Following';
+import Followers from './Followers';
 
 const Tab = createMaterialTopTabNavigator();
-
-const FriendsScreen = () => (
-  <View style={styles.tabContainer}>
-    <Text>Friends</Text>
-  </View>
-);
-
-const FollowingScreen = () => (
-  <View style={styles.tabContainer}>
-    <Text>Following</Text>
-  </View>
-);
-
-const FollowersScreen = () => (
-  <View style={styles.tabContainer}>
-    <Text>Followers</Text>
-  </View>
-);
 
 const People = () => {
   const [user, setUser] = useState(null);
@@ -70,9 +55,9 @@ const People = () => {
           tabBarItemStyle: { margin: 0, padding: 5 }
         }}
       >
-        <Tab.Screen name="Friends" component={FriendsScreen} options={{ headerShown: false }} />
-        <Tab.Screen name="Following" component={FollowingScreen} options={{ headerShown: false }} />
-        <Tab.Screen name="Followers" component={FollowersScreen} options={{ headerShown: false }} />
+        <Tab.Screen name="Friends" component={Friends} options={{ headerShown: false }} />
+        <Tab.Screen name="Following" component={Following} options={{ headerShown: false }} />
+        <Tab.Screen name="Followers" component={Followers} options={{ headerShown: false }} />
         <Tab.Screen
           name="MyProfile"
           options={{ headerShown: false, tabBarLabel: () => null,
