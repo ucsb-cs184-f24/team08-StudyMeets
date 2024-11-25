@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { Alert, View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Avatar, Button } from 'react-native-paper';
 import { doc, getDoc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { firestore, auth } from '../../firebase';
 
 const Profile = ({ route }) => {
-  const { user } = route.params; // User B's data
+  const { user } = route.params;
   const [isFollowing, setIsFollowing] = useState(false);
-  const currentUserId = auth.currentUser.uid; // User A's ID
+  const currentUserId = auth.currentUser.uid;
 
-  // Check if User A is already following User B
   useEffect(() => {
     const checkFollowingStatus = async () => {
       try {
@@ -37,7 +36,7 @@ const Profile = ({ route }) => {
       const userDoc = await getDoc(userDocRef);
   
       if (userDoc.exists()) {
-        return userDoc.data().username; // Access the 'username' field
+        return userDoc.data().username;
       } else {
         console.error('User document does not exist.');
         return null;
@@ -57,7 +56,6 @@ const Profile = ({ route }) => {
       }
   
       if (isFollowing) {
-        // Unfollow: Remove entries
         const followingRef = doc(
           firestore,
           'users',
@@ -77,8 +75,10 @@ const Profile = ({ route }) => {
           deleteDoc(followingRef),
           deleteDoc(followersRef),
         ]);
+
+        Alert.alert(`You Are No Longer Following ${user.username}`);
+
       } else {
-        // Follow: Add entries
         const followingRef = doc(
           firestore,
           'users',
@@ -98,6 +98,8 @@ const Profile = ({ route }) => {
           setDoc(followingRef, { username: user.username }),
           setDoc(followersRef, { username: currentUsername }),
         ]);
+
+        Alert.alert(`Following ${user.username}`);
       }
   
       setIsFollowing(!isFollowing);

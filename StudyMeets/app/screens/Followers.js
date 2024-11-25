@@ -15,12 +15,11 @@ const Followers = () => {
 
   const fetchFollowersUsers = async () => {
     try {
-      setLoading(true); // Show loading indicator while fetching data
+      setLoading(true);
       const followersCollection = collection(firestore, 'users', currentUserId, 'followers');
       const followersSnapshot = await getDocs(followersCollection);
       const followersIds = followersSnapshot.docs.map(doc => doc.id);
 
-      // Fetch user details for each followers user
       const usersCollection = collection(firestore, 'users');
       const usersSnapshot = await getDocs(usersCollection);
       const usersList = usersSnapshot.docs
@@ -34,7 +33,7 @@ const Followers = () => {
     } catch (error) {
       console.error('Error fetching followers users:', error);
     } finally {
-      setLoading(false); // Hide loading indicator after fetching data
+      setLoading(false);
     }
   };
 
@@ -43,9 +42,9 @@ const Followers = () => {
   }, []);
 
   const onRefresh = async () => {
-    setRefreshing(true); // Show the refresh indicator
+    setRefreshing(true);
     await fetchFollowersUsers();
-    setRefreshing(false); // Hide the refresh indicator
+    setRefreshing(false);
   };
 
   if (loading) {
