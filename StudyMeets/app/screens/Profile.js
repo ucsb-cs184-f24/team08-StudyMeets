@@ -76,7 +76,7 @@ const Profile = ({ route }) => {
           deleteDoc(followersRef),
         ]);
 
-        Alert.alert(`You Are No Longer Following ${user.username}`);
+        Alert.alert(`Unfollowed`, `You Are No Longer Following ${user.username}`);
 
       } else {
         const followingRef = doc(
@@ -99,7 +99,7 @@ const Profile = ({ route }) => {
           setDoc(followersRef, { username: currentUsername }),
         ]);
 
-        Alert.alert(`Following ${user.username}`);
+        Alert.alert(`Followed`, `Following ${user.username}`);
       }
   
       setIsFollowing(!isFollowing);

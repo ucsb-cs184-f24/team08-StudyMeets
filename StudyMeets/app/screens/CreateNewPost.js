@@ -59,7 +59,7 @@ const CreateNewPost = ({ visible, onClose }) => {
         Description: description,
         Tags: selectedTags,
         OwnerEmail: currentUser.email,
-        OwnerName: userName,
+        OwnerName: currentUser.username,
         CreatedAt: new Date(),
       });
 
