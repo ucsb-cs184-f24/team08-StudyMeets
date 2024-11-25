@@ -1,9 +1,111 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Avatar } from 'react-native-paper';
+import { Avatar, Button } from 'react-native-paper';
+import { doc, getDoc, setDoc, deleteDoc, collection } from 'firebase/firestore';
+import { firestore, auth } from '../../firebase';
 
 const Profile = ({ route }) => {
-  const { user } = route.params;
+  const { user } = route.params; // User B's data
+  const [isFollowing, setIsFollowing] = useState(false);
+  const currentUserId = auth.currentUser.uid; // User A's ID
+
+  // Check if User A is already following User B
+  useEffect(() => {
+    const checkFollowingStatus = async () => {
+      try {
+        const docRef = doc(
+          firestore,
+          'users',
+          currentUserId,
+          'following',
+          user.id
+        );
+        const docSnap = await getDoc(docRef);
+
+        setIsFollowing(docSnap.exists());
+      } catch (error) {
+        console.error('Error checking following status: ', error);
+      }
+    };
+
+    checkFollowingStatus();
+  }, [firestore, currentUserId, user.id]);
+
+  const fetchCurrentUsername = async () => {
+    try {
+      const userDocRef = doc(firestore, 'users', currentUserId);
+      const userDoc = await getDoc(userDocRef);
+  
+      if (userDoc.exists()) {
+        return userDoc.data().username; // Access the 'username' field
+      } else {
+        console.error('User document does not exist.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching current user username:', error);
+      return null;
+    }
+  };
+
+  const handleFollowToggle = async () => {
+    try {
+      const currentUsername = await fetchCurrentUsername();
+      if (!currentUsername) {
+        console.error('Could not retrieve current user username.');
+        return;
+      }
+  
+      if (isFollowing) {
+        // Unfollow: Remove entries
+        const followingRef = doc(
+          firestore,
+          'users',
+          currentUserId,
+          'following',
+          user.id
+        );
+        const followersRef = doc(
+          firestore,
+          'users',
+          user.id,
+          'followers',
+          currentUserId
+        );
+  
+        await Promise.all([
+          deleteDoc(followingRef),
+          deleteDoc(followersRef),
+        ]);
+      } else {
+        // Follow: Add entries
+        const followingRef = doc(
+          firestore,
+          'users',
+          currentUserId,
+          'following',
+          user.id
+        );
+        const followersRef = doc(
+          firestore,
+          'users',
+          user.id,
+          'followers',
+          currentUserId
+        );
+  
+        await Promise.all([
+          setDoc(followingRef, { username: user.username }),
+          setDoc(followersRef, { username: currentUsername }),
+        ]);
+      }
+  
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.error('Error toggling follow status:', error);
+    }
+  };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -16,6 +118,14 @@ const Profile = ({ route }) => {
 
       <Text style={styles.username}>{user.username}</Text>
       <Text style={styles.email}>{user.email}</Text>
+
+      <Button
+        mode="contained"
+        onPress={handleFollowToggle}
+        style={styles.followButton}
+      >
+        {isFollowing ? 'Following' : 'Follow'}
+      </Button>
 
       <Text style={[styles.detailsTextBold]}>University: </Text>
       <Text style={styles.detailsText}>{user.university}</Text>
@@ -96,6 +206,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     lineHeight: 22,
+  },
+  followButton: {
+    marginTop: 20,
+    width: '90%',
+    alignSelf: 'center',
   },
 });
 

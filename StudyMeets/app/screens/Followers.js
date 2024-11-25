@@ -1,34 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { firestore } from '../../firebase';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
+import { firestore, auth } from '../../firebase';
 import { Avatar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 const Followers = () => {
-  const [users, setUsers] = useState([]);
+  const [followersUsers, setFollowersUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const placeholderImage = 'https://via.placeholder.com/80';
+  const currentUserId = auth.currentUser.uid;
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const usersCollection = collection(firestore, 'users');
-        const usersSnapshot = await getDocs(usersCollection);
-        const usersList = usersSnapshot.docs.map(doc => ({
+  const fetchFollowersUsers = async () => {
+    try {
+      setLoading(true); // Show loading indicator while fetching data
+      const followersCollection = collection(firestore, 'users', currentUserId, 'followers');
+      const followersSnapshot = await getDocs(followersCollection);
+      const followersIds = followersSnapshot.docs.map(doc => doc.id);
+
+      // Fetch user details for each followers user
+      const usersCollection = collection(firestore, 'users');
+      const usersSnapshot = await getDocs(usersCollection);
+      const usersList = usersSnapshot.docs
+        .map(doc => ({
           id: doc.id,
           ...doc.data(),
-        }));
-        setUsers(usersList);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
+        }))
+        .filter(user => followersIds.includes(user.id));
+
+      setFollowersUsers(usersList);
+    } catch (error) {
+      console.error('Error fetching followers users:', error);
+    } finally {
+      setLoading(false); // Hide loading indicator after fetching data
+    }
+  };
+
+  useEffect(() => {
+    fetchFollowersUsers();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true); // Show the refresh indicator
+    await fetchFollowersUsers();
+    setRefreshing(false); // Hide the refresh indicator
+  };
 
   if (loading) {
     return (
@@ -44,16 +62,25 @@ const Followers = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={users}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
-            <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
-            <Text style={styles.username}>{item.username || 'Unknown'}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      {followersUsers.length > 0 ? (
+        <FlatList
+          data={followersUsers}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
+              <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
+              <Text style={styles.username}>{item.username || 'Unknown'}</Text>
+            </TouchableOpacity>
+          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      ) : (
+        <View style={styles.noUsersContainer}>
+          <Text style={styles.noUsersText}>You're not followed by anyone yet.</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -85,6 +112,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  noUsersContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noUsersText: {
+    fontSize: 16,
+    color: '#888',
   },
 });
 

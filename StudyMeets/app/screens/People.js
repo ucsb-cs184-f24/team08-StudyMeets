@@ -47,12 +47,13 @@ const People = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Tab.Navigator
+        lazy={true}
         screenOptions={{
           tabBarActiveTintColor: '#000',
           tabBarIndicatorStyle: { backgroundColor: '#000' },
           tabBarLabelStyle: { fontSize: 16 },
           tabBarStyle: { backgroundColor: '#f5f5f5' },
-          tabBarItemStyle: { margin: 0, padding: 5 }
+          tabBarItemStyle: { padding: 5 }
         }}
       >
         <Tab.Screen name="Friends" component={Friends} options={{ headerShown: false }} />
@@ -73,12 +74,3 @@ const People = () => {
 };
 
 export default People;
-
-const styles = StyleSheet.create({
-  tabContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-});

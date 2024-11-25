@@ -19,7 +19,7 @@ const MainTabs = () => {
     <Tab.Navigator>
       <Tab.Screen name="Explore" component={Explore} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Search color={color} size={size} />}} />
       <Tab.Screen name="MyGroups" component={MyGroups} options={{headerShown: false, tabBarIcon: ({ color, size }) => <LayoutGrid color={color} size={size} />}}/>
-      <Tab.Screen name="People" component={PeopleNavigation} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}/>
+      <Tab.Screen name="PeopleNavigation" component={PeopleNavigation} options={{headerShown: false, tabBarLabel: 'People', tabBarIcon: ({ color, size }) => <Users color={color} size={size} />}}/>
       <Tab.Screen name="Settings" component={SettingsNavigation} options={{headerShown: false, tabBarIcon: ({ color, size }) => <Settings color={color} size={size} /> }} />
     </Tab.Navigator>
   );
