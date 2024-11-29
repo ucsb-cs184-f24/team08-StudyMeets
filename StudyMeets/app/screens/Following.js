@@ -7,7 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 
 const Following = () => {
   const [followingUsers, setFollowingUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const placeholderImage = 'https://via.placeholder.com/80';
@@ -15,7 +14,6 @@ const Following = () => {
 
   const fetchFollowingUsers = async () => {
     try {
-      setLoading(true);
       const followingCollection = collection(firestore, 'users', currentUserId, 'following');
       const followingSnapshot = await getDocs(followingCollection);
       const followingIds = followingSnapshot.docs.map(doc => doc.id);
@@ -32,8 +30,6 @@ const Following = () => {
       setFollowingUsers(usersList);
     } catch (error) {
       console.error('Error fetching following users:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -47,39 +43,34 @@ const Following = () => {
     setRefreshing(false);
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   const handlePress = (user) => {
     navigation.navigate('Profile', { user });
   };
 
   return (
     <View style={styles.container}>
-      {followingUsers.length > 0 ? (
-        <FlatList
-          data={followingUsers}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
-              <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
-              <Text style={styles.username}>{item.username || 'Unknown'}</Text>
-            </TouchableOpacity>
-          )}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
-      ) : (
-        <View style={styles.noUsersContainer}>
-          <Text style={styles.noUsersText}>You're not following anyone yet.</Text>
-        </View>
-      )}
+      <FlatList
+        data={followingUsers}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
+            <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
+            <Text style={styles.username}>{item.username || 'Unknown'}</Text>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={() => (
+          <View style={styles.noUsersContainer}>
+            <Text style={styles.noUsersText}>You're not following anyone yet.</Text>
+          </View>
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
     </View>
   );
 };
