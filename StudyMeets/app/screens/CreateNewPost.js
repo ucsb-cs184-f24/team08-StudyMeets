@@ -3,7 +3,6 @@ import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, Touc
 import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
-
 import { tagsList } from '../../definitions/Definitions.js';
 
 const CreateNewPost = ({ visible, onClose }) => {
@@ -22,7 +21,7 @@ const CreateNewPost = ({ visible, onClose }) => {
         return [...prevTags, tag];
       }
     });
-    setSearchText(''); // Clear the search text when a tag is added
+    setSearchText(''); 
   };
 
   const handleRemoveTag = (tag) => {
