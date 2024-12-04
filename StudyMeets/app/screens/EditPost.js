@@ -56,6 +56,11 @@ const EditPost = ({ visible, onClose, postId }) => {
   };
 
   const handleUpdatePost = async () => {
+    if (title.trim() === '') {
+      Alert.alert('Error', 'The title cannot be empty, please enter a title.');
+      return;
+    }
+
     try {
       await updateDoc(doc(firestore, 'studymeets', postId), {
         Title: title,

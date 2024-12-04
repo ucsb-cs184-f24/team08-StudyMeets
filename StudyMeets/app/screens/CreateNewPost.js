@@ -34,6 +34,11 @@ const CreateNewPost = ({ visible, onClose }) => {
   );
 
   const handleCreatePost = async () => {
+    if (title.trim() === '') {
+      Alert.alert('Error', 'The title cannot be empty, please enter a title.');
+      return;
+    }
+
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
