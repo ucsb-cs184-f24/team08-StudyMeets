@@ -4,6 +4,9 @@ import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
+import * as ImagePicker from 'expo-image-picker';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
