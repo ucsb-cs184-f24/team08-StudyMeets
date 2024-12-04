@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
-import { firestore } from '../../firebase';
-import { auth } from '../../firebase';
+import { View, FlatList, Alert } from 'react-native';
+import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
+import { firestore, auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -12,45 +13,39 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
+  const [isTBD, setIsTBD] = useState(false);
 
   const handleTagToggle = (tag) => {
-    setSelectedTags(prevTags => {
-      if (prevTags.includes(tag)) {
-        return prevTags.filter(t => t !== tag);
-      } else {
-        return [...prevTags, tag];
-      }
-    });
-    setSearchText(''); 
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+    );
+    setSearchText('');
   };
 
   const handleRemoveTag = (tag) => {
-    setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
+    setSelectedTags((prevTags) => prevTags.filter((t) => t !== tag));
   };
 
-  const filteredTags = tagsList.filter(tag =>
-    tag.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate) {
+      setNextMeetingDate(selectedDate);
+      setIsTBD(false); // Reset TBD when a valid date is selected
+    }
+  };
+
+  const handleSetTBD = () => {
+    setIsTBD(true);
+    setNextMeetingDate(new Date()); // Maintain valid Date object for picker
+  };
 
   const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
-      if (!currentUser) {
-        throw new Error('User not authenticated');
-      }
-
-      console.log('Title:', title);
-      console.log('Location:', location);
-      console.log('Description:', description);
-      console.log('Tags:', selectedTags);
-
+      if (!currentUser) throw new Error('User not authenticated');
 
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      if (userDoc.exists()) {
-        setUserName(userDoc.data().username);
-      } else {
-        console.log('No such document!');
-      }
+      if (userDoc.exists()) setUserName(userDoc.data().username);
 
       await addDoc(collection(firestore, 'studymeets'), {
         Title: title,
@@ -60,6 +55,7 @@ const CreateNewPost = ({ visible, onClose }) => {
         OwnerEmail: currentUser.email,
         OwnerName: userName,
         CreatedAt: new Date(),
+        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate,
       });
 
       onClose();
@@ -70,170 +66,112 @@ const CreateNewPost = ({ visible, onClose }) => {
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.formTitle}>Create New StudyMeet</Text>
-          <Text style={styles.label}>Title</Text>
+    <Modal visible={visible} onDismiss={onClose} contentContainerStyle={{ padding: 20 }}>
+      <Card>
+        <Card.Title title="Create New StudyMeet" />
+        <Card.Content>
           <TextInput
-            style={styles.input}
-            placeholder="Title"
+            label="Title"
+            mode="outlined"
             value={title}
             onChangeText={setTitle}
+            style={{ marginBottom: 10 }}
           />
-          <Text style={styles.label}>Location</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Location"
+            label="Location"
+            mode="outlined"
             value={location}
             onChangeText={setLocation}
+            style={{ marginBottom: 10 }}
           />
-          <Text style={styles.label}>Description</Text>
           <TextInput
-            style={styles.largeInput}
+            label="Description"
+            mode="outlined"
+            multiline
+            numberOfLines={4}
             value={description}
             onChangeText={setDescription}
+            style={{ marginBottom: 10 }}
           />
-          
-          <Text style={styles.label}>Search Tags</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Search tags..."
+            label="Search Tags"
+            mode="outlined"
             value={searchText}
             onChangeText={setSearchText}
+            style={{ marginBottom: 10 }}
           />
-
-          {/* Scrollable box for filtered tags */}
-          {searchText && filteredTags.length > 0 && (
-            <View style={styles.tagSuggestions}>
-              <FlatList
-                data={filteredTags}
-                keyExtractor={item => item}
-                renderItem={({ item }) => (
-                  <View style={styles.tagItem}>
-                    <Text style={styles.tagText}>{item}</Text>
-                    <Button 
-                      title={selectedTags.includes(item) ? "Remove" : "Add"} 
-                      onPress={() => handleTagToggle(item)}
-                      color={selectedTags.includes(item) ? 'red' : 'green'}
-                    />
-                  </View>
-                )}
-              />
-            </View>
-          )}
-
-          {/* Display selected tags with remove option */}
-          <Text style={styles.label}>Selected Tags:</Text>
-          <View style={styles.selectedTagsContainer}>
-            {selectedTags.map(tag => (
-              <View key={tag} style={styles.selectedTagContainer}>
-                <Text style={styles.selectedTag}>{tag}</Text>
-                <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
-                  <Text style={styles.removeTag}> X </Text>
-                </TouchableOpacity>
-              </View>
+          <FlatList
+            data={tagsList.filter((tag) =>
+              tag.toLowerCase().includes(searchText.toLowerCase())
+            )}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <Chip
+                style={{ margin: 2 }}
+                onPress={() => handleTagToggle(item)}
+                selected={selectedTags.includes(item)}
+              >
+                {item}
+              </Chip>
+            )}
+            horizontal
+          />
+          <Divider style={{ marginVertical: 10 }} />
+          <Text variant="bodyMedium">Selected Tags:</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
+            {selectedTags.map((tag) => (
+              <Chip
+                key={tag}
+                style={{ margin: 2 }}
+                onClose={() => handleRemoveTag(tag)}
+              >
+                {tag}
+              </Chip>
             ))}
           </View>
-
-          <Button title="Create" onPress={handleCreatePost} />
-          <Button title="Cancel" onPress={onClose} color="red" />
-        </View>
-      </View>
+          <Divider style={{ marginVertical: 10 }} />
+          <Text variant="bodyMedium" style={{ marginBottom: 10 }}>
+            Set First Meeting:
+          </Text>
+          <View style={{ marginBottom: 20 }}>
+            <DateTimePicker
+              mode="date"
+              value={nextMeetingDate}
+              onChange={handleDateChange}
+              style={{ marginBottom: 10 }}
+            />
+            <DateTimePicker
+              mode="time"
+              value={nextMeetingDate}
+              onChange={handleDateChange}
+              style={{ marginBottom: 10 }}
+            />
+            <Button
+              mode="outlined"
+              color="red"
+              onPress={handleSetTBD}
+              style={{ marginTop: 10 }}
+            >
+              Set as TBD
+            </Button>
+          </View>
+          <Text>
+            {isTBD
+              ? 'First Meeting Date: TBD'
+              : `Selected: ${nextMeetingDate.toLocaleDateString()} ${nextMeetingDate.toLocaleTimeString()}`}
+          </Text>
+        </Card.Content>
+        <Card.Actions>
+          <Button mode="contained" onPress={handleCreatePost}>
+            Create
+          </Button>
+          <Button mode="outlined" onPress={onClose} color="red">
+            Cancel
+          </Button>
+        </Card.Actions>
+      </Card>
     </Modal>
   );
 };
 
 export default CreateNewPost;
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: 300,
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  largeInput: {
-    width: '100%',
-    height: 100,
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    textAlignVertical: 'top',
-  },
-  label: {
-    alignSelf: 'flex-start',
-    marginBottom: 5,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  tagSuggestions: {
-    width: '100%',
-    maxHeight: 150, // Set a maximum height for the suggestions box
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingVertical: 5,
-    overflow: 'hidden', // Hide overflow to create a clean border
-  },
-  tagItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  tagText: {
-    flex: 1,
-  },
-  selectedTagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 15,
-  },
-  selectedTagContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
-    borderRadius: 15,
-    padding: 5,
-    margin: 5,
-  },
-  selectedTag: {
-    marginRight: 5,
-  },
-  removeTag: {
-    color: 'red',
-    fontWeight: 'bold',
-    padding: 5,
-  },
-});
