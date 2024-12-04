@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity, Image, ScrollView} from 'react-native';
 import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
@@ -12,6 +12,7 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [image, setImage] = useState(null);
 
   const handleTagToggle = (tag) => {
     setSelectedTags(prevTags => {
@@ -32,6 +33,24 @@ const CreateNewPost = ({ visible, onClose }) => {
     tag.toLowerCase().includes(searchText.toLowerCase())
   );
 
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image');
+    }
+  };
+
   const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
@@ -39,11 +58,21 @@ const CreateNewPost = ({ visible, onClose }) => {
         throw new Error('User not authenticated');
       }
 
+      let imageUrl = null;
+      if (image) {
+        // Upload image to Firebase Storage
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const imageRef = ref(storage, `studymeet-images/${Date.now()}`);
+        await uploadBytes(imageRef, blob);
+        imageUrl = await getDownloadURL(imageRef);
+      }
+
       console.log('Title:', title);
       console.log('Location:', location);
       console.log('Description:', description);
       console.log('Tags:', selectedTags);
-
+      console.log('Image"', image)
 
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
       if (userDoc.exists()) {
@@ -60,8 +89,10 @@ const CreateNewPost = ({ visible, onClose }) => {
         OwnerEmail: currentUser.email,
         OwnerName: userName,
         CreatedAt: new Date(),
+        ImageUrl: imageUrl,
       });
 
+      setImage(null); // Reset image state
       onClose();
     } catch (error) {
       console.error('Error creating document:', error);
@@ -140,6 +171,31 @@ const CreateNewPost = ({ visible, onClose }) => {
               </View>
             ))}
           </View>
+
+          <Text style={styles.label}>Image (Optional)</Text>
+          <TouchableOpacity 
+            style={styles.imageUploadButton} 
+            onPress={pickImage}
+          >
+            <Text style={styles.imageUploadText}>
+              {image ? 'Change Image' : 'Pick an Image'}
+            </Text>
+          </TouchableOpacity>
+
+          {image && (
+            <View style={styles.imagePreviewContainer}>
+              <Image 
+                source={{ uri: image }} 
+                style={styles.imagePreview} 
+              />
+              <TouchableOpacity 
+                style={styles.removeImageButton}
+                onPress={() => setImage(null)}
+              >
+                <Text style={styles.removeImageText}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <Button title="Create" onPress={handleCreatePost} />
           <Button title="Cancel" onPress={onClose} color="red" />
@@ -235,5 +291,44 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     padding: 5,
+  },
+  imageUploadButton: {
+    width: '100%',
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  imageUploadText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  imagePreviewContainer: {
+    width: '100%',
+    height: 200,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'red',
+    padding: 5,
+    borderRadius: 5,
+  },
+  removeImageText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
