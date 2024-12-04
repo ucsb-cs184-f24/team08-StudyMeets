@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, ScrollView, Alert, StyleSheet } from 'react-native';
 import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
@@ -11,6 +12,10 @@ const EditPost = ({ visible, onClose, postId }) => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
+  const [isTBD, setIsTBD] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -22,6 +27,10 @@ const EditPost = ({ visible, onClose, postId }) => {
           setLocation(postData.Location);
           setDescription(postData.Description);
           setTags(postData.Tags || []);
+          if (postData.NextMeetingDate) {
+            setNextMeetingDate(new Date(postData.NextMeetingDate));
+            setIsTBD(postData.NextMeetingDate === 'TBD');
+          }
         } else {
           console.error('No such document!');
         }
@@ -31,9 +40,7 @@ const EditPost = ({ visible, onClose, postId }) => {
       }
     };
 
-    if (postId) {
-      fetchPostData();
-    }
+    if (postId) fetchPostData();
   }, [postId]);
 
   const handleTagToggle = (tag) => {
@@ -47,6 +54,31 @@ const EditPost = ({ visible, onClose, postId }) => {
     setTags((prevTags) => prevTags.filter((t) => t !== tag));
   };
 
+  const handleDateChange = (selectedDate) => {
+    if (selectedDate) {
+      setNextMeetingDate((prevDate) => {
+        if (isTimePickerVisible) {
+          return new Date(
+            prevDate.getFullYear(),
+            prevDate.getMonth(),
+            prevDate.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes()
+          );
+        }
+        return selectedDate;
+      });
+      setIsTBD(false);
+    }
+    setDatePickerVisible(false);
+    setTimePickerVisible(false);
+  };
+
+  const handleSetTBD = () => {
+    setIsTBD(true);
+    setNextMeetingDate(new Date());
+  };
+
   const handleUpdatePost = async () => {
     try {
       await updateDoc(doc(firestore, 'studymeets', postId), {
@@ -54,6 +86,7 @@ const EditPost = ({ visible, onClose, postId }) => {
         Location: location,
         Description: description,
         Tags: tags,
+        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
         UpdatedAt: new Date(),
       });
       Alert.alert('Success', 'Post updated successfully');
@@ -65,81 +98,170 @@ const EditPost = ({ visible, onClose, postId }) => {
   };
 
   return (
-    <Modal visible={visible} onDismiss={onClose} contentContainerStyle={{ padding: 20 }}>
-      <Card>
-        <Card.Title title="Edit StudyMeet" />
-        <Card.Content>
-          <TextInput
-            label="Title"
-            mode="outlined"
-            value={title}
-            onChangeText={setTitle}
-            style={{ marginBottom: 10 }}
-          />
-          <TextInput
-            label="Location"
-            mode="outlined"
-            value={location}
-            onChangeText={setLocation}
-            style={{ marginBottom: 10 }}
-          />
-          <TextInput
-            label="Description"
-            mode="outlined"
-            multiline
-            numberOfLines={4}
-            value={description}
-            onChangeText={setDescription}
-            style={{ marginBottom: 10 }}
-          />
-          <TextInput
-            label="Search Tags"
-            mode="outlined"
-            value={searchText}
-            onChangeText={setSearchText}
-            style={{ marginBottom: 10 }}
-          />
-          <FlatList
-            data={tagsList.filter((tag) =>
-              tag.toLowerCase().includes(searchText.toLowerCase())
-            )}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <Chip
-                style={{ margin: 2 }}
-                onPress={() => handleTagToggle(item)}
-                selected={tags.includes(item)}
+    <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
+      <View style={styles.modalContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Card>
+            <Card.Title title="Edit StudyMeet" />
+            <Card.Content>
+              <TextInput
+                label="Title"
+                mode="outlined"
+                value={title}
+                onChangeText={setTitle}
+                style={styles.input}
+              />
+              <TextInput
+                label="Location"
+                mode="outlined"
+                value={location}
+                onChangeText={setLocation}
+                style={styles.input}
+              />
+              <TextInput
+                label="Description"
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                value={description}
+                onChangeText={setDescription}
+                style={styles.input}
+              />
+              <TextInput
+                label="Search Tags"
+                mode="outlined"
+                value={searchText}
+                onChangeText={setSearchText}
+                style={styles.input}
+              />
+              <FlatList
+                data={tagsList.filter((tag) =>
+                  tag.toLowerCase().includes(searchText.toLowerCase())
+                )}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <Chip
+                    style={styles.chip}
+                    onPress={() => handleTagToggle(item)}
+                    selected={tags.includes(item)}
+                  >
+                    {item}
+                  </Chip>
+                )}
+                horizontal
+              />
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Selected Tags:</Text>
+              <View style={styles.tagsContainer}>
+                {tags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    style={styles.chip}
+                    onClose={() => handleRemoveTag(tag)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </View>
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium" style={styles.sectionTitle}>
+                Next Meeting:
+              </Text>
+              <Button
+                mode="outlined"
+                onPress={() => setDatePickerVisible(true)}
+                style={styles.input}
               >
-                {item}
-              </Chip>
-            )}
-            horizontal
-          />
-          <Divider style={{ marginVertical: 10 }} />
-          <Text variant="bodyMedium">Selected Tags:</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
-            {tags.map((tag) => (
-              <Chip
-                key={tag}
-                style={{ margin: 2 }}
-                onClose={() => handleRemoveTag(tag)}
+                Pick Date
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => setTimePickerVisible(true)}
+                style={styles.input}
               >
-                {tag}
-              </Chip>
-            ))}
-          </View>
-        </Card.Content>
-        <Card.Actions>
+                Pick Time
+              </Button>
+              <Button
+                mode="outlined"
+                color="red"
+                onPress={handleSetTBD}
+                style={styles.input}
+              >
+                Set as TBD
+              </Button>
+              <Text style={styles.selectedDate}>
+                {isTBD
+                  ? 'Next Meeting Date: TBD'
+                  : `Selected: ${nextMeetingDate.toLocaleDateString()} ${nextMeetingDate.toLocaleTimeString()}`}
+              </Text>
+            </Card.Content>
+          </Card>
+        </ScrollView>
+        <View style={styles.actions}>
           <Button mode="contained" onPress={handleUpdatePost}>
             Update
           </Button>
           <Button mode="outlined" onPress={onClose} color="red">
             Cancel
           </Button>
-        </Card.Actions>
-      </Card>
+        </View>
+      </View>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible || isTimePickerVisible}
+        mode={isDatePickerVisible ? 'date' : 'time'}
+        date={nextMeetingDate}
+        onConfirm={handleDateChange}
+        onCancel={() => {
+          setDatePickerVisible(false);
+          setTimePickerVisible(false);
+        }}
+      />
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    width: '90%',
+    maxHeight: '90%',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  input: {
+    marginBottom: 10,
+  },
+  chip: {
+    margin: 2,
+  },
+  divider: {
+    marginVertical: 10,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  sectionTitle: {
+    marginBottom: 10,
+  },
+  selectedDate: {
+    marginTop: 10,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  },
+});
 
 export default EditPost;
