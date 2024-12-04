@@ -57,7 +57,7 @@ const EditPost = ({ visible, onClose, postId }) => {
 
   const handleUpdatePost = async () => {
     if (title.trim() === '') {
-      Alert.alert('Error', 'The title cannot be empty, please enter a title.');
+      Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
       return;
     }
 
