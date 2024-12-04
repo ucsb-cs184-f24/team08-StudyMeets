@@ -3,10 +3,13 @@ import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, Touc
 import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
+<<<<<<< HEAD
 import * as ImagePicker from 'expo-image-picker';
 import { storage } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+=======
+>>>>>>> main
 import { tagsList } from '../../definitions/Definitions.js';
 
 const CreateNewPost = ({ visible, onClose }) => {
@@ -26,7 +29,7 @@ const CreateNewPost = ({ visible, onClose }) => {
         return [...prevTags, tag];
       }
     });
-    setSearchText(''); // Clear the search text when a tag is added
+    setSearchText(''); 
   };
 
   const handleRemoveTag = (tag) => {
