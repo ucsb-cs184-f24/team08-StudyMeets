@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Pressable, View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, firestore } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { ThemeContext } from "../../theme/ThemeContext";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,8 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
   const [isVisible, setVisible] = useState(true);
+  const { theme } = useContext(ThemeContext);
+
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -67,16 +70,19 @@ const Login = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background}]}>
+      <Text style={[styles.title, { color: theme.colors.text }]}>StudyMeets</Text>
       {isSignUp ? (
         <>
-          <Text testID='HeaderCreateAccount' style={styles.header}>Create Account</Text>
+          <Text testID='HeaderCreateAccount' style={[styles.header, { color: theme.colors.text }]}>Create Account</Text>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Username"
               value={username || ''}
               onChangeText={setUsername}
-              style={styles.input}
+              style={[styles.input, { color: theme.colors.text }]}
+              placeholderTextColor={theme.colors.placeholderTextColor}
+              borderColor={theme.colors.borderColor}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -84,7 +90,9 @@ const Login = () => {
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
-              style={styles.input}
+              style={[styles.input, { color: theme.colors.text }]}
+              placeholderTextColor={theme.colors.placeholderTextColor}
+              borderColor={theme.colors.borderColor}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -93,7 +101,9 @@ const Login = () => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={isVisible}
-              style={styles.passwordInput}
+              style={[styles.passwordInput, { color: theme.colors.text }]}
+              placeholderTextColor={theme.colors.placeholderTextColor}
+              borderColor={theme.colors.borderColor}
             />
             <Button
               title="Show"
@@ -104,20 +114,30 @@ const Login = () => {
             <ActivityIndicator size="large" />
           ) : (
             <>
-              <Button testID='CreateAccountButton' title="Create Account" onPress={handleCreateAccount} />
-              <Button title="Back to Sign In" onPress={() => setIsSignUp(false)} />
-            </>
+            <View style={styles.buttonContainer}>
+              <View style={styles.buttonWrapper}>
+                <Button testID='CreateAccountButton' title="Create Account" onPress={handleCreateAccount} />
+              </View>
+            </View>
+            <View style={styles.buttonContainer}>
+              <View style={styles.buttonWrapper}>
+                <Button title="Back to Sign In" onPress={() => setIsSignUp(false)} />
+              </View>
+            </View>
+          </>
           )}
         </>
       ) : (
         <>
-          <Text testID='HeaderSignIn' style={styles.header}>Sign In</Text>
+          <Text testID='HeaderSignIn' style={[styles.header, { color: theme.colors.text }]}>Sign In</Text>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
-              style={styles.input}
+              style={[styles.input, { color: theme.colors.text }]}
+              placeholderTextColor={theme.colors.placeholderTextColor}
+              borderColor={theme.colors.borderColor}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -126,7 +146,9 @@ const Login = () => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={isVisible}
-              style={styles.passwordInput}
+              style={[styles.passwordInput, { color: theme.colors.text }]}
+              placeholderTextColor={theme.colors.placeholderTextColor}
+              borderColor={theme.colors.borderColor}
             />
             <Button
               title='Show'
@@ -188,13 +210,21 @@ const styles = StyleSheet.create({
     marginRight: 10, // Add space between the input and button
   },
   createAccountButton: {
-    marginTop: 20
+    marginTop: 20,
+    marginBottom: 10
   },
   buttonContainer: {
     marginBottom: 10,
   },
   buttonWrapper: {
     width: 330
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 100,
+    marginTop: -60
   }
 });
 

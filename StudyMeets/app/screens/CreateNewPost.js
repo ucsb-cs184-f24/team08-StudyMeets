@@ -24,7 +24,7 @@ const CreateNewPost = ({ visible, onClose }) => {
         return [...prevTags, tag];
       }
     });
-    setSearchText(''); // Clear the search text when a tag is added
+    setSearchText(''); 
   };
 
   const handleRemoveTag = (tag) => {
