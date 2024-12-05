@@ -1,12 +1,19 @@
-import React from 'react';
-import { Card, Button, Text, Divider, Chip } from 'react-native-paper';
-import { View } from 'react-native';
+import React, { useState } from 'react';
+import { Card, Button, Text, Divider, Chip, IconButton } from 'react-native-paper';
+import { View, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
 
-const GroupCard = ({ item, onPrimaryAction, primaryActionLabel, secondaryActionLabel, onSecondaryAction }) => {
-  // Helper to safely format the date
+const GroupCard = ({ 
+  item, 
+  onPrimaryAction, 
+  primaryActionLabel, 
+  secondaryActionLabel, 
+  onSecondaryAction,
+}) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
   const formatDate = (date) => {
     if (!date) return 'TBD';
-    if (typeof date === 'string') return date; // Already a string like 'TBD'
+    if (typeof date === 'string') return date; // If date is already a string (e.g., 'TBD')
     if (date.toDate) {
       const formattedDate = date.toDate();
       return `${formattedDate.toLocaleDateString()} ${formattedDate.toLocaleTimeString([], {
@@ -18,52 +25,150 @@ const GroupCard = ({ item, onPrimaryAction, primaryActionLabel, secondaryActionL
   };
 
   return (
-    <Card style={{ marginVertical: 10, marginHorizontal: 10 }}>
-      <Card.Title title={item.Title} subtitle={`Location: ${item.Location}`} />
-      <Card.Content>
-        <Text variant="bodyMedium" style={{ marginBottom: 5 }}>{item.Description}</Text>
-        
-        {/* Tags Section */}
-        {item.Tags && item.Tags.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
-            {item.Tags.map((tag, index) => (
-              <Chip key={index} style={{ marginRight: 5, marginBottom: 5 }}>
-                {tag}
-              </Chip>
-            ))}
+    <>
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Card style={{ marginVertical: 10, marginHorizontal: 10 }}>
+          <Card.Title title={item.Title} subtitle={`Location: ${item.Location}`} />
+          <Card.Content>
+            <Text variant="bodyMedium" style={{ marginBottom: 5 }}>
+              {item.Description}
+            </Text>
+            {item.Tags && item.Tags.length > 0 && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
+                {item.Tags.map((tag, index) => (
+                  <Chip key={index} style={{ marginRight: 5, marginBottom: 5 }}>
+                    {tag}
+                  </Chip>
+                ))}
+              </View>
+            )}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
+              <Text variant="bodySmall">Created by: {item.OwnerName}</Text>
+              <Text variant="bodySmall">
+                Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
+              </Text>
+            </View>
+            <Text variant="bodySmall">
+              Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
+            </Text>
+            <View style={{ marginTop: 10 }}>
+              <Text variant="bodySmall" style={{ fontWeight: 'bold' }}>
+                Next Meeting:
+              </Text>
+              <Text variant="bodySmall">{formatDate(item.NextMeetingDate)}</Text>
+            </View>
+          </Card.Content>
+          <Divider />
+          <Card.Actions>
+            <View style={styles.buttonContainer}>
+              <Button onPress={() => onPrimaryAction(item.id)}>{primaryActionLabel}</Button>
+              {secondaryActionLabel && onSecondaryAction && (
+                <Button onPress={() => onSecondaryAction(item.id)} textColor="red">
+                  {secondaryActionLabel}
+                </Button>
+              )}
+            </View>
+          </Card.Actions>
+        </Card>
+      </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text variant="headlineMedium">{item.Title}</Text>
+              <IconButton icon="close" onPress={() => setModalVisible(false)} />
+            </View>
+            <ScrollView>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Location</Text>
+              <Text variant="bodyLarge">{item.Location}</Text>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Description</Text>
+              <Text variant="bodyLarge">{item.Description}</Text>
+              {item.Tags && item.Tags.length > 0 && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
+                  <View style={styles.tagsContainer}>
+                    {item.Tags.map((tag, index) => (
+                      <Chip key={index} style={styles.tag}>
+                        {tag}
+                      </Chip>
+                    ))}
+                  </View>
+                </>
+              )}
+              <View style={styles.detailsContainer}>
+                <Text variant="bodyMedium">Created by: {item.OwnerName}</Text>
+                <Text variant="bodyMedium">
+                  Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
+                </Text>
+                <Text variant="bodyMedium">
+                  Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
+                </Text>
+              </View>
+            </ScrollView>
+            <Button mode="contained" onPress={() => setModalVisible(false)} style={styles.closeButton}>
+              Close
+            </Button>
           </View>
-        )}
-
-        {/* Creator and Date/Time Information */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
-          <Text variant="bodySmall">Created by: {item.OwnerName}</Text>
-          <Text variant="bodySmall">
-            Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
-          </Text>
         </View>
-        <Text variant="bodySmall">
-          Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
-        </Text>
-
-        {/* Next Meeting Date and Time */}
-        <View style={{ marginTop: 10 }}>
-          <Text variant="bodySmall" style={{ fontWeight: 'bold' }}>
-            Next Meeting:
-          </Text>
-          <Text variant="bodySmall">{formatDate(item.NextMeetingDate)}</Text>
-        </View>
-      </Card.Content>
-      <Divider />
-      <Card.Actions>
-        <Button onPress={() => onPrimaryAction(item.id)}>{primaryActionLabel}</Button>
-        {secondaryActionLabel && onSecondaryAction && (
-          <Button onPress={() => onSecondaryAction(item.id)} textColor="red">
-            {secondaryActionLabel}
-          </Button>
-        )}
-      </Card.Actions>
-    </Card>
+      </Modal>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    marginTop: 15,
+    marginBottom: 5,
+    fontWeight: 'bold',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 5,
+  },
+  tag: {
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  detailsContainer: {
+    marginTop: 15,
+    gap: 5,
+  },
+  closeButton: {
+    marginTop: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
+  },
+});
 
 export default GroupCard;

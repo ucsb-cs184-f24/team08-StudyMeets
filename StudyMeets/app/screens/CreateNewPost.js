@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, FlatList, ScrollView, Alert, StyleSheet } from 'react-native';
+import { View, FlatList, ScrollView, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
 import { firestore, auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import * as ImagePicker from 'expo-image-picker';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -17,6 +18,7 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [isTBD, setIsTBD] = useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
+  const [image, setImage] = useState(null);
 
   const handleTagToggle = (tag) => {
     setSelectedTags((prevTags) =>
@@ -54,6 +56,24 @@ const CreateNewPost = ({ visible, onClose }) => {
     setNextMeetingDate(new Date());
   };
 
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image');
+    }
+  };
+
   const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
@@ -71,8 +91,10 @@ const CreateNewPost = ({ visible, onClose }) => {
         OwnerName: userName,
         CreatedAt: new Date(),
         NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
+        ImageUrl: image,
       });
 
+      setImage(null); // Reset image state
       onClose();
     } catch (error) {
       console.error('Error creating document:', error);
@@ -177,6 +199,24 @@ const CreateNewPost = ({ visible, onClose }) => {
                   ? 'First Meeting Date: TBD'
                   : `Selected: ${nextMeetingDate.toLocaleDateString()} ${nextMeetingDate.toLocaleTimeString()}`}
               </Text>
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Image:</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.imageUploadButton}>
+                <Text style={styles.imageUploadText}>
+                  {image ? 'Change Image' : 'Pick an Image'}
+                </Text>
+              </TouchableOpacity>
+              {image && (
+                <View style={styles.imagePreviewContainer}>
+                  <Image source={{ uri: image }} style={styles.imagePreview} />
+                  <TouchableOpacity
+                    onPress={() => setImage(null)}
+                    style={styles.removeImageButton}
+                  >
+                    <Text style={styles.removeImageText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </Card.Content>
           </Card>
         </ScrollView>
@@ -244,6 +284,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 10,
+  },
+  imageUploadButton: {
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  imageUploadText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  imagePreviewContainer: {
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  removeImageButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
+    padding: 5,
+    borderRadius: 5,
+  },
+  removeImageText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

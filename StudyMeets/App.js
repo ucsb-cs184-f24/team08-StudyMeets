@@ -12,10 +12,12 @@ import MyGroups from './app/screens/MyGroups';
 import People from './app/screens/People';
 import CreateProfile from './app/screens/CreateProfile';
 import Profile from './app/screens/Profile';
+import Notifications from './app/screens/Notifications';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Placeholder screens
 const NotificationsScreen = () => (
   <View style={styles.tabContainer}>
     <Text>notifications</Text>
