@@ -32,7 +32,6 @@ const Login = () => {
       }
     } catch (error) {
       alert("Email and Password not match!");
-      console.error(error);
     } finally {
       setLoading(false);
     }
