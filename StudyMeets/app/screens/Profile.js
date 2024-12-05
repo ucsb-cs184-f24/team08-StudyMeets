@@ -8,28 +8,65 @@ import { ThemeContext } from '../../theme/ThemeContext';
 const Profile = ({ route }) => {
   const { user } = route.params;
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isFriendRequested, setIsFriendRequested] = useState(false);
+  const [isFriend, setIsFriend] = useState(false);
   const currentUserId = auth.currentUser.uid;
   const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const checkFollowingStatus = async () => {
       try {
-        const docRef = doc(
+        const followRef = doc(
           firestore,
           'users',
           currentUserId,
           'following',
           user.id
         );
-        const docSnap = await getDoc(docRef);
+        const followSnap = await getDoc(followRef);
 
-        setIsFollowing(docSnap.exists());
+        setIsFollowing(followSnap.exists());
       } catch (error) {
         console.error('Error checking following status: ', error);
       }
     };
 
+    const checkFriendRequestStatus = async () => {
+      try {
+        const requestRef = doc(
+          firestore,
+          'users',
+          user.id,
+          'friendrequestreceived',
+          currentUserId
+        );
+        const requestSnap = await getDoc(requestRef);
+
+        setIsFriendRequested(requestSnap.exists());
+      } catch (error) {
+        console.error('Error checking friend request status: ', error);
+      }
+    };
+    const checkFriendStatus = async () => {
+      try {
+        const friendRef = doc(
+          firestore,
+          'users',
+          user.id,
+          'friends',
+          currentUserId
+        );
+        const friendSnap = await getDoc(friendRef);
+
+        setIsFriend(friendSnap.exists());
+      } catch (error) {
+        console.error('Error checking friend status: ', error);
+      }
+    };
+
     checkFollowingStatus();
+    checkFriendRequestStatus();
+    checkFriendStatus();
   }, [firestore, currentUserId, user.id]);
 
   const fetchCurrentUsername = async () => {
@@ -109,6 +146,70 @@ const Profile = ({ route }) => {
       console.error('Error toggling follow status:', error);
     }
   };
+
+  const handleAddFriendToggle = async () => {
+    try {
+      const friendRequestRef = doc(
+        firestore,
+        'users',
+        user.id,
+        'friendrequestreceived',
+        currentUserId
+      );
+
+      if (isFriendRequested) {
+        // Cancel friend request
+        await deleteDoc(friendRequestRef);
+        setIsFriendRequested(false);
+        Alert.alert('Friend Request Canceled', `You canceled the friend request to ${user.username}.`);
+      } else {
+        // Send friend request
+        await setDoc(friendRequestRef, { requesterId: currentUserId });
+        setIsFriendRequested(true);
+        Alert.alert('Friend Request Sent', `Friend request sent to ${user.username}.`);
+      }
+    } catch (error) {
+      console.error('Error toggling friend request:', error);
+    }
+  };
+  
+  const handleRemoveFriend = async () => {
+    try {
+      const currentUserFriendRef = doc(
+        firestore,
+        'users',
+        currentUserId,
+        'friends',
+        user.id
+      );
+      const selectedUserFriendRef = doc(
+        firestore,
+        'users',
+        user.id,
+        'friends',
+        currentUserId
+      );
+  
+      await Promise.all([
+        deleteDoc(currentUserFriendRef),
+        deleteDoc(selectedUserFriendRef),
+      ]);
+  
+      Alert.alert(
+        'Friend Removed',
+        `You are no longer friends with ${user.username}.`
+      );
+  
+      setIsFriend(false);
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      Alert.alert(
+        'Error',
+        'An error occurred while removing the friend. Please try again.'
+      );
+    }
+  };
+  
   
 
   return (
@@ -130,6 +231,24 @@ const Profile = ({ route }) => {
       >
         {isFollowing ? 'Following' : 'Follow'}
       </Button>
+
+      {isFriend ?
+      <Button
+        mode="contained"
+        onPress={handleRemoveFriend}
+        style={styles.friendButton}
+      >
+        Remove Friend
+      </Button>
+      :
+      <Button
+        mode="contained"
+        onPress={handleAddFriendToggle}
+        style={styles.friendButton}
+      >
+        {isFriendRequested ? 'Request Received' : 'Add Friend'}
+      </Button>
+      }
 
       <Text style={[styles.detailsTextBold, { color: theme.colors.text }]}>University: </Text>
       <Text style={[styles.detailsText, { color: theme.colors.text }]}>{user.university}</Text>
@@ -212,6 +331,11 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   followButton: {
+    marginTop: 20,
+    width: '90%',
+    alignSelf: 'center',
+  },
+  friendButton: {
     marginTop: 20,
     width: '90%',
     alignSelf: 'center',

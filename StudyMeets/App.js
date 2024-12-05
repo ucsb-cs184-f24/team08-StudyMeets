@@ -10,6 +10,7 @@ import MyGroups from './app/screens/MyGroups';
 import People from './app/screens/People';
 import CreateProfile from './app/screens/CreateProfile';
 import Profile from './app/screens/Profile';
+import Notifications from './app/screens/Notifications';
 import { Settings, Search, Users, LayoutGrid } from 'lucide-react-native';
 import { ThemeProvider, ThemeContext } from './theme/ThemeContext';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -18,26 +19,21 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // delete below screen when implemented, currently like this do we dont have empty skeleton files
-const NotificationsScreen = () => (
-  <View style={styles.tabContainer}>
-      <Text>notifications</Text>
-  </View>
-);
 
 const NotificationSettingsScreen = () => (
-  <View style={styles.tabContainer}>
+  <View>
       <Text>notification settings</Text>
   </View>
 );
 
 const ProfilePrivacyScreen = () => (
-  <View style={styles.tabContainer}>
+  <View>
       <Text>profile privacy settings</Text>
   </View>
 );
 
 const GeneralScreen = () => (
-  <View style={styles.tabContainer}>
+  <View>
       <Text>general settings</Text>
   </View>
 );
@@ -80,7 +76,7 @@ const App = () => {
                 <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
                 <Stack.Screen name="CreateProfile" component={CreateProfile} options={{ headerShown: false }} />
                 <Stack.Screen name="Profile" component={Profile} options={{ headerTitle: ''}}/>
-                <Stack.Screen name="Notifications" component={NotificationsScreen}/>
+                <Stack.Screen name="Notifications" component={Notifications}/>
                 <Stack.Screen name="Notification Settings" component={NotificationSettingsScreen}/>
                 <Stack.Screen name="Profile Privacy Settings" component={ProfilePrivacyScreen}/>
                 <Stack.Screen name="General Settings" component={GeneralScreen}/>
@@ -95,13 +91,3 @@ const App = () => {
 };
 
 export default App;
-
-// delete this too when settings screen are implemented
-const styles = StyleSheet.create({
-  tabContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-});

@@ -15,7 +15,8 @@ export const lightTheme = {
     cardBackgroundColor: '#fbf0ff',
     warning: '#dc3545',
     placeholderTextColor: '#8c8c8c',
-    icon: '#000000'
+    icon: '#000000',
+    groupCardTag: '#b6abf7'
   },
 };
 
@@ -27,13 +28,14 @@ export const darkTheme = {
     tabBar: '#181818',
     tabBarActive: '#007BFF',
     tabBarInactive: '#7d868e',
-    background: '#333333',
+    background: '#222222',
     text: '#ffffff',
     secondary: '#75b8ff',
     borderColor: '#f2f2f2',
     cardBackgroundColor: '#474547',
     warning: '#dc3545',
     placeholderTextColor: '#a6a6a6',
-    icon: '#ffffff'
+    icon: '#ffffff',
+    groupCardTag: '#6c85a1'
   },
 };
