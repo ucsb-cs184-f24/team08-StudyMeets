@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity, Image, ScrollView} from 'react-native';
-import { firestore } from '../../firebase';
-import { auth } from '../../firebase';
+import { View, FlatList, ScrollView, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
+import { firestore, auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { ThemeContext } from '../../theme/ThemeContext';
-
 import { tagsList } from '../../definitions/Definitions.js';
+import * as ImagePicker from 'expo-image-picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -15,6 +16,10 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchText, setSearchText] = useState('');
   const { theme } = useContext(ThemeContext);
+  const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
+  const [isTBD, setIsTBD] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const [image, setImage] = useState(null);
 
   const handleTagToggle = (tag) => {
@@ -32,9 +37,34 @@ const CreateNewPost = ({ visible, onClose }) => {
     setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
   };
 
+  const handleDateChange = (selectedDate) => {
+    if (selectedDate) {
+      setNextMeetingDate((prevDate) => {
+        if (isTimePickerVisible) {
+          return new Date(
+            prevDate.getFullYear(),
+            prevDate.getMonth(),
+            prevDate.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes()
+          );
+        }
+        return selectedDate;
+      });
+      setIsTBD(false);
+    }
+    setDatePickerVisible(false);
+    setTimePickerVisible(false);
+  };
+
   const filteredTags = tagsList.filter(tag =>
     tag.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const handleSetTBD = () => {
+    setIsTBD(true);
+    setNextMeetingDate(new Date());
+  };
 
   const pickImage = async () => {
     try {
@@ -104,110 +134,155 @@ const CreateNewPost = ({ visible, onClose }) => {
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalContainer}>
-        <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-        <Text style={[styles.formTitle, { color: theme.colors.text }]}>Create New StudyMeet</Text>
-        <Text style={[styles.label, { color: theme.colors.text }]}>Title</Text>
-          <TextInput
-            style={[styles.input, { color: theme.colors.text }]}
-            placeholder="Title"
-            value={title}
-            onChangeText={setTitle}
-            placeholderTextColor={theme.colors.placeholderTextColor}
-          />
-          <Text style={[styles.label, { color: theme.colors.text }]}>Location</Text>
-          <TextInput
-            style={[styles.input, { color: theme.colors.text }]}
-            placeholder="Location"
-            value={location}
-            onChangeText={setLocation}
-            placeholderTextColor={theme.colors.placeholderTextColor}
-          />
-          <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
-          <TextInput
-            style={[styles.largeInput, { color: theme.colors.text }]}
-            value={description}
-            onChangeText={setDescription}
-            placeholderTextColor={theme.colors.placeholderTextColor}
-          />
-          
-          <Text style={[styles.label, { color: theme.colors.text }]}>Search Tags</Text>
-          <TextInput
-            style={[styles.input, { color: theme.colors.text }]}
-            placeholder="Search tags..."
-            value={searchText}
-            onChangeText={setSearchText}
-            placeholderTextColor={theme.colors.placeholderTextColor}
-          />
-
-          {/* Scrollable box for filtered tags */}
-          {searchText && filteredTags.length > 0 && (
-            <View style={styles.tagSuggestions}>
+    <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
+      <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Card>
+            <Card.Title title="Create New StudyMeet" />
+            <Card.Content>
+              <TextInput
+                label="Title"
+                mode="outlined"
+                value={title}
+                onChangeText={setTitle}
+                style={[styles.input, { color: theme.colors.text }]}
+              />
+              <TextInput
+                label="Location"
+                mode="outlined"
+                value={location}
+                onChangeText={setLocation}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
+              />
+              <TextInput
+                label="Description"
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                value={description}
+                onChangeText={setDescription}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
+              />
+              <TextInput
+                label="Search Tags"
+                mode="outlined"
+                value={searchText}
+                onChangeText={setSearchText}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
+              />
               <FlatList
                 data={filteredTags}
                 keyExtractor={item => item}
                 renderItem={({ item }) => (
-                  <View style={styles.tagItem}>
-                    <Text style={[styles.tagText, { color: theme.colors.text }]}>{item}</Text>
-                    <Button 
-                      title={selectedTags.includes(item) ? "Remove" : "Add"} 
-                      onPress={() => handleTagToggle(item)}
-                      color={selectedTags.includes(item) ? 'red' : 'green'}
-                    />
-                  </View>
+                  <Chip
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onPress={() => handleTagToggle(item)}
+                    selected={selectedTags.includes(item)}
+                    textStyle={{ color: theme.colors.text }}
+                  >
+                    {item}
+                  </Chip>
                 )}
+                horizontal
               />
-            </View>
-          )}
-
-          {/* Display selected tags with remove option */}
-          <Text style={[styles.label, { color: theme.colors.text }]}>Selected Tags:</Text>
-          <View style={styles.selectedTagsContainer}>
-            {selectedTags.map(tag => (
-              <View key={tag} style={styles.selectedTagContainer}>
-                <Text style={styles.selectedTag}>{tag}</Text>
-                <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
-                  <Text style={styles.removeTag}> X </Text>
-                </TouchableOpacity>
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Selected Tags:</Text>
+              <View style={styles.tagsContainer}>
+                {selectedTags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onClose={() => handleRemoveTag(tag)}
+                    textStyle={{ color: theme.colors.text }}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
               </View>
-            ))}
-          </View>
-
-          <Text style={[styles.label, { color: theme.colors.text }]}>Image (Optional)</Text>
-          <TouchableOpacity 
-            style={styles.imageUploadButton} 
-            onPress={pickImage}
-          >
-            <Text style={[styles.imageUploadText, { color: theme.colors.text }]}>
-              {image ? 'Change Image' : 'Pick an Image'}
-            </Text>
-          </TouchableOpacity>
-
-          {image && (
-            <View style={styles.imagePreviewContainer}>
-              <Image 
-                source={{ uri: image }} 
-                style={styles.imagePreview} 
-              />
-              <TouchableOpacity 
-                style={styles.removeImageButton}
-                onPress={() => setImage(null)}
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium" style={styles.sectionTitle}>
+                Next Meeting:
+              </Text>
+              <Button
+                mode="outlined"
+                onPress={() => setDatePickerVisible(true)}
+                style={styles.input}
               >
-                <Text style={styles.removeImageText}>Remove</Text>
+                Pick Date
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => setTimePickerVisible(true)}
+                style={styles.input}
+              >
+                Pick Time
+              </Button>
+              <Button
+                mode="outlined"
+                color="red"
+                onPress={handleSetTBD}
+                style={styles.input}
+              >
+                Set as TBD
+              </Button>
+              <Text style={styles.selectedDate}>
+                {isTBD
+                  ? 'First Meeting Date: TBD'
+                  : `Selected: ${nextMeetingDate.toLocaleDateString()} ${nextMeetingDate.toLocaleTimeString()}`}
+              </Text>
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Image:</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.imageUploadButton}>
+                <Text style={styles.imageUploadText}>
+                  {image ? 'Change Image' : 'Pick an Image'}
+                </Text>
               </TouchableOpacity>
-            </View>
-          )}
-
-          <Button title="Create" onPress={handleCreatePost} />
-          <Button title="Cancel" onPress={onClose} color="red" />
+              {image && (
+                <View style={styles.imagePreviewContainer}>
+                  <Image source={{ uri: image }} style={styles.imagePreview} />
+                  <TouchableOpacity
+                    onPress={() => setImage(null)}
+                    style={styles.removeImageButton}
+                  >
+                    <Text style={styles.removeImageText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </Card.Content>
+          </Card>
+        </ScrollView>
+        <View style={styles.actions}>
+          <Button 
+            mode="contained" 
+            onPress={handleCreatePost} 
+            buttonColor={theme.colors.primary}
+            textColor = {theme.colors.text}
+          >
+            Create
+          </Button>
+          <Button 
+            mode="contained" 
+            onPress={onClose}
+            buttonColor={theme.colors.cancel}
+            textColor = {theme.colors.text}
+          >
+            Cancel
+          </Button>
         </View>
       </View>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible || isTimePickerVisible}
+        mode={isDatePickerVisible ? 'date' : 'time'}
+        date={nextMeetingDate}
+        onConfirm={handleDateChange}
+        onCancel={() => {
+          setDatePickerVisible(false);
+          setTimePickerVisible(false);
+        }}
+      />
     </Modal>
   );
 };
@@ -222,7 +297,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: 300,
+    width: '80%',
     padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
@@ -338,4 +413,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  }
 });

@@ -16,7 +16,8 @@ export const lightTheme = {
     warning: '#dc3545',
     placeholderTextColor: '#8c8c8c',
     icon: '#000000',
-    groupCardTag: '#b6abf7'
+    groupCardTag: '#b6abf7',
+    cancel: '#ed7168'
   },
 };
 
@@ -36,6 +37,7 @@ export const darkTheme = {
     warning: '#dc3545',
     placeholderTextColor: '#a6a6a6',
     icon: '#ffffff',
-    groupCardTag: '#6c85a1'
+    groupCardTag: '#6c85a1',
+    cancel: '#ed7168'
   },
 };
