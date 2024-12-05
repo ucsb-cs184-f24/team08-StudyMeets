@@ -1,15 +1,32 @@
-import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Mail } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from '../../firebase';
 import { Button as PaperButton } from 'react-native-paper';
 import { signOut } from "firebase/auth";
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 const SettingsTab = () => {
     
     const navigation = useNavigation();
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+      const fetchUserInfo = async () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          Alert.alert("Error", "User not found. Please log in again.");
+          navigation.navigate('Login');
+          return;
+        }
+  
+        setUser(currentUser);
+      };
+  
+      fetchUserInfo();
+    }, []);
 
     const handleLogout = async () => {
       try {
@@ -17,6 +34,17 @@ const SettingsTab = () => {
         navigation.navigate('Login');
       } catch (error) {
         console.error("Error logging out:", error);
+      }
+    };
+
+    const handleChangePassword = async () => {
+      if (user && user.email) {
+        try {
+          await sendPasswordResetEmail(auth, user.email);
+          Alert.alert("Password Reset", "Check your email for password reset instructions.");
+        } catch (error) {
+          Alert.alert("Error", "Unable to send password reset email.");
+        }
       }
     };
 
@@ -50,9 +78,17 @@ const SettingsTab = () => {
           </View>
 
           <PaperButton
+            mode="contained"
+            onPress={handleChangePassword}
+            style={{ marginVertical: 10 }}
+          >
+            Change Password
+          </PaperButton>
+
+          <PaperButton
             mode="outlined"
             onPress={handleLogout}
-            style={styles.logoutButton}
+            style={{ marginBottom: 20 }}
           >
             Logout
           </PaperButton>
@@ -95,8 +131,5 @@ const styles = StyleSheet.create({
     settingText: {
         fontSize: 16,
         color: '#000',
-    },
-    logoutButton: {
-        marginVertical: 20,
     },
 });
