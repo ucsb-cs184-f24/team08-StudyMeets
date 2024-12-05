@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupCard from './GroupCard';
 import { PlusCircle } from 'lucide-react-native';
 import PeopleList from './PeopleList'
+import { canUserJoinGroup } from '../utils/groupUtils';
 
 const Explore = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -123,11 +124,24 @@ const Explore = () => {
     const currentUser = auth.currentUser;
     if (currentUser) {
       try {
+        // Check if user can join before attempting to join
+        const result = await canUserJoinGroup(currentUser.uid, postId);
+        
+        if (!result.canJoin) {
+          Alert.alert(
+            'Cannot Join Group',
+            result.reason,
+            [{ text: 'OK' }]
+          );
+          return;
+        }
+  
+        // If they can join, proceed with joining
         await addDoc(collection(firestore, 'userGroups'), {
           userId: currentUser.uid,
           postId: postId,
         });
-        Alert.alert('Joined', 'You have successfully joined the group.');
+        Alert.alert('Success', 'You have successfully joined the group.');
       } catch (error) {
         console.error('Error joining group:', error);
         Alert.alert('Error', 'Failed to join the group.');

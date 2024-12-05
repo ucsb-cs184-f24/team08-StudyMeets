@@ -38,13 +38,51 @@ const GroupCard = ({
               {item.Description}
             </Text>
 
+            {/* Add Universities Section */}
+            {item.Restrictions?.universityRestricted && item.Universities?.length > 0 && (
+              <View style={styles.restrictionSection}>
+                <Text variant="bodyMedium" style={styles.restrictionTitle}>
+                  Restricted to Universities:
+                </Text>
+                <View style={styles.chipContainer}>
+                  {item.Universities.map((uni, index) => (
+                    <Chip key={`uni-${index}`} style={styles.chip}>
+                      {uni}
+                    </Chip>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Add Majors Section */}
+            {item.Restrictions?.majorRestricted && item.Majors?.length > 0 && (
+              <View style={styles.restrictionSection}>
+                <Text variant="bodyMedium" style={styles.restrictionTitle}>
+                  Restricted to Majors:
+                </Text>
+                <View style={styles.chipContainer}>
+                  {item.Majors.map((major, index) => (
+                    <Chip key={`major-${index}`} style={styles.chip}>
+                      {major}
+                    </Chip>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Existing Tags Section */}
             {item.Tags && item.Tags.length > 0 && (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
-                {item.Tags.map((tag, index) => (
-                  <Chip key={index} style={{ marginRight: 5, marginBottom: 5 }}>
-                    {tag}
-                  </Chip>
-                ))}
+              <View style={styles.restrictionSection}>
+                <Text variant="bodyMedium" style={styles.restrictionTitle}>
+                  Tags:
+                </Text>
+                <View style={styles.chipContainer}>
+                  {item.Tags.map((tag, index) => (
+                    <Chip key={`tag-${index}`} style={styles.chip}>
+                      {tag}
+                    </Chip>
+                  ))}
+                </View>
               </View>
             )}
 
@@ -105,6 +143,39 @@ const GroupCard = ({
               <Text variant="titleMedium" style={styles.sectionTitle}>Description</Text>
               <Text variant="bodyLarge">{item.Description}</Text>
 
+              {/* Add Universities to Modal */}
+              {item.Restrictions?.universityRestricted && item.Universities?.length > 0 && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>
+                    Restricted to Universities
+                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {item.Universities.map((uni, index) => (
+                      <Chip key={`uni-${index}`} style={styles.tag}>
+                        {uni}
+                      </Chip>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              {/* Add Majors to Modal */}
+              {item.Restrictions?.majorRestricted && item.Majors?.length > 0 && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>
+                    Restricted to Majors
+                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {item.Majors.map((major, index) => (
+                      <Chip key={`major-${index}`} style={styles.tag}>
+                        {major}
+                      </Chip>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              {/* Existing Tags Section */}
               {item.Tags && item.Tags.length > 0 && (
                 <>
                   <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
@@ -193,6 +264,22 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginHorizontal: 5,
+  },
+  restrictionSection: {
+    marginVertical: 5,
+  },
+  restrictionTitle: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+  },
+  chip: {
+    marginRight: 5,
+    marginBottom: 5,
   },
 });
 

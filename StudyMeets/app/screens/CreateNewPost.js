@@ -4,6 +4,9 @@ import { firestore } from '../../firebase';
 import { auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
+import * as ImagePicker from 'expo-image-picker';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -11,27 +14,27 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [description, setDescription] = useState('');
   const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
-  const [searchText, setSearchText] = useState('');
+  const [tagInput, setTagInput] = useState('');
   const [image, setImage] = useState(null);
+  const [universities, setUniversities] = useState([]);
+  const [majors, setMajors] = useState([]);
+  const [universityInput, setUniversityInput] = useState('');
+  const [majorInput, setMajorInput] = useState('');
+  const [restrictions, setRestrictions] = useState({
+    universityRestricted: false,
+    majorRestricted: false,
+  });
 
-  const handleTagToggle = (tag) => {
-    setSelectedTags(prevTags => {
-      if (prevTags.includes(tag)) {
-        return prevTags.filter(t => t !== tag);
-      } else {
-        return [...prevTags, tag];
-      }
-    });
-    setSearchText(''); 
+  const handleAddTag = () => {
+    if (tagInput.trim() && !selectedTags.includes(tagInput.trim())) {
+      setSelectedTags(prev => [...prev, tagInput.trim()]);
+      setTagInput('');
+    }
   };
 
   const handleRemoveTag = (tag) => {
-    setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
+    setSelectedTags(prev => prev.filter(t => t !== tag));
   };
-
-  const filteredTags = tagsList.filter(tag =>
-    tag.toLowerCase().includes(searchText.toLowerCase())
-  );
 
   const pickImage = async () => {
     try {
@@ -51,6 +54,45 @@ const CreateNewPost = ({ visible, onClose }) => {
     }
   };
 
+  const handleAddUniversity = () => {
+    if (universityInput.trim() && !universities.includes(universityInput.trim())) {
+      setUniversities(prev => [...prev, universityInput.trim()]);
+      setUniversityInput('');
+    }
+  };
+
+  const handleAddMajor = () => {
+    if (majorInput.trim() && !majors.includes(majorInput.trim())) {
+      setMajors(prev => [...prev, majorInput.trim()]);
+      setMajorInput('');
+    }
+  };
+
+  const handleRemoveUniversity = (uni) => {
+    setUniversities(prev => prev.filter(u => u !== uni));
+  };
+
+  const handleRemoveMajor = (major) => {
+    setMajors(prev => prev.filter(m => m !== major));
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setLocation('');
+    setDescription('');
+    setSelectedTags([]);
+    setTagInput('');
+    setUniversities([]);
+    setMajors([]);
+    setUniversityInput('');
+    setMajorInput('');
+    setImage(null);
+    setRestrictions({
+      universityRestricted: false,
+      majorRestricted: false,
+    });
+  };
+
   const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
@@ -60,7 +102,6 @@ const CreateNewPost = ({ visible, onClose }) => {
 
       let imageUrl = null;
       if (image) {
-        // Upload image to Firebase Storage
         const response = await fetch(image);
         const blob = await response.blob();
         const imageRef = ref(storage, `studymeet-images/${Date.now()}`);
@@ -68,17 +109,9 @@ const CreateNewPost = ({ visible, onClose }) => {
         imageUrl = await getDownloadURL(imageRef);
       }
 
-      console.log('Title:', title);
-      console.log('Location:', location);
-      console.log('Description:', description);
-      console.log('Tags:', selectedTags);
-      console.log('Image"', image)
-
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
       if (userDoc.exists()) {
         setUserName(userDoc.data().username);
-      } else {
-        console.log('No such document!');
       }
 
       await addDoc(collection(firestore, 'studymeets'), {
@@ -90,10 +123,15 @@ const CreateNewPost = ({ visible, onClose }) => {
         OwnerName: userName,
         CreatedAt: new Date(),
         ImageUrl: imageUrl,
+        Universities: universities,
+        Majors: majors,
+        Restrictions: restrictions,
       });
 
-      setImage(null); // Reset image state
+      resetForm();
       onClose();
+      Alert.alert('Success', 'Your StudyMeet has been created!');
+      
     } catch (error) {
       console.error('Error creating document:', error);
       Alert.alert('Error', error.message);
@@ -108,98 +146,146 @@ const CreateNewPost = ({ visible, onClose }) => {
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.formTitle}>Create New StudyMeet</Text>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Title"
-            value={title}
-            onChangeText={setTitle}
-          />
-          <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Location"
-            value={location}
-            onChangeText={setLocation}
-          />
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={styles.largeInput}
-            value={description}
-            onChangeText={setDescription}
-          />
-          
-          <Text style={styles.label}>Search Tags</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Search tags..."
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-
-          {/* Scrollable box for filtered tags */}
-          {searchText && filteredTags.length > 0 && (
-            <View style={styles.tagSuggestions}>
-              <FlatList
-                data={filteredTags}
-                keyExtractor={item => item}
-                renderItem={({ item }) => (
-                  <View style={styles.tagItem}>
-                    <Text style={styles.tagText}>{item}</Text>
-                    <Button 
-                      title={selectedTags.includes(item) ? "Remove" : "Add"} 
-                      onPress={() => handleTagToggle(item)}
-                      color={selectedTags.includes(item) ? 'red' : 'green'}
-                    />
-                  </View>
-                )}
-              />
-            </View>
-          )}
-
-          {/* Display selected tags with remove option */}
-          <Text style={styles.label}>Selected Tags:</Text>
-          <View style={styles.selectedTagsContainer}>
-            {selectedTags.map(tag => (
-              <View key={tag} style={styles.selectedTagContainer}>
-                <Text style={styles.selectedTag}>{tag}</Text>
-                <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
-                  <Text style={styles.removeTag}> X </Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-
-          <Text style={styles.label}>Image (Optional)</Text>
-          <TouchableOpacity 
-            style={styles.imageUploadButton} 
-            onPress={pickImage}
-          >
-            <Text style={styles.imageUploadText}>
-              {image ? 'Change Image' : 'Pick an Image'}
-            </Text>
-          </TouchableOpacity>
-
-          {image && (
-            <View style={styles.imagePreviewContainer}>
-              <Image 
-                source={{ uri: image }} 
-                style={styles.imagePreview} 
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.modalContent}>
+            <Text style={styles.formTitle}>Create New StudyMeet</Text>
+            <Text style={styles.label}>Title</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Title"
+              value={title}
+              onChangeText={setTitle}
+            />
+            <Text style={styles.label}>Location</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Location"
+              value={location}
+              onChangeText={setLocation}
+            />
+            <Text style={styles.label}>Description</Text>
+            <TextInput
+              style={styles.largeInput}
+              value={description}
+              onChangeText={setDescription}
+              multiline={true}
+              numberOfLines={4}
+              textAlignVertical='top'
+            />
+            
+            <Text style={styles.label}>Universities</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Enter university name"
+                value={universityInput}
+                onChangeText={setUniversityInput}
+                onSubmitEditing={handleAddUniversity}
               />
               <TouchableOpacity 
-                style={styles.removeImageButton}
-                onPress={() => setImage(null)}
+                style={styles.addButton}
+                onPress={handleAddUniversity}
               >
-                <Text style={styles.removeImageText}>Remove</Text>
+                <Text style={styles.addButtonText}>Add</Text>
               </TouchableOpacity>
             </View>
-          )}
 
-          <Button title="Create" onPress={handleCreatePost} />
-          <Button title="Cancel" onPress={onClose} color="red" />
-        </View>
+            <View style={styles.selectedTagsContainer}>
+              {universities.map(uni => (
+                <View key={uni} style={styles.selectedTagContainer}>
+                  <Text style={styles.selectedTag}>{uni}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveUniversity(uni)}>
+                    <Text style={styles.removeTag}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.label}>Majors</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Enter major"
+                value={majorInput}
+                onChangeText={setMajorInput}
+                onSubmitEditing={handleAddMajor}
+              />
+              <TouchableOpacity 
+                style={styles.addButton}
+                onPress={handleAddMajor}
+              >
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.selectedTagsContainer}>
+              {majors.map(major => (
+                <View key={major} style={styles.selectedTagContainer}>
+                  <Text style={styles.selectedTag}>{major}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveMajor(major)}>
+                    <Text style={styles.removeTag}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.label}>Tags</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Enter tag"
+                value={tagInput}
+                onChangeText={setTagInput}
+                onSubmitEditing={handleAddTag}
+              />
+              <TouchableOpacity 
+                style={styles.addButton}
+                onPress={handleAddTag}
+              >
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.selectedTagsContainer}>
+              {selectedTags.map(tag => (
+                <View key={tag} style={styles.selectedTagContainer}>
+                  <Text style={styles.selectedTag}>{tag}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
+                    <Text style={styles.removeTag}> X </Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.label}>Image (Optional)</Text>
+            <TouchableOpacity 
+              style={styles.imageUploadButton} 
+              onPress={pickImage}
+            >
+              <Text style={styles.imageUploadText}>
+                {image ? 'Change Image' : 'Pick an Image'}
+              </Text>
+            </TouchableOpacity>
+
+            {image && (
+              <View style={styles.imagePreviewContainer}>
+                <Image 
+                  source={{ uri: image }} 
+                  style={styles.imagePreview} 
+                />
+                <TouchableOpacity 
+                  style={styles.removeImageButton}
+                  onPress={() => setImage(null)}
+                >
+                  <Text style={styles.removeImageText}>Remove</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <Button title="Create" onPress={handleCreatePost} />
+            <Button title="Cancel" onPress={onClose} color="red" />
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -213,31 +299,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingVertical: 20,
+  },
+  scrollView: {
+    width: '100%',
+    maxWidth: 400,
   },
   modalContent: {
-    width: 300,
-    padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
-    alignItems: 'center',
+    padding: 20,
+    margin: 25,
+    width: 'auto',
+    minWidth: 300,
+    alignSelf: 'center',
   },
   input: {
-    width: '100%',
-    padding: 10,
+    // width: '100%',
+    minHeight: 40,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 10,
   },
   largeInput: {
-    width: '100%',
-    height: 100,
-    padding: 10,
+    // width: '100%',
+    minHeight: 100,
+    maxHeight: 200,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
     textAlignVertical: 'top',
+    multiline: true,
   },
   label: {
     alignSelf: 'flex-start',
@@ -253,23 +351,41 @@ const styles = StyleSheet.create({
   },
   tagSuggestions: {
     width: '100%',
-    maxHeight: 150, // Set a maximum height for the suggestions box
+    maxHeight: 150,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
     paddingVertical: 5,
-    overflow: 'hidden', // Hide overflow to create a clean border
   },
   tagItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 5,
+    paddingVertical: 8,
     paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   tagText: {
     flex: 1,
+  },
+  tagButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  addButton: {
+    backgroundColor: '#4CAF50',
+  },
+  removeButton: {
+    backgroundColor: '#ff5252',
+  },
+  tagButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   selectedTagsContainer: {
     flexDirection: 'row',
@@ -290,10 +406,10 @@ const styles = StyleSheet.create({
   removeTag: {
     color: 'red',
     fontWeight: 'bold',
-    padding: 5,
+    fontSize: 18
   },
   imageUploadButton: {
-    width: '100%',
+    // width: '100%',
     padding: 10,
     borderColor: 'gray',
     borderWidth: 1,
@@ -330,5 +446,65 @@ const styles = StyleSheet.create({
   removeImageText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  scrollView: {
+    width: '100%',
+  },
+  restrictionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 15,
+  },
+  toggleButton: {
+    backgroundColor: '#cc0404',
+    padding: 8,
+    borderRadius: 5,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: '#4CAF50',
+  },
+  toggleButtonText: {
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 10,
+  },
+  addButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 60,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+    gap: 5,
+  },
+  selectedTagContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 15,
+    padding: 5,
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  selectedTag: {
+    marginRight: 5,
   },
 });
