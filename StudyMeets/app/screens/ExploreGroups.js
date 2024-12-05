@@ -7,7 +7,7 @@ import CreateNewPost from './CreateNewPost';
 import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupCard from './GroupCard';
-import { PlusCircle } from 'lucide-react-native';
+import { PlusCircle, CircleX } from 'lucide-react-native';
 import PeopleList from './PeopleList'
 
 const ExploreGroups = () => {
@@ -172,6 +172,8 @@ const ExploreGroups = () => {
     post.Title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const clearSearch = () => setSearchQuery('');
+
   return (
     <SafeAreaView style={styles.container}>
       <PaperTextInput
@@ -180,6 +182,13 @@ const ExploreGroups = () => {
         value={searchQuery}
         onChangeText={setSearchQuery}
         style={styles.searchBar}
+        right={
+          searchQuery ? (
+            <PaperTextInput.Icon
+              icon={() => <CircleX size={25} color="black" />}
+              onPress={clearSearch}
+            />
+          ) : null }
       />
     <FlatList
       data={filteredPosts}

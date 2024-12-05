@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore, auth } from '../../firebase';
-import { Avatar } from 'react-native-paper';
+import { Avatar, TextInput as PaperTextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { CircleX } from 'lucide-react-native';
 
 const ExploreUsers = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
   const placeholderImage = 'https://via.placeholder.com/80';
   const currentUserId = auth.currentUser.uid;
@@ -17,11 +20,11 @@ const ExploreUsers = () => {
       const usersCollection = collection(firestore, 'users');
       const usersSnapshot = await getDocs(usersCollection);
       const usersList = usersSnapshot.docs
-        .map(doc => ({
+        .map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(user => user.id !== currentUserId); // Exclude current user
+        .filter((user) => user.id !== currentUserId); // Exclude current user
 
       setAllUsers(usersList);
     } catch (error) {
@@ -43,10 +46,30 @@ const ExploreUsers = () => {
     navigation.navigate('Profile', { user });
   };
 
+  const filteredUsers = allUsers.filter((user) =>
+    user.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const clearSearch = () => setSearchQuery('');
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <PaperTextInput
+        mode="outlined"
+        placeholder="Search users by username..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={styles.searchBar}
+        right={
+          searchQuery ? (
+            <PaperTextInput.Icon
+              icon={() => <CircleX size={25} color="black" />}
+              onPress={clearSearch}
+            />
+          ) : null }
+      />
       <FlatList
-        data={allUsers}
+        data={filteredUsers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
@@ -56,7 +79,7 @@ const ExploreUsers = () => {
         )}
         ListEmptyComponent={() => (
           <View style={styles.noUsersContainer}>
-            <Text style={styles.noUsersText}>There are no users to explore.</Text>
+            <Text style={styles.noUsersText}>No users found.</Text>
           </View>
         )}
         refreshControl={
@@ -67,15 +90,18 @@ const ExploreUsers = () => {
         }
         contentContainerStyle={{ flexGrow: 1 }}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 8,
     backgroundColor: '#f9f9f9',
+  },
+  searchBar: {
+    marginHorizontal: 10,
+    marginBottom: 10,
   },
   userCard: {
     flexDirection: 'row',
@@ -90,14 +116,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   username: {
-    marginLeft: 10,
     fontSize: 16,
     fontWeight: '500',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginLeft: 10,
   },
   noUsersContainer: {
     flex: 1,
