@@ -18,12 +18,6 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Placeholder screens
-const NotificationsScreen = () => (
-  <View style={styles.tabContainer}>
-    <Text>notifications</Text>
-  </View>
-);
-
 const NotificationSettingsScreen = () => (
   <View style={styles.tabContainer}>
     <Text>notification settings</Text>
@@ -90,7 +84,7 @@ const App = () => {
           <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
           <Stack.Screen name="CreateProfile" component={CreateProfile} options={{ headerShown: false }} />
           <Stack.Screen name="Profile" component={Profile} options={{ headerTitle: '' }} />
-          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="Notifications" component={Notifications} />
           <Stack.Screen name="Notification Settings" component={NotificationSettingsScreen} />
           <Stack.Screen name="Profile Privacy Settings" component={ProfilePrivacyScreen} />
           <Stack.Screen name="General Settings" component={GeneralScreen} />
