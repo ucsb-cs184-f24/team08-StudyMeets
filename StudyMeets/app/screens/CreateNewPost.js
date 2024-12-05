@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, FlatList, Alert, TouchableOpacity, Image, ScrollView} from 'react-native';
-import { firestore } from '../../firebase';
-import { auth } from '../../firebase';
+import { View, FlatList, ScrollView, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
+import { firestore, auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import * as ImagePicker from 'expo-image-picker';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -12,26 +14,47 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
+  const [isTBD, setIsTBD] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const [image, setImage] = useState(null);
 
   const handleTagToggle = (tag) => {
-    setSelectedTags(prevTags => {
-      if (prevTags.includes(tag)) {
-        return prevTags.filter(t => t !== tag);
-      } else {
-        return [...prevTags, tag];
-      }
-    });
-    setSearchText(''); 
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+    );
+    setSearchText('');
   };
 
   const handleRemoveTag = (tag) => {
-    setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
+    setSelectedTags((prevTags) => prevTags.filter((t) => t !== tag));
   };
 
-  const filteredTags = tagsList.filter(tag =>
-    tag.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleDateChange = (selectedDate) => {
+    if (selectedDate) {
+      setNextMeetingDate((prevDate) => {
+        if (isTimePickerVisible) {
+          return new Date(
+            prevDate.getFullYear(),
+            prevDate.getMonth(),
+            prevDate.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes()
+          );
+        }
+        return selectedDate;
+      });
+      setIsTBD(false);
+    }
+    setDatePickerVisible(false);
+    setTimePickerVisible(false);
+  };
+
+  const handleSetTBD = () => {
+    setIsTBD(true);
+    setNextMeetingDate(new Date());
+  };
 
   const pickImage = async () => {
     try {
@@ -54,32 +77,10 @@ const CreateNewPost = ({ visible, onClose }) => {
   const handleCreatePost = async () => {
     try {
       const currentUser = auth.currentUser;
-      if (!currentUser) {
-        throw new Error('User not authenticated');
-      }
-
-      let imageUrl = null;
-      if (image) {
-        // Upload image to Firebase Storage
-        const response = await fetch(image);
-        const blob = await response.blob();
-        const imageRef = ref(storage, `studymeet-images/${Date.now()}`);
-        await uploadBytes(imageRef, blob);
-        imageUrl = await getDownloadURL(imageRef);
-      }
-
-      console.log('Title:', title);
-      console.log('Location:', location);
-      console.log('Description:', description);
-      console.log('Tags:', selectedTags);
-      console.log('Image"', image)
+      if (!currentUser) throw new Error('User not authenticated');
 
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      if (userDoc.exists()) {
-        setUserName(userDoc.data().username);
-      } else {
-        console.log('No such document!');
-      }
+      if (userDoc.exists()) setUserName(userDoc.data().username);
 
       await addDoc(collection(firestore, 'studymeets'), {
         Title: title,
@@ -89,7 +90,8 @@ const CreateNewPost = ({ visible, onClose }) => {
         OwnerEmail: currentUser.email,
         OwnerName: userName,
         CreatedAt: new Date(),
-        ImageUrl: imageUrl,
+        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
+        ImageUrl: image,
       });
 
       setImage(null); // Reset image state
@@ -101,228 +103,211 @@ const CreateNewPost = ({ visible, onClose }) => {
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.formTitle}>Create New StudyMeet</Text>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Title"
-            value={title}
-            onChangeText={setTitle}
-          />
-          <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Location"
-            value={location}
-            onChangeText={setLocation}
-          />
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={styles.largeInput}
-            value={description}
-            onChangeText={setDescription}
-          />
-          
-          <Text style={styles.label}>Search Tags</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Search tags..."
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-
-          {/* Scrollable box for filtered tags */}
-          {searchText && filteredTags.length > 0 && (
-            <View style={styles.tagSuggestions}>
+    <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
+      <View style={styles.modalContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Card>
+            <Card.Title title="Create New StudyMeet" />
+            <Card.Content>
+              <TextInput
+                label="Title"
+                mode="outlined"
+                value={title}
+                onChangeText={setTitle}
+                style={styles.input}
+              />
+              <TextInput
+                label="Location"
+                mode="outlined"
+                value={location}
+                onChangeText={setLocation}
+                style={styles.input}
+              />
+              <TextInput
+                label="Description"
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                value={description}
+                onChangeText={setDescription}
+                style={styles.input}
+              />
+              <TextInput
+                label="Search Tags"
+                mode="outlined"
+                value={searchText}
+                onChangeText={setSearchText}
+                style={styles.input}
+              />
               <FlatList
-                data={filteredTags}
-                keyExtractor={item => item}
-                renderItem={({ item }) => (
-                  <View style={styles.tagItem}>
-                    <Text style={styles.tagText}>{item}</Text>
-                    <Button 
-                      title={selectedTags.includes(item) ? "Remove" : "Add"} 
-                      onPress={() => handleTagToggle(item)}
-                      color={selectedTags.includes(item) ? 'red' : 'green'}
-                    />
-                  </View>
+                data={tagsList.filter((tag) =>
+                  tag.toLowerCase().includes(searchText.toLowerCase())
                 )}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <Chip
+                    style={styles.chip}
+                    onPress={() => handleTagToggle(item)}
+                    selected={selectedTags.includes(item)}
+                  >
+                    {item}
+                  </Chip>
+                )}
+                horizontal
               />
-            </View>
-          )}
-
-          {/* Display selected tags with remove option */}
-          <Text style={styles.label}>Selected Tags:</Text>
-          <View style={styles.selectedTagsContainer}>
-            {selectedTags.map(tag => (
-              <View key={tag} style={styles.selectedTagContainer}>
-                <Text style={styles.selectedTag}>{tag}</Text>
-                <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
-                  <Text style={styles.removeTag}> X </Text>
-                </TouchableOpacity>
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Selected Tags:</Text>
+              <View style={styles.tagsContainer}>
+                {selectedTags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    style={styles.chip}
+                    onClose={() => handleRemoveTag(tag)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
               </View>
-            ))}
-          </View>
-
-          <Text style={styles.label}>Image (Optional)</Text>
-          <TouchableOpacity 
-            style={styles.imageUploadButton} 
-            onPress={pickImage}
-          >
-            <Text style={styles.imageUploadText}>
-              {image ? 'Change Image' : 'Pick an Image'}
-            </Text>
-          </TouchableOpacity>
-
-          {image && (
-            <View style={styles.imagePreviewContainer}>
-              <Image 
-                source={{ uri: image }} 
-                style={styles.imagePreview} 
-              />
-              <TouchableOpacity 
-                style={styles.removeImageButton}
-                onPress={() => setImage(null)}
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium" style={styles.sectionTitle}>
+                Next Meeting:
+              </Text>
+              <Button
+                mode="outlined"
+                onPress={() => setDatePickerVisible(true)}
+                style={styles.input}
               >
-                <Text style={styles.removeImageText}>Remove</Text>
+                Pick Date
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => setTimePickerVisible(true)}
+                style={styles.input}
+              >
+                Pick Time
+              </Button>
+              <Button
+                mode="outlined"
+                color="red"
+                onPress={handleSetTBD}
+                style={styles.input}
+              >
+                Set as TBD
+              </Button>
+              <Text style={styles.selectedDate}>
+                {isTBD
+                  ? 'First Meeting Date: TBD'
+                  : `Selected: ${nextMeetingDate.toLocaleDateString()} ${nextMeetingDate.toLocaleTimeString()}`}
+              </Text>
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Image:</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.imageUploadButton}>
+                <Text style={styles.imageUploadText}>
+                  {image ? 'Change Image' : 'Pick an Image'}
+                </Text>
               </TouchableOpacity>
-            </View>
-          )}
-
-          <Button title="Create" onPress={handleCreatePost} />
-          <Button title="Cancel" onPress={onClose} color="red" />
+              {image && (
+                <View style={styles.imagePreviewContainer}>
+                  <Image source={{ uri: image }} style={styles.imagePreview} />
+                  <TouchableOpacity
+                    onPress={() => setImage(null)}
+                    style={styles.removeImageButton}
+                  >
+                    <Text style={styles.removeImageText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </Card.Content>
+          </Card>
+        </ScrollView>
+        <View style={styles.actions}>
+          <Button mode="contained" onPress={handleCreatePost}>
+            Create
+          </Button>
+          <Button mode="outlined" onPress={onClose} color="red">
+            Cancel
+          </Button>
         </View>
       </View>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible || isTimePickerVisible}
+        mode={isDatePickerVisible ? 'date' : 'time'}
+        date={nextMeetingDate}
+        onConfirm={handleDateChange}
+        onCancel={() => {
+          setDatePickerVisible(false);
+          setTimePickerVisible(false);
+        }}
+      />
     </Modal>
   );
 };
-
-export default CreateNewPost;
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingHorizontal: 20,
   },
   modalContent: {
-    width: 300,
-    padding: 20,
     backgroundColor: 'white',
+    width: '90%',
+    maxHeight: '90%',
     borderRadius: 10,
-    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   input: {
-    width: '100%',
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
     marginBottom: 10,
   },
-  largeInput: {
-    width: '100%',
-    height: 100,
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    textAlignVertical: 'top',
+  chip: {
+    margin: 2,
   },
-  label: {
-    alignSelf: 'flex-start',
-    marginBottom: 5,
-    fontSize: 16,
-    fontWeight: 'bold',
+  divider: {
+    marginVertical: 10,
   },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  tagSuggestions: {
-    width: '100%',
-    maxHeight: 150, // Set a maximum height for the suggestions box
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingVertical: 5,
-    overflow: 'hidden', // Hide overflow to create a clean border
-  },
-  tagItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  tagText: {
-    flex: 1,
-  },
-  selectedTagsContainer: {
+  tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 15,
   },
-  selectedTagContainer: {
+  sectionTitle: {
+    marginBottom: 10,
+  },
+  selectedDate: {
+    marginTop: 10,
+  },
+  actions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
-    borderRadius: 15,
-    padding: 5,
-    margin: 5,
-  },
-  selectedTag: {
-    marginRight: 5,
-  },
-  removeTag: {
-    color: 'red',
-    fontWeight: 'bold',
-    padding: 5,
+    justifyContent: 'space-between',
+    padding: 10,
   },
   imageUploadButton: {
-    width: '100%',
     padding: 10,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 10,
     alignItems: 'center',
+    marginBottom: 10,
   },
   imageUploadText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
   imagePreviewContainer: {
-    width: '100%',
-    height: 200,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    overflow: 'hidden',
+    marginVertical: 10,
+    alignItems: 'center',
   },
   imagePreview: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: 100,
+    height: 100,
+    borderRadius: 10,
   },
   removeImageButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
+    marginTop: 10,
     backgroundColor: 'red',
     padding: 5,
     borderRadius: 5,
@@ -332,3 +317,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default CreateNewPost;
