@@ -5,7 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { firestore, auth } from '../../firebase';
 import { Avatar, TextInput as PaperTextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { CircleX } from 'lucide-react-native';
+import { CircleX, Search } from 'lucide-react-native';
 
 const ExploreUsers = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -67,6 +67,9 @@ const ExploreUsers = () => {
               onPress={clearSearch}
             />
           ) : null }
+        left={
+            <PaperTextInput.Icon
+              icon={() => <Search size={25} color="grey" />}/>}
       />
       <FlatList
         data={filteredUsers}

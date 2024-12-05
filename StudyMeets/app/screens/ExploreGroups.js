@@ -7,7 +7,7 @@ import CreateNewPost from './CreateNewPost';
 import { TextInput as PaperTextInput, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupCard from './GroupCard';
-import { PlusCircle, CircleX } from 'lucide-react-native';
+import { PlusCircle, CircleX, Search } from 'lucide-react-native';
 import PeopleList from './PeopleList'
 
 const ExploreGroups = () => {
@@ -189,6 +189,9 @@ const ExploreGroups = () => {
               onPress={clearSearch}
             />
           ) : null }
+        left={
+          <PaperTextInput.Icon
+            icon={() => <Search size={25} color="grey" />}/>}
       />
     <FlatList
       data={filteredPosts}
