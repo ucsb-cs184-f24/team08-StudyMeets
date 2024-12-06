@@ -10,6 +10,7 @@ const MyGroups = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Tab.Navigator
+        lazy={true}
         screenOptions={{
           tabBarActiveTintColor: '#000',
           tabBarIndicatorStyle: { backgroundColor: '#000' },

@@ -95,6 +95,15 @@ const EditPost = ({ visible, onClose, postId }) => {
   };
 
   const handleUpdatePost = async () => {
+    if (title.trim() === '') {
+      Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
+      return;
+    }
+    if (location.trim() === '') {
+      Alert.alert('Error', 'The Location cannot be empty, please enter a Location.');
+      return;
+    }    
+
     try {
       await updateDoc(doc(firestore, 'studymeets', postId), {
         Title: title,

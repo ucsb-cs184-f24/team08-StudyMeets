@@ -8,12 +8,14 @@ const GroupCard = ({
   primaryActionLabel, 
   secondaryActionLabel, 
   onSecondaryAction,
+  thirdActionLabel,
+  onThirdAction
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const formatDate = (date) => {
     if (!date) return 'TBD';
-    if (typeof date === 'string') return date; // If date is already a string (e.g., 'TBD')
+    if (typeof date === 'string') return date;
     if (date.toDate) {
       const formattedDate = date.toDate();
       return `${formattedDate.toLocaleDateString()} ${formattedDate.toLocaleTimeString([], {
@@ -66,11 +68,19 @@ const GroupCard = ({
           <Card.Actions>
             <View style={styles.buttonContainer}>
               <Button onPress={() => onPrimaryAction(item.id)}>{primaryActionLabel}</Button>
+
+              {thirdActionLabel && onThirdAction && (
+                <Button onPress={() => onThirdAction(item.id)}>
+                  {thirdActionLabel}
+                </Button>
+              )}
+              
               {secondaryActionLabel && onSecondaryAction && (
                 <Button onPress={() => onSecondaryAction(item.id)} textColor="red">
                   {secondaryActionLabel}
                 </Button>
               )}
+
             </View>
           </Card.Actions>
         </Card>
