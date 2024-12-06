@@ -75,6 +75,15 @@ const CreateNewPost = ({ visible, onClose }) => {
   };
 
   const handleCreatePost = async () => {
+    if (title.trim() === '') {
+      Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
+      return;
+    }
+    if (location.trim() === '') {
+      Alert.alert('Error', 'The Location cannot be empty, please enter a Location.');
+      return;
+    }    
+
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) throw new Error('User not authenticated');
