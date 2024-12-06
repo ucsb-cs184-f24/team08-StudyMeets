@@ -1,4 +1,3 @@
-// GroupCard.js
 import React, { useState } from 'react';
 import { Card, Button, Text, Divider, Chip, IconButton } from 'react-native-paper';
 import { View, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
@@ -12,106 +11,63 @@ const GroupCard = ({
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleCardPress = (item) => {
-    setModalVisible(true);
+  const formatDate = (date) => {
+    if (!date) return 'TBD';
+    if (typeof date === 'string') return date; // If date is already a string (e.g., 'TBD')
+    if (date.toDate) {
+      const formattedDate = date.toDate();
+      return `${formattedDate.toLocaleDateString()} ${formattedDate.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`;
+    }
+    return 'TBD';
   };
 
   return (
     <>
-      <TouchableOpacity onPress={() => handleCardPress(item)}>
-        <Card style={{ marginVertical: 10 ,marginHorizontal: 10}}>
-          <Card.Title title={item.Title} />
-          
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Card style={{ marginVertical: 10, marginHorizontal: 10 }}>
+          <Card.Title title={item.Title} subtitle={`Location: ${item.Location}`} />
           {item.ImageUrl && (
             <Card.Cover 
               source={{ uri: item.ImageUrl }} 
               style={{ height: 275, marginBottom: 5, resizeMode: 'cover' }}
             />
           )}
-          
           <Card.Content>
-            <Text variant="bodyMedium" style={{ marginBottom: 5 }}>
-              Location: {item.Location}
-            </Text>
-            
             <Text variant="bodyMedium" style={{ marginBottom: 5 }}>
               {item.Description}
             </Text>
-
-            {/* Add Universities Section */}
-            {item.Restrictions?.universityRestricted && item.Universities?.length > 0 && (
-              <View style={styles.restrictionSection}>
-                <Text variant="bodyMedium" style={styles.restrictionTitle}>
-                  Restricted to Universities:
-                </Text>
-                <View style={styles.chipContainer}>
-                  {item.Universities.map((uni, index) => (
-                    <Chip key={`uni-${index}`} style={styles.chip}>
-                      {uni}
-                    </Chip>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Add Majors Section */}
-            {item.Restrictions?.majorRestricted && item.Majors?.length > 0 && (
-              <View style={styles.restrictionSection}>
-                <Text variant="bodyMedium" style={styles.restrictionTitle}>
-                  Restricted to Majors:
-                </Text>
-                <View style={styles.chipContainer}>
-                  {item.Majors.map((major, index) => (
-                    <Chip key={`major-${index}`} style={styles.chip}>
-                      {major}
-                    </Chip>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Existing Tags Section */}
             {item.Tags && item.Tags.length > 0 && (
-              <View style={styles.restrictionSection}>
-                <Text variant="bodyMedium" style={styles.restrictionTitle}>
-                  Tags:
-                </Text>
-                <View style={styles.chipContainer}>
+              <View style={styles.tagRow}>
+                <Text variant="bodySmall" style={{ fontWeight: 'bold' }}></Text>
+                <View style={styles.condensedChipContainer}>
                   {item.Tags.map((tag, index) => (
-                    <Chip key={`tag-${index}`} style={styles.chip}>
+                    <Chip 
+                      key={`tag-${index}`} 
+                      style={styles.condensedChip}
+                      textStyle={styles.condensedChipText}
+                    >
                       {tag}
                     </Chip>
                   ))}
                 </View>
               </View>
             )}
-
-            {/* Creator and Date/Time Information */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
-              <Text variant="bodySmall">Created by: {item.OwnerName}</Text>
-              <Text variant="bodySmall">
-                Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
+            <View style={{ marginTop: 10 }}>
+              <Text variant="bodySmall" style={{ fontWeight: 'bold' }}>
+                Next Meeting:
               </Text>
+              <Text variant="bodySmall">{formatDate(item.NextMeetingDate)}</Text>
             </View>
-            <Text variant="bodySmall">
-              Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
-            </Text>
           </Card.Content>
           <Divider />
           <Card.Actions>
             <View style={styles.buttonContainer}>
-              <Button 
-                onPress={() => onPrimaryAction(item.id)}
-                style={styles.actionButton}
-              >
-                {primaryActionLabel}
-              </Button>
+              <Button onPress={() => onPrimaryAction(item.id)}>{primaryActionLabel}</Button>
               {secondaryActionLabel && onSecondaryAction && (
-                <Button 
-                  onPress={() => onSecondaryAction(item.id)} 
-                  textColor="red"
-                  style={styles.actionButton}
-                >
+                <Button onPress={() => onSecondaryAction(item.id)} textColor="red">
                   {secondaryActionLabel}
                 </Button>
               )}
@@ -130,55 +86,17 @@ const GroupCard = ({
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text variant="headlineMedium">{item.Title}</Text>
-              <IconButton
-                icon="close"
-                onPress={() => setModalVisible(false)}
-              />
+              <IconButton icon="close" onPress={() => setModalVisible(false)} />
             </View>
-            
             <ScrollView>
               <Text variant="titleMedium" style={styles.sectionTitle}>Location</Text>
               <Text variant="bodyLarge">{item.Location}</Text>
-
               <Text variant="titleMedium" style={styles.sectionTitle}>Description</Text>
               <Text variant="bodyLarge">{item.Description}</Text>
-
-              {/* Add Universities to Modal */}
-              {item.Restrictions?.universityRestricted && item.Universities?.length > 0 && (
-                <>
-                  <Text variant="titleMedium" style={styles.sectionTitle}>
-                    Restricted to Universities
-                  </Text>
-                  <View style={styles.tagsContainer}>
-                    {item.Universities.map((uni, index) => (
-                      <Chip key={`uni-${index}`} style={styles.tag}>
-                        {uni}
-                      </Chip>
-                    ))}
-                  </View>
-                </>
-              )}
-
-              {/* Add Majors to Modal */}
-              {item.Restrictions?.majorRestricted && item.Majors?.length > 0 && (
-                <>
-                  <Text variant="titleMedium" style={styles.sectionTitle}>
-                    Restricted to Majors
-                  </Text>
-                  <View style={styles.tagsContainer}>
-                    {item.Majors.map((major, index) => (
-                      <Chip key={`major-${index}`} style={styles.tag}>
-                        {major}
-                      </Chip>
-                    ))}
-                  </View>
-                </>
-              )}
-
-              {/* Existing Tags Section */}
+              <Text variant="titleMedium" style={styles.sectionTitle}>Tags:</Text>
               {item.Tags && item.Tags.length > 0 && (
                 <>
-                  <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
+                  {/* <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text> */}
                   <View style={styles.tagsContainer}>
                     {item.Tags.map((tag, index) => (
                       <Chip key={index} style={styles.tag}>
@@ -187,24 +105,47 @@ const GroupCard = ({
                     ))}
                   </View>
                 </>
+
               )}
+              {item.Restrictions && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>Restrictions</Text>
+                  <Text variant="bodyLarge">
+                    {item.Restrictions.universityRestricted ? 'University Restricted' : ''}
+                    {item.Restrictions.universityRestricted && item.Restrictions.majorRestricted ? ', ' : ''}
+                    {item.Restrictions.majorRestricted ? 'Major Restricted' : ''}
+                    {!item.Restrictions.universityRestricted && !item.Restrictions.majorRestricted ? 'None' : ''}
+                  </Text>
+                  
+                  {item.Restrictions.universityRestricted && item.Restrictions.universities?.length > 0 && (
+                    <>
+                      <Text variant="titleMedium" style={[styles.sectionTitle, { fontSize: 14 }]}>Allowed Universities:</Text>
+                      <View style={styles.tagsContainer}>
+                        {item.Restrictions.universities.map((university, index) => (
+                          <Chip key={`uni-${index}`} style={styles.tag}>
+                            {university}
+                          </Chip>
+                        ))}
+                      </View>
+                    </>
+                  )}
 
-              <View style={styles.detailsContainer}>
-                <Text variant="bodyMedium">Created by: {item.OwnerName}</Text>
-                <Text variant="bodyMedium">
-                  Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
-                </Text>
-                <Text variant="bodyMedium">
-                  Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
-                </Text>
-              </View>
+                  {item.Restrictions.majorRestricted && item.Restrictions.majors?.length > 0 && (
+                    <>
+                      <Text variant="titleMedium" style={[styles.sectionTitle, { fontSize: 14 }]}>Allowed Majors:</Text>
+                      <View style={styles.tagsContainer}>
+                        {item.Restrictions.majors.map((major, index) => (
+                          <Chip key={`major-${index}`} style={styles.tag}>
+                            {major}
+                          </Chip>
+                        ))}
+                      </View>
+                    </>
+                  )}
+                </>
+              )}
             </ScrollView>
-
-            <Button 
-              mode="contained" 
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
+            <Button mode="contained" onPress={() => setModalVisible(false)} style={styles.closeButton}>
               Close
             </Button>
           </View>
@@ -248,6 +189,7 @@ const styles = StyleSheet.create({
   tag: {
     marginRight: 5,
     marginBottom: 5,
+    marginTop: 5,
   },
   detailsContainer: {
     marginTop: 15,
@@ -262,24 +204,24 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 10,
   },
-  actionButton: {
-    marginHorizontal: 5,
-  },
-  restrictionSection: {
-    marginVertical: 5,
-  },
-  restrictionTitle: {
-    fontWeight: 'bold',
+  tagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 5,
   },
-  chipContainer: {
+  condensedChipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 5,
   },
-  chip: {
+  condensedChip: {
     marginRight: 5,
     marginBottom: 5,
+  },
+  condensedChipText: {
+    fontSize: 12,
+  },
+  restrictionsText: {
+    fontWeight: 'bold',
   },
 });
 

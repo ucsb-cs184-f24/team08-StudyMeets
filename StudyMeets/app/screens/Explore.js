@@ -228,11 +228,13 @@ const Explore = () => {
       owner={owner}
     />
           <CreateNewPost visible={isModalVisible} onClose={closeModal} />
-          <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
-            <View style={styles.circleBackground}>
-              <PlusCircle size={40} color="white" />
-            </View>
-          </TouchableOpacity>
+          {!isModalVisible && (
+            <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
+              <View style={styles.circleBackground}>
+                <PlusCircle size={40} color="white" />
+              </View>
+            </TouchableOpacity>
+          )}
         </SafeAreaView>
       );
     };

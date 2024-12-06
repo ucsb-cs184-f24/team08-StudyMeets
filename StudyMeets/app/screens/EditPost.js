@@ -1,39 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, Alert, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, FlatList, ScrollView, Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { Modal, Text, TextInput, Button, Chip, Divider, Card, IconButton } from 'react-native-paper';
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-
 import { tagsList } from '../../definitions/Definitions.js';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [tags, setTags] = useState([]); // New state for tags
+  const [tags, setTags] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [universities, setUniversities] = useState([]);
-  const [majors, setMajors] = useState([]);
+  const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
+  const [isTBD, setIsTBD] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
+  const [showRestrictions, setShowRestrictions] = useState(false);
   const [universityInput, setUniversityInput] = useState('');
   const [majorInput, setMajorInput] = useState('');
+  const [universities, setUniversities] = useState([]);
+  const [majors, setMajors] = useState([]);
   const [restrictions, setRestrictions] = useState({
     universityRestricted: false,
     majorRestricted: false,
   });
-
-  const handleTagToggle = (tag) => {
-    setTags(prevTags => {
-      if (prevTags.includes(tag)) {
-        return prevTags.filter(t => t !== tag);
-      } else {
-        return [...prevTags, tag];
-      }
-    });
-    setSearchText(''); // Clear the search text when a tag is added
-  };
-
-  const filteredTags = tagsList.filter(tag =>
-    tag.toLowerCase().includes(searchText.toLowerCase())
-  );
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -44,15 +35,19 @@ const EditPost = ({ visible, onClose, postId }) => {
           setTitle(postData.Title);
           setLocation(postData.Location);
           setDescription(postData.Description);
-          setTags(postData.Tags || []); // Set the fetched tags
+          setTags(postData.Tags || []);
+          if (postData.NextMeetingDate) {
+            setNextMeetingDate(new Date(postData.NextMeetingDate));
+            setIsTBD(postData.NextMeetingDate === 'TBD');
+          }
           setUniversities(postData.Universities || []);
           setMajors(postData.Majors || []);
-          setRestrictions({
-            universityRestricted: postData.universityRestricted || false,
-            majorRestricted: postData.majorRestricted || false,
+          setRestrictions(postData.Restrictions || {
+            universityRestricted: false,
+            majorRestricted: false,
           });
         } else {
-          console.log('No such document!');
+          console.error('No such document!');
         }
       } catch (error) {
         console.error('Error fetching document:', error);
@@ -60,13 +55,43 @@ const EditPost = ({ visible, onClose, postId }) => {
       }
     };
 
-    if (postId) {
-      fetchPostData();
-    }
+    if (postId) fetchPostData();
   }, [postId]);
 
+  const handleTagToggle = (tag) => {
+    setTags((prevTags) =>
+      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+    );
+    setSearchText('');
+  };
+
   const handleRemoveTag = (tag) => {
-    setTags(prevTags => prevTags.filter(t => t !== tag)); // Remove tag from state
+    setTags((prevTags) => prevTags.filter((t) => t !== tag));
+  };
+
+  const handleDateChange = (selectedDate) => {
+    if (selectedDate) {
+      setNextMeetingDate((prevDate) => {
+        if (isTimePickerVisible) {
+          return new Date(
+            prevDate.getFullYear(),
+            prevDate.getMonth(),
+            prevDate.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes()
+          );
+        }
+        return selectedDate;
+      });
+      setIsTBD(false);
+    }
+    setDatePickerVisible(false);
+    setTimePickerVisible(false);
+  };
+
+  const handleSetTBD = () => {
+    setIsTBD(true);
+    setNextMeetingDate(new Date());
   };
 
   const handleUpdatePost = async () => {
@@ -75,11 +100,15 @@ const EditPost = ({ visible, onClose, postId }) => {
         Title: title,
         Location: location,
         Description: description,
-        Tags: tags, // Update with the current tags
+        Tags: tags,
+        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
         UpdatedAt: new Date(),
         Universities: universities,
         Majors: majors,
-        Restrictions: restrictions,
+        Restrictions: {
+          universityRestricted: restrictions.universityRestricted,
+          majorRestricted: restrictions.majorRestricted,
+        },
       });
       Alert.alert('Success', 'Post updated successfully');
       onClose();
@@ -112,335 +141,361 @@ const EditPost = ({ visible, onClose, postId }) => {
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalContainer}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.modalContent}>
-            <Text style={styles.formTitle}>Edit StudyMeet</Text>
-            <Text style={styles.label}>Title</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Title"
-              value={title}
-              onChangeText={setTitle}
-            />
-            <Text style={styles.label}>Location</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Location"
-              value={location}
-              onChangeText={setLocation}
-            />
-            <Text style={styles.label}>Description</Text>
-            <TextInput
-              style={styles.largeInput}
-              value={description}
-              onChangeText={setDescription}
-            />
-            <Text style={styles.label}>Search Tags</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Search tags..."
-              value={searchText}
-              onChangeText={setSearchText}
-            />
-
-            {/* Scrollable box for filtered tags */}
-            {searchText && filteredTags.length > 0 && (
-              <View style={styles.tagSuggestions}>
-                <FlatList
-                  data={filteredTags}
-                  keyExtractor={item => item}
-                  renderItem={({ item }) => (
-                    <View style={styles.tagItem}>
-                      <Text style={styles.tagText}>{item}</Text>
-                      <Button 
-                        title={tags.includes(item) ? "Remove" : "Add"} 
-                        onPress={() => handleTagToggle(item)}
-                        color={tags.includes(item) ? 'red' : 'green'}
-                      />
-                    </View>
-                  )}
+    <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
+      <View style={styles.modalContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Card>
+            <Card.Title title="Edit StudyMeet" />
+            <Card.Content>
+              <TextInput
+                label="Title"
+                mode="outlined"
+                value={title}
+                onChangeText={setTitle}
+                style={styles.input}
+              />
+              <TextInput
+                label="Location"
+                mode="outlined"
+                value={location}
+                onChangeText={setLocation}
+                style={styles.input}
+              />
+              <TextInput
+                label="Description"
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                value={description}
+                onChangeText={setDescription}
+                style={styles.input}
+              />
+              <TextInput
+                label="Search Tags"
+                mode="outlined"
+                value={searchText}
+                onChangeText={setSearchText}
+                style={styles.input}
+              />
+              <FlatList
+                data={tagsList.filter((tag) =>
+                  tag.toLowerCase().includes(searchText.toLowerCase())
+                )}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <Chip
+                    style={styles.chip}
+                    onPress={() => handleTagToggle(item)}
+                    selected={tags.includes(item)}
+                  >
+                    {item}
+                  </Chip>
+                )}
+                horizontal
+              />
+              <Divider style={styles.divider} />
+              <TouchableOpacity 
+                style={styles.restrictionHeader}
+                onPress={() => setShowRestrictions(!showRestrictions)}
+              >
+                <Text style={styles.sectionTitle}>Restrictions</Text>
+                <IconButton
+                  icon={showRestrictions ? "chevron-up" : "chevron-down"}
+                  size={24}
                 />
+              </TouchableOpacity>
+
+              {showRestrictions && (
+                <View style={styles.restrictionsContainer}>
+                  {/* Universities Section */}
+                  <View style={styles.restrictionSection}>
+                    <View style={styles.restrictionContainer}>
+                      <Text>Restrict to specific universities</Text>
+                      <TouchableOpacity
+                        style={[
+                          styles.toggleButton,
+                          restrictions.universityRestricted && styles.toggleButtonActive
+                        ]}
+                        onPress={() => setRestrictions(prev => ({
+                          ...prev,
+                          universityRestricted: !prev.universityRestricted
+                        }))}
+                      >
+                        <Text style={[
+                          styles.toggleButtonText,
+                          restrictions.universityRestricted && styles.toggleButtonTextActive
+                        ]}>
+                          {restrictions.universityRestricted ? 'ON' : 'OFF'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {restrictions.universityRestricted && (
+                      <>
+                        <TextInput
+                          mode="outlined"
+                          label="Enter universities (one per line)"
+                          value={universityInput}
+                          onChangeText={setUniversityInput}
+                          multiline
+                          numberOfLines={4}
+                          style={styles.restrictionInput}
+                        />
+                        <Button
+                          mode="contained"
+                          onPress={() => {
+                            const newUniversities = universityInput
+                              .split('\n')
+                              .map(uni => uni.trim())
+                              .filter(uni => uni && !universities.includes(uni));
+                            
+                            if (newUniversities.length > 0) {
+                              setUniversities(prev => [...prev, ...newUniversities]);
+                              setUniversityInput('');
+                            }
+                          }}
+                          style={styles.addButton}
+                        >
+                          Add Universities
+                        </Button>
+
+                        <View style={styles.selectedTagsContainer}>
+                          {universities.map(uni => (
+                            <Chip
+                              key={uni}
+                              onClose={() => handleRemoveUniversity(uni)}
+                              style={styles.restrictionChip}
+                            >
+                              {uni}
+                            </Chip>
+                          ))}
+                        </View>
+                      </>
+                    )}
+                  </View>
+
+                  {/* Majors Section */}
+                  <View style={styles.restrictionSection}>
+                    <View style={styles.restrictionContainer}>
+                      <Text>Restrict to specific majors</Text>
+                      <TouchableOpacity
+                        style={[
+                          styles.toggleButton,
+                          restrictions.majorRestricted && styles.toggleButtonActive
+                        ]}
+                        onPress={() => setRestrictions(prev => ({
+                          ...prev,
+                          majorRestricted: !prev.majorRestricted
+                        }))}
+                      >
+                        <Text style={[
+                          styles.toggleButtonText,
+                          restrictions.majorRestricted && styles.toggleButtonTextActive
+                        ]}>
+                          {restrictions.majorRestricted ? 'ON' : 'OFF'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {restrictions.majorRestricted && (
+                      <>
+                        <TextInput
+                          mode="outlined"
+                          label="Enter majors (one per line)"
+                          value={majorInput}
+                          onChangeText={setMajorInput}
+                          multiline
+                          numberOfLines={4}
+                          style={styles.restrictionInput}
+                        />
+                        <Button
+                          mode="contained"
+                          onPress={() => {
+                            const newMajors = majorInput
+                              .split('\n')
+                              .map(major => major.trim())
+                              .filter(major => major && !majors.includes(major));
+                            
+                            if (newMajors.length > 0) {
+                              setMajors(prev => [...prev, ...newMajors]);
+                              setMajorInput('');
+                            }
+                          }}
+                          style={styles.addButton}
+                        >
+                          Add Majors
+                        </Button>
+
+                        <View style={styles.selectedTagsContainer}>
+                          {majors.map(major => (
+                            <Chip
+                              key={major}
+                              onClose={() => handleRemoveMajor(major)}
+                              style={styles.restrictionChip}
+                            >
+                              {major}
+                            </Chip>
+                          ))}
+                        </View>
+                      </>
+                    )}
+                  </View>
+                </View>
+              )}
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Selected Tags:</Text>
+              <View style={styles.tagsContainer}>
+                {tags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    style={styles.chip}
+                    onClose={() => handleRemoveTag(tag)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
               </View>
-            )}
-            
-            <Text style={styles.label}>Tags:</Text>
-            <View style={styles.selectedTagsContainer}>
-              {tags.map(tag => (
-                <View key={tag} style={styles.selectedTagContainer}>
-                  <Text style={styles.selectedTag}>{tag}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
-                    <Text style={styles.removeTag}> X </Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-
-            {/* Universities Section */}
-            <Text style={styles.label}>Universities</Text>
-            <View style={styles.restrictionContainer}>
-              <Text>Restrict to universities</Text>
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  restrictions.universityRestricted && styles.toggleButtonActive
-                ]}
-                onPress={() => setRestrictions(prev => ({
-                  ...prev,
-                  universityRestricted: !prev.universityRestricted
-                }))}
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium" style={styles.sectionTitle}>
+                Next Meeting:
+              </Text>
+              <Button
+                mode="outlined"
+                onPress={() => setDatePickerVisible(true)}
+                style={styles.input}
               >
-                <Text style={styles.toggleButtonText}>
-                  {restrictions.universityRestricted ? 'Yes' : 'No'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {restrictions.universityRestricted && (
-              <>
-                <TextInput
-                  style={styles.largeInput}
-                  placeholder="Enter universities (one per line)"
-                  value={universityInput}
-                  onChangeText={setUniversityInput}
-                  multiline={true}
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-                <View style={styles.inputContainer}>
-                  <TouchableOpacity 
-                    style={styles.addButton}
-                    onPress={() => {
-                      const newUniversities = universityInput
-                        .split('\n')
-                        .map(uni => uni.trim())
-                        .filter(uni => uni && !universities.includes(uni));
-                      
-                      if (newUniversities.length > 0) {
-                        setUniversities(prev => [...prev, ...newUniversities]);
-                        setUniversityInput('');
-                      }
-                    }}
-                  >
-                    <Text style={styles.addButtonText}>Add Universities</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.selectedTagsContainer}>
-                  {universities.map(uni => (
-                    <View key={uni} style={styles.selectedTagContainer}>
-                      <Text style={styles.selectedTag}>{uni}</Text>
-                      <TouchableOpacity onPress={() => handleRemoveUniversity(uni)}>
-                        <Text style={styles.removeTag}>×</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-
-            {/* Majors Section */}
-            <Text style={styles.label}>Majors</Text>
-            <View style={styles.restrictionContainer}>
-              <Text>Restrict to majors</Text>
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  restrictions.majorRestricted && styles.toggleButtonActive
-                ]}
-                onPress={() => setRestrictions(prev => ({
-                  ...prev,
-                  majorRestricted: !prev.majorRestricted
-                }))}
+                Pick Date
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => setTimePickerVisible(true)}
+                style={styles.input}
               >
-                <Text style={styles.toggleButtonText}>
-                  {restrictions.majorRestricted ? 'Yes' : 'No'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {restrictions.majorRestricted && (
-              <>
-                <TextInput
-                  style={styles.largeInput}
-                  placeholder="Enter majors (one per line)"
-                  value={majorInput}
-                  onChangeText={setMajorInput}
-                  multiline={true}
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-                <View style={styles.inputContainer}>
-                  <TouchableOpacity 
-                    style={styles.addButton}
-                    onPress={() => {
-                      const newMajors = majorInput
-                        .split('\n')
-                        .map(major => major.trim())
-                        .filter(major => major && !majors.includes(major));
-                      
-                      if (newMajors.length > 0) {
-                        setMajors(prev => [...prev, ...newMajors]);
-                        setMajorInput('');
-                      }
-                    }}
-                  >
-                    <Text style={styles.addButtonText}>Add Majors</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.selectedTagsContainer}>
-                  {majors.map(major => (
-                    <View key={major} style={styles.selectedTagContainer}>
-                      <Text style={styles.selectedTag}>{major}</Text>
-                      <TouchableOpacity onPress={() => handleRemoveMajor(major)}>
-                        <Text style={styles.removeTag}>×</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-
-            <Button title="Update" onPress={handleUpdatePost} />
-            <Button title="Cancel" onPress={onClose} color="red" />
-          </View>
+                Pick Time
+              </Button>
+              <Button
+                mode="outlined"
+                color="red"
+                onPress={handleSetTBD}
+                style={styles.input}
+              >
+                Set as TBD
+              </Button>
+              <Text style={styles.selectedDate}>
+                {isTBD
+                  ? 'Next Meeting Date: TBD'
+                  : `Selected: ${nextMeetingDate.toLocaleDateString()} ${nextMeetingDate.toLocaleTimeString()}`}
+              </Text>
+            </Card.Content>
+          </Card>
         </ScrollView>
+        <View style={styles.actions}>
+          <Button mode="contained" onPress={handleUpdatePost}>
+            Update
+          </Button>
+          <Button mode="outlined" onPress={onClose} color="red">
+            Cancel
+          </Button>
+        </View>
       </View>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible || isTimePickerVisible}
+        mode={isDatePickerVisible ? 'date' : 'time'}
+        date={nextMeetingDate}
+        onConfirm={handleDateChange}
+        onCancel={() => {
+          setDatePickerVisible(false);
+          setTimePickerVisible(false);
+        }}
+      />
     </Modal>
   );
 };
-
-export default EditPost;
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingHorizontal: 20,
   },
   modalContent: {
-    width: 300,
-    padding: 20,
     backgroundColor: 'white',
+    width: '90%',
+    maxHeight: '90%',
     borderRadius: 10,
-    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   input: {
-    width: '100%',
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
     marginBottom: 10,
   },
-  largeInput: {
-    width: '100%',
-    minHeight: 100,
-    maxHeight: 200,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    textAlignVertical: 'top',
+  chip: {
+    margin: 2,
   },
-  label: {
-    alignSelf: 'flex-start',
-    marginBottom: 5,
-    fontSize: 16,
-    fontWeight: 'bold',
+  divider: {
+    marginVertical: 10,
   },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  selectedTagsContainer: {
+  tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 15,
   },
-  selectedTagContainer: {
+  sectionTitle: {
+    marginBottom: 10,
+  },
+  selectedDate: {
+    marginTop: 10,
+  },
+  actions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
-    borderRadius: 15,
-    padding: 5,
-    margin: 5,
+    justifyContent: 'space-between',
+    padding: 10,
   },
-  selectedTag: {
-    marginRight: 5,
-  },
-  removeTag: {
-    color: 'red',
-    fontWeight: 'bold',
-    padding: 5,
-  },
-  tagSuggestions: {
-    width: '100%',
-    maxHeight: 150, // Set a maximum height for the suggestions box
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingVertical: 5,
-    overflow: 'hidden', // Hide overflow to create a clean border
-  },
-  tagItem: {
+  restrictionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    padding: 10,
   },
-  tagText: {
-    flex: 1,
+  restrictionSection: {
+    marginBottom: 10,
   },
   restrictionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    padding: 10,
   },
   toggleButton: {
     padding: 5,
     borderWidth: 1,
-    borderColor: 'gray',
     borderRadius: 5,
   },
   toggleButtonActive: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
+    backgroundColor: '#e0e0e0',
   },
   toggleButtonText: {
     fontWeight: 'bold',
   },
-  inputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  toggleButtonTextActive: {
+    color: 'white',
+  },
+  restrictionInput: {
     marginBottom: 10,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 120,
+    marginTop: 10,
   },
-  addButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  restrictionChip: {
+    margin: 2,
   },
 });
+
+export default EditPost;
