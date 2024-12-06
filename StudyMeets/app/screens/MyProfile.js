@@ -3,11 +3,11 @@ import { View, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Avatar, Button as PaperButton, Text, Divider } from 'react-native-paper';
 import { auth } from '../../firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, getDocs, query, where, collection } from 'firebase/firestore';
 import { firestore } from '../../firebase';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
-import { signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { signOut, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
 
 const MyProfile = ({ imageUri, setImageUri }) => {
   const [user, setUser] = useState(null);
@@ -112,6 +112,77 @@ const MyProfile = ({ imageUri, setImageUri }) => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const currentUser = auth.currentUser;
+              if (!currentUser) {
+                throw new Error("No user found");
+              }
+
+              // Delete user data from Firestore
+              await deleteDoc(doc(firestore, 'users', currentUser.uid));
+
+              // Delete the user's authentication account
+              await deleteUser(currentUser);
+
+              // Delete user's profile image from storage
+              if (imageUri) {
+                const imageRef = ref(storage, `profile_images/${currentUser.uid}`);
+                try {
+                  await deleteObject(imageRef);
+                } catch (error) {
+                  console.error("Error deleting profile image:", error);
+                }
+              }
+
+              // Delete user's posts and related data
+              const userPosts = await getDocs(
+                query(collection(firestore, 'studymeets'), 
+                where('OwnerEmail', '==', currentUser.email))
+              );
+
+              const deletePromises = userPosts.docs.map(doc => deleteDoc(doc.ref));
+              await Promise.all(deletePromises);
+
+              // Navigate to login screen
+              navigation.navigate('Login');
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              
+              // Handle specific errors
+              if (error.code === 'auth/requires-recent-login') {
+                Alert.alert(
+                  "Re-authentication Required",
+                  "Please log out and log in again before deleting your account.",
+                  [
+                    {
+                      text: "OK",
+                      onPress: handleLogout
+                    }
+                  ]
+                );
+              } else {
+                Alert.alert("Error", "Failed to delete account. Please try again.");
+              }
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, paddingTop: 30 }}>
       {user ? (
@@ -149,6 +220,15 @@ const MyProfile = ({ imageUri, setImageUri }) => {
             style={{ marginVertical: 5 }}
           >
             Logout
+          </PaperButton>
+          <PaperButton
+            mode="contained"
+            onPress={handleDeleteAccount}
+            buttonColor="red"
+            textColor="white"
+            style={{ marginVertical: 5 }}
+          >
+            Delete Account
           </PaperButton>
         </>
       ) : (
