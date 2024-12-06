@@ -1,8 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import ExploreGroups from './ExploreGroups';
 import ExploreUsers from './ExploreUsers';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import GroupCard from './GroupCard';
+import { PlusCircle } from 'lucide-react-native';
+import PeopleList from './PeopleList'
+import {useNavigation} from "@react-navigation/native"
 
 const Tab = createMaterialTopTabNavigator();
 

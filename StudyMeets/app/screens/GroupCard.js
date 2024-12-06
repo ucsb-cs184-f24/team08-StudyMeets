@@ -31,28 +31,32 @@ const GroupCard = ({
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Card style={{ marginVertical: 10, marginHorizontal: 10 }}>
           <Card.Title title={item.Title} subtitle={`Location: ${item.Location}`} />
+          {item.ImageUrl && (
+            <Card.Cover 
+              source={{ uri: item.ImageUrl }} 
+              style={{ height: 275, marginBottom: 5, resizeMode: 'cover' }}
+            />
+          )}
           <Card.Content>
             <Text variant="bodyMedium" style={{ marginBottom: 5 }}>
               {item.Description}
             </Text>
             {item.Tags && item.Tags.length > 0 && (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
-                {item.Tags.map((tag, index) => (
-                  <Chip key={index} style={{ marginRight: 5, marginBottom: 5 }}>
-                    {tag}
-                  </Chip>
-                ))}
+              <View style={styles.tagRow}>
+                <Text variant="bodySmall" style={{ fontWeight: 'bold' }}></Text>
+                <View style={styles.condensedChipContainer}>
+                  {item.Tags.map((tag, index) => (
+                    <Chip 
+                      key={`tag-${index}`} 
+                      style={styles.condensedChip}
+                      textStyle={styles.condensedChipText}
+                    >
+                      {tag}
+                    </Chip>
+                  ))}
+                </View>
               </View>
             )}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
-              <Text variant="bodySmall">Created by: {item.OwnerName}</Text>
-              <Text variant="bodySmall">
-                Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
-              </Text>
-            </View>
-            <Text variant="bodySmall">
-              Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
-            </Text>
             <View style={{ marginTop: 10 }}>
               <Text variant="bodySmall" style={{ fontWeight: 'bold' }}>
                 Next Meeting:
@@ -99,9 +103,10 @@ const GroupCard = ({
               <Text variant="bodyLarge">{item.Location}</Text>
               <Text variant="titleMedium" style={styles.sectionTitle}>Description</Text>
               <Text variant="bodyLarge">{item.Description}</Text>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Tags:</Text>
               {item.Tags && item.Tags.length > 0 && (
                 <>
-                  <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
+                  {/* <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text> */}
                   <View style={styles.tagsContainer}>
                     {item.Tags.map((tag, index) => (
                       <Chip key={index} style={styles.tag}>
@@ -110,6 +115,7 @@ const GroupCard = ({
                     ))}
                   </View>
                 </>
+
               )}
               <View style={styles.detailsContainer}>
                 <Text variant="bodyMedium">Created by: {item.OwnerName}</Text>
@@ -120,6 +126,43 @@ const GroupCard = ({
                   Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
                 </Text>
               </View>
+              {item.Restrictions && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>Restrictions</Text>
+                  <Text variant="bodyLarge">
+                    {item.Restrictions.universityRestricted ? 'University Restricted' : ''}
+                    {item.Restrictions.universityRestricted && item.Restrictions.majorRestricted ? ', ' : ''}
+                    {item.Restrictions.majorRestricted ? 'Major Restricted' : ''}
+                    {!item.Restrictions.universityRestricted && !item.Restrictions.majorRestricted ? 'None' : ''}
+                  </Text>
+                  
+                  {item.Restrictions.universityRestricted && item.Restrictions.universities?.length > 0 && (
+                    <>
+                      <Text variant="titleMedium" style={[styles.sectionTitle, { fontSize: 14 }]}>Allowed Universities:</Text>
+                      <View style={styles.tagsContainer}>
+                        {item.Restrictions.universities.map((university, index) => (
+                          <Chip key={`uni-${index}`} style={styles.tag}>
+                            {university}
+                          </Chip>
+                        ))}
+                      </View>
+                    </>
+                  )}
+
+                  {item.Restrictions.majorRestricted && item.Restrictions.majors?.length > 0 && (
+                    <>
+                      <Text variant="titleMedium" style={[styles.sectionTitle, { fontSize: 14 }]}>Allowed Majors:</Text>
+                      <View style={styles.tagsContainer}>
+                        {item.Restrictions.majors.map((major, index) => (
+                          <Chip key={`major-${index}`} style={styles.tag}>
+                            {major}
+                          </Chip>
+                        ))}
+                      </View>
+                    </>
+                  )}
+                </>
+              )}
             </ScrollView>
             <Button mode="contained" onPress={() => setModalVisible(false)} style={styles.closeButton}>
               Close
@@ -165,6 +208,7 @@ const styles = StyleSheet.create({
   tag: {
     marginRight: 5,
     marginBottom: 5,
+    marginTop: 5,
   },
   detailsContainer: {
     marginTop: 15,
@@ -178,6 +222,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: 10,
+  },
+  tagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  condensedChipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  condensedChip: {
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  condensedChipText: {
+    fontSize: 12,
+  },
+  restrictionsText: {
+    fontWeight: 'bold',
   },
 });
 

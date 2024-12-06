@@ -19,6 +19,14 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const [image, setImage] = useState(null);
+  const [universities, setUniversities] = useState([]);
+  const [majors, setMajors] = useState([]);
+  const [universityInput, setUniversityInput] = useState('');
+  const [majorInput, setMajorInput] = useState('');
+  const [restrictions, setRestrictions] = useState({
+    universityRestricted: false,
+    majorRestricted: false,
+  });
 
   const handleTagToggle = (tag) => {
     setSelectedTags((prevTags) =>
@@ -74,6 +82,45 @@ const CreateNewPost = ({ visible, onClose }) => {
     }
   };
 
+  const handleAddUniversity = () => {
+    if (universityInput.trim() && !universities.includes(universityInput.trim())) {
+      setUniversities(prev => [...prev, universityInput.trim()]);
+      setUniversityInput('');
+    }
+  };
+
+  const handleAddMajor = () => {
+    if (majorInput.trim() && !majors.includes(majorInput.trim())) {
+      setMajors(prev => [...prev, majorInput.trim()]);
+      setMajorInput('');
+    }
+  };
+
+  const handleRemoveUniversity = (uni) => {
+    setUniversities(prev => prev.filter(u => u !== uni));
+  };
+
+  const handleRemoveMajor = (major) => {
+    setMajors(prev => prev.filter(m => m !== major));
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setLocation('');
+    setDescription('');
+    setSelectedTags([]);
+    setNextMeetingDate(new Date());
+    setUniversities([]);
+    setMajors([]);
+    setUniversityInput('');
+    setMajorInput('');
+    setImage(null);
+    setRestrictions({
+      universityRestricted: false,
+      majorRestricted: false,
+    });
+  };
+
   const handleCreatePost = async () => {
     if (title.trim() === '') {
       Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
@@ -104,8 +151,28 @@ const CreateNewPost = ({ visible, onClose }) => {
         });
       }
 
-      setImage(null); 
+      await addDoc(collection(firestore, 'studymeets'), {
+        Title: title,
+        Location: location,
+        Description: description,
+        Tags: selectedTags,
+        OwnerEmail: currentUser.email,
+        OwnerName: userName,
+        CreatedAt: new Date(),
+        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
+        ImageUrl: image,
+        Restrictions: {
+          universities: restrictions.universityRestricted ? universities : [],
+          majors: restrictions.majorRestricted ? majors : [],
+          universityRestricted: restrictions.universityRestricted,
+          majorRestricted: restrictions.majorRestricted,
+          },
+      });
+
+      resetForm();
       onClose();
+      Alert.alert('Success', 'Your StudyMeet has been created!');
+      
     } catch (error) {
       console.error('Error creating document:', error);
       Alert.alert('Error', error.message);
@@ -227,6 +294,104 @@ const CreateNewPost = ({ visible, onClose }) => {
                   </TouchableOpacity>
                 </View>
               )}
+              <Divider style={styles.divider} />
+              <Text variant="bodyMedium">Restrictions:</Text>
+              
+              <View style={styles.restrictionContainer}>
+                <Text>University Restriction</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    restrictions.universityRestricted && styles.toggleButtonActive
+                  ]}
+                  onPress={() => setRestrictions(prev => ({
+                    ...prev,
+                    universityRestricted: !prev.universityRestricted
+                  }))}
+                >
+                  <Text style={styles.toggleButtonText}>
+                    {restrictions.universityRestricted ? 'ON' : 'OFF'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {restrictions.universityRestricted && (
+                <>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      label="Add University"
+                      mode="outlined"
+                      value={universityInput}
+                      onChangeText={setUniversityInput}
+                      style={{ flex: 1 }}
+                    />
+                    <TouchableOpacity
+                      style={styles.addButton}
+                      onPress={handleAddUniversity}
+                    >
+                      <Text style={styles.addButtonText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.selectedTagsContainer}>
+                    {universities.map((uni) => (
+                      <View key={uni} style={styles.selectedTagContainer}>
+                        <Text style={styles.selectedTag}>{uni}</Text>
+                        <TouchableOpacity onPress={() => handleRemoveUniversity(uni)}>
+                          <Text>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              <View style={styles.restrictionContainer}>
+                <Text>Major Restriction</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    restrictions.majorRestricted && styles.toggleButtonActive
+                  ]}
+                  onPress={() => setRestrictions(prev => ({
+                    ...prev,
+                    majorRestricted: !prev.majorRestricted
+                  }))}
+                >
+                  <Text style={styles.toggleButtonText}>
+                    {restrictions.majorRestricted ? 'ON' : 'OFF'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {restrictions.majorRestricted && (
+                <>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      label="Add Major"
+                      mode="outlined"
+                      value={majorInput}
+                      onChangeText={setMajorInput}
+                      style={{ flex: 1 }}
+                    />
+                    <TouchableOpacity
+                      style={styles.addButton}
+                      onPress={handleAddMajor}
+                    >
+                      <Text style={styles.addButtonText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.selectedTagsContainer}>
+                    {majors.map((major) => (
+                      <View key={major} style={styles.selectedTagContainer}>
+                        <Text style={styles.selectedTag}>{major}</Text>
+                        <TouchableOpacity onPress={() => handleRemoveMajor(major)}>
+                          <Text>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
             </Card.Content>
           </Card>
         </ScrollView>
@@ -325,6 +490,66 @@ const styles = StyleSheet.create({
   removeImageText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  scrollView: {
+    width: '100%',
+  },
+  restrictionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 15,
+  },
+  toggleButton: {
+    backgroundColor: '#cc0404',
+    padding: 8,
+    borderRadius: 5,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: '#4CAF50',
+  },
+  toggleButtonText: {
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 10,
+  },
+  addButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 60,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+    gap: 5,
+  },
+  selectedTagContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 15,
+    padding: 5,
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  selectedTag: {
+    marginRight: 5,
   },
 });
 
