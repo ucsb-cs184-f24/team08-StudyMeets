@@ -117,6 +117,15 @@ const GroupCard = ({
                 </>
 
               )}
+              <View style={styles.detailsContainer}>
+                <Text variant="bodyMedium">Created by: {item.OwnerName}</Text>
+                <Text variant="bodyMedium">
+                  Date: {item.CreatedAt?.toDate().toLocaleDateString() || 'N/A'}
+                </Text>
+                <Text variant="bodyMedium">
+                  Time: {item.CreatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
+                </Text>
+              </View>
               {item.Restrictions && (
                 <>
                   <Text variant="titleMedium" style={styles.sectionTitle}>Restrictions</Text>
