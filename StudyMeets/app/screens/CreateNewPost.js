@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, FlatList, ScrollView, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
 import { firestore, auth } from '../../firebase';
-import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
+import { addDoc, collection, getDoc, doc, setDoc, getDocs } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -75,39 +75,52 @@ const CreateNewPost = ({ visible, onClose }) => {
   };
 
   const handleCreatePost = async () => {
-    if (title.trim() === '') {
-      Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
+    if (title.trim() === '' || location.trim() === '') {
+      Alert.alert('Error', 'Title and Location cannot be empty.');
       return;
     }
-    if (location.trim() === '') {
-      Alert.alert('Error', 'The Location cannot be empty, please enter a Location.');
-      return;
-    }    
-
+  
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) throw new Error('User not authenticated');
-
+  
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      
-      if (userDoc.exists()) {
-        await addDoc(collection(firestore, 'studymeets'), {
-          Title: title,
-          Location: location,
-          Description: description,
-          Tags: selectedTags,
-          OwnerEmail: currentUser.email,
-          OwnerName: userDoc.data().username,
+      if (!userDoc.exists()) throw new Error('User data not found');
+  
+      const postRef = await addDoc(collection(firestore, 'studymeets'), {
+        Title: title,
+        Location: location,
+        Description: description,
+        Tags: selectedTags,
+        OwnerEmail: currentUser.email,
+        OwnerName: userDoc.data().username,
+        CreatedAt: new Date(),
+        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
+        ImageUrl: image,
+      });
+  
+      const friendsCollection = collection(firestore, 'users', currentUser.uid, 'friends');
+      const friendsSnapshot = await getDocs(friendsCollection);
+      const friends = friendsSnapshot.docs.map(doc => doc.id);
+  
+      const notifications = friends.map(friendId => {
+        const notificationRef = doc(firestore, 'users', friendId, 'notifications', postRef.id);
+        return setDoc(notificationRef, {
+          Title: `New Post by ${userDoc.data().username}`,
+          Description: `${title} - ${description}`,
+          PostId: postRef.id,
           CreatedAt: new Date(),
-          NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
-          ImageUrl: image,
+          Read: false,
         });
-      }
-
-      setImage(null); 
+      });
+  
+      await Promise.all(notifications);
+  
+      Alert.alert('Success', 'Post created and friends notified!');
+      setImage(null);
       onClose();
     } catch (error) {
-      console.error('Error creating document:', error);
+      console.error('Error creating post:', error);
       Alert.alert('Error', error.message);
     }
   };
