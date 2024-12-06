@@ -13,6 +13,14 @@
 
 ### Tim Choi ###
 
+- Set up firebase for the project
+- Implemented logout functionality
+- Implemented a Change Password feature that sent user an email with instructions on how to change the password securely.
+- Implemented a Profile Picture feature that user could change and is connected to their Photo Library
+- Implemented the "Joining Study Group" functionality and having the group show up on their MyGroups tab by moving the GroupCard into it's own component
+- Designed the UI of certain components of the app such as the GroupCard that is displayed on the Explore page, the CreateGroupComponent, EditGroupComponent, Profile Tab, etc.
+- Implemented Unit Testing for the GroupCard rendering and functionality
+- Implemented a Setup Meeting Time to be displayed on the GroupCard and allow editting from the Edit button and Create button. If no meeting time is established, it defaults to TBD.
 
 ### Meron Tesfandrias ###
 
