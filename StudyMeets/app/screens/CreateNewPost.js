@@ -89,21 +89,22 @@ const CreateNewPost = ({ visible, onClose }) => {
       if (!currentUser) throw new Error('User not authenticated');
 
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      if (userDoc.exists()) setUserName(userDoc.data().username);
+      
+      if (userDoc.exists()) {
+        await addDoc(collection(firestore, 'studymeets'), {
+          Title: title,
+          Location: location,
+          Description: description,
+          Tags: selectedTags,
+          OwnerEmail: currentUser.email,
+          OwnerName: userDoc.data().username,
+          CreatedAt: new Date(),
+          NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
+          ImageUrl: image,
+        });
+      }
 
-      await addDoc(collection(firestore, 'studymeets'), {
-        Title: title,
-        Location: location,
-        Description: description,
-        Tags: selectedTags,
-        OwnerEmail: currentUser.email,
-        OwnerName: userName,
-        CreatedAt: new Date(),
-        NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
-        ImageUrl: image,
-      });
-
-      setImage(null); // Reset image state
+      setImage(null); 
       onClose();
     } catch (error) {
       console.error('Error creating document:', error);
