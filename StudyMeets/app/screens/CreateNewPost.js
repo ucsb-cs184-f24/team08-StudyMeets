@@ -85,6 +85,15 @@ const CreateNewPost = ({ visible, onClose }) => {
   };
 
   const handleCreatePost = async () => {
+    if (title.trim() === '') {
+      Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
+      return;
+    }
+    if (location.trim() === '') {
+      Alert.alert('Error', 'The Location cannot be empty, please enter a Location.');
+      return;
+    }    
+
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
@@ -108,24 +117,22 @@ const CreateNewPost = ({ visible, onClose }) => {
       console.log('Image"', image)
 
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
+      
       if (userDoc.exists()) {
-        setUserName(userDoc.data().username);
-      } else {
-        console.log('No such document!');
+        await addDoc(collection(firestore, 'studymeets'), {
+          Title: title,
+          Location: location,
+          Description: description,
+          Tags: selectedTags,
+          OwnerEmail: currentUser.email,
+          OwnerName: userDoc.data().username,
+          CreatedAt: new Date(),
+          NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
+          ImageUrl: image,
+        });
       }
 
-      await addDoc(collection(firestore, 'studymeets'), {
-        Title: title,
-        Location: location,
-        Description: description,
-        Tags: selectedTags,
-        OwnerEmail: currentUser.email,
-        OwnerName: userName,
-        CreatedAt: new Date(),
-        ImageUrl: imageUrl,
-      });
-
-      setImage(null); // Reset image state
+      setImage(null); 
       onClose();
     } catch (error) {
       console.error('Error creating document:', error);

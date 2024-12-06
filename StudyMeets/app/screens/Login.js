@@ -35,7 +35,7 @@ const Login = () => {
       }
     } catch (error) {
       alert("Email and Password not match!");
-      console.error(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,8 @@ const Login = () => {
 
       setIsSignUp(false);
     } catch (error) {
-      console.error(error);
+      alert("Invalid Email!");
+      console.log(error);
     } finally {
       setLoading(false);
     }
