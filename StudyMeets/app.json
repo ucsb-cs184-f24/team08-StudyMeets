@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "StudyMeets",
-    "slug": "StudyMeets",
+    "slug": "studymeets",
     "scheme": "StudyMeets",
     "entryPoint": "./App.js",
     "version": "1.0.0",
@@ -31,8 +31,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "208e0354-5bad-48f1-bf8a-b1bdb77cf42a"
+        "projectId": "085f602a-5acb-4f48-a6de-e13123f4fadd"
       }
-    }
+    },
+    "owner": "kaihanucsb"
   }
 }
