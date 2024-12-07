@@ -1,29 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { firestore } from '../../firebase';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, FlatList, Modal, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { firestore, auth } from '../../firebase';
+import { collection, query, orderBy, onSnapshot, addDoc, where, getDocs, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { TextInput as PaperTextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupCard from './GroupCard';
 import CreateNewPost from './CreateNewPost';
+import PeopleList from './PeopleList';
 import { PlusCircle, CircleX, Search, ChevronDown, ChevronUp } from 'lucide-react-native';
 import { tagsList } from '../../definitions/Definitions';
 import { useSubjectsClasses } from './SubjectsClasses';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const ExploreGroups = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [isPeopleModalVisible, setPeopleModalVisible] = useState(false);
   const [posts, setPosts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
-  const [expandedSections, setExpandedSections] = useState({
-    Days: false,
-    Locations: false,
-    Subjects: false,
-    Classes: false,
-    Misc: false,
-  });
+  const [expandedSections, setExpandedSections] = useState({Days: false, Locations: false, Subjects: false, Classes: false, Misc: false,});
+  const [joinedGroups, setJoinedGroups] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [owner, setOwner] = useState(null);
   const { subjects, classes, loading: isLoadingClasses } = useSubjectsClasses();
+  const { theme } = useContext(ThemeContext);
+
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
+  const openFilterModal = () => setFilterModalVisible(true);
+  const closeFilterModal = () => setFilterModalVisible(false);
+
+  useEffect(() => {
+    const fetchJoinedGroups = () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userGroupsQuery = query(collection(firestore, 'userGroups'), orderBy('postId'));
+
+        const unsubscribe = onSnapshot(userGroupsQuery, (snapshot) => {
+          const groups = snapshot.docs
+            .filter((doc) => doc.data().userId === currentUser.uid)
+            .map((doc) => doc.data().postId);
+          setJoinedGroups(groups);
+        });
+
+        return unsubscribe;
+      }
+    };
+
+    const unsubscribe = fetchJoinedGroups();
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchPosts = () => {
@@ -35,17 +62,13 @@ const ExploreGroups = () => {
         }));
         setPosts(postsData);
       });
+
       return unsubscribe;
     };
 
     const unsubscribe = fetchPosts();
     return () => unsubscribe();
   }, []);
-
-  const openModal = () => setModalVisible(true);
-  const closeModal = () => setModalVisible(false);
-  const openFilterModal = () => setFilterModalVisible(true);
-  const closeFilterModal = () => setFilterModalVisible(false);
 
   const toggleTagSelection = (tag) => {
     setSelectedTags((prevTags) =>
@@ -60,8 +83,108 @@ const ExploreGroups = () => {
     }));
   };
 
-  const clearFilters = () => {
-    setSelectedTags([]);
+  const clearFilters = () => setSelectedTags([]);
+
+  const handlePeopleClick = async (postId) => {
+    try {
+      const groupDoc = await getDoc(doc(firestore, 'studymeets', postId));
+      if (!groupDoc.exists()) {
+        throw new Error('Group not found.');
+      }
+
+      const { OwnerEmail } = groupDoc.data();
+
+      const ownerQuery = query(collection(firestore, 'users'), where('email', '==', OwnerEmail));
+      const ownerSnapshot = await getDocs(ownerQuery);
+
+      if (ownerSnapshot.empty) {
+        throw new Error('Owner not found.');
+      }
+
+      const ownerDoc = ownerSnapshot.docs[0];
+      const ownerData = { id: ownerDoc.id, ...ownerDoc.data() };
+
+      const userGroupsQuery = query(
+        collection(firestore, 'userGroups'),
+        where('postId', '==', postId)
+      );
+      const userGroupsSnapshot = await getDocs(userGroupsQuery);
+      const userIds = userGroupsSnapshot.docs.map((doc) => doc.data().userId);
+
+      if (userIds.length === 0) {
+        setMembers([]);
+        setOwner(ownerData);
+        setPeopleModalVisible(true);
+        return;
+      }
+
+      const usersQuery = query(
+        collection(firestore, 'users'),
+        where('__name__', 'in', userIds)
+      );
+      const usersSnapshot = await getDocs(usersQuery);
+
+      const usersData = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setMembers(usersData);
+      setOwner(ownerData);
+      setPeopleModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching people:', error);
+      Alert.alert('Error', 'Failed to fetch group members.');
+    }
+  };
+
+  const handleJoinGroup = async (postId) => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        await addDoc(collection(firestore, 'userGroups'), {
+          userId: currentUser.uid,
+          postId: postId,
+        });
+        Alert.alert('Joined', 'You have successfully joined the group.');
+      } catch (error) {
+        console.error('Error joining group:', error);
+        Alert.alert('Error', 'Failed to join the group.');
+      }
+    }
+  };
+
+  const handleLeaveGroup = async (postId) => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        const userGroupQuery = query(
+          collection(firestore, 'userGroups'),
+          where('userId', '==', currentUser.uid),
+          where('postId', '==', postId)
+        );
+
+        const querySnapshot = await getDocs(userGroupQuery);
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
+
+        Alert.alert('Left', 'You have successfully left the group.');
+      } catch (error) {
+        console.error('Error leaving group:', error);
+        Alert.alert('Error', 'Failed to leave the group.');
+      }
+    }
+  };
+
+  const handleDeleteGroup = async (id) => {
+    try {
+      await deleteDoc(doc(firestore, 'studymeets', id));
+      Alert.alert('Deleted', 'The post has been deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      Alert.alert('Error', 'Failed to delete the post.');
+    }
   };
 
   const filteredPosts = posts.filter((post) => {
@@ -76,7 +199,7 @@ const ExploreGroups = () => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.topBar}>
         <PaperTextInput
           mode="outlined"
@@ -98,21 +221,44 @@ const ExploreGroups = () => {
           Filter
         </Button>
       </View>
-
       <FlatList
         data={filteredPosts}
-        renderItem={({ item }) => <GroupCard item={item} primaryActionLabel="View" />}
+        renderItem={({ item }) => {
+          const isOwner = item.OwnerEmail === auth.currentUser?.email;
+          const isJoined = joinedGroups.includes(item.id);
+
+          return (
+            <GroupCard
+              item={item}
+              onPrimaryAction={() => handlePeopleClick(item.id)}
+              primaryActionLabel="People"
+              onSecondaryAction={() => {
+                if (isOwner) {
+                  handleDeleteGroup(item.id);
+                } else {
+                  isJoined ? handleLeaveGroup(item.id) : handleJoinGroup(item.id);
+                }
+              }}
+              secondaryActionLabel={isOwner ? 'Delete' : isJoined ? 'Leave' : 'Join'}
+            />
+          );
+        }}
         keyExtractor={(item) => item.id}
       />
-
+      <PeopleList
+        visible={isPeopleModalVisible}
+        onClose={() => setPeopleModalVisible(false)}
+        members={members}
+        owner={owner}
+      />
       <CreateNewPost visible={isModalVisible} onClose={closeModal} />
-
-      <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
-        <View style={styles.circleBackground}>
-          <PlusCircle size={40} color="white" />
-        </View>
-      </TouchableOpacity>
-
+      {!isModalVisible && (
+        <TouchableOpacity onPress={openModal} style={styles.floatingButton}>
+          <View style={styles.circleBackground}>
+            <PlusCircle size={40} color="white" />
+          </View>
+        </TouchableOpacity>
+      )}
       <Modal
         visible={isFilterModalVisible}
         animationType="slide"
@@ -123,10 +269,16 @@ const ExploreGroups = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter by Tags</Text>
 
-            {/* Days Section */}
-            <TouchableOpacity onPress={() => toggleSection('Days')} style={styles.subheadingContainer}>
+            <TouchableOpacity
+              onPress={() => toggleSection('Days')}
+              style={styles.subheadingContainer}
+            >
               <Text style={styles.subheading}>Days</Text>
-              {expandedSections.Days ? <ChevronUp size={20} color="black" /> : <ChevronDown size={20} color="black" />}
+              {expandedSections.Days ? (
+                <ChevronUp size={20} color="black" />
+              ) : (
+                <ChevronDown size={20} color="black" />
+              )}
             </TouchableOpacity>
             {expandedSections.Days && (
               <FlatList
@@ -146,8 +298,10 @@ const ExploreGroups = () => {
               />
             )}
 
-            {/* Locations Section */}
-            <TouchableOpacity onPress={() => toggleSection('Locations')} style={styles.subheadingContainer}>
+            <TouchableOpacity
+              onPress={() => toggleSection('Locations')}
+              style={styles.subheadingContainer}
+            >
               <Text style={styles.subheading}>Locations</Text>
               {expandedSections.Locations ? (
                 <ChevronUp size={20} color="black" />
@@ -173,8 +327,10 @@ const ExploreGroups = () => {
               />
             )}
 
-            {/* Subjects Section */}
-            <TouchableOpacity onPress={() => toggleSection('Subjects')} style={styles.subheadingContainer}>
+            <TouchableOpacity
+              onPress={() => toggleSection('Subjects')}
+              style={styles.subheadingContainer}
+            >
               <Text style={styles.subheading}>Subjects</Text>
               {expandedSections.Subjects ? (
                 <ChevronUp size={20} color="black" />
@@ -200,8 +356,10 @@ const ExploreGroups = () => {
               />
             )}
 
-            {/* Classes Section */}
-            <TouchableOpacity onPress={() => toggleSection('Classes')} style={styles.subheadingContainer}>
+            <TouchableOpacity
+              onPress={() => toggleSection('Classes')}
+              style={styles.subheadingContainer}
+            >
               <Text style={styles.subheading}>Classes</Text>
               {expandedSections.Classes ? (
                 <ChevronUp size={20} color="black" />
@@ -231,10 +389,16 @@ const ExploreGroups = () => {
               )
             )}
 
-            {/* Misc Section */}
-            <TouchableOpacity onPress={() => toggleSection('Misc')} style={styles.subheadingContainer}>
+            <TouchableOpacity
+              onPress={() => toggleSection('Misc')}
+              style={styles.subheadingContainer}
+            >
               <Text style={styles.subheading}>Misc</Text>
-              {expandedSections.Misc ? <ChevronUp size={20} color="black" /> : <ChevronDown size={20} color="black" />}
+              {expandedSections.Misc ? (
+                <ChevronUp size={20} color="black" />
+              ) : (
+                <ChevronDown size={20} color="black" />
+              )}
             </TouchableOpacity>
             {expandedSections.Misc && (
               <FlatList
@@ -374,7 +538,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-
 
 export default ExploreGroups;
