@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Card, Button, Text, Divider, Chip, IconButton } from 'react-native-paper';
 import { View, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const GroupCard = ({ 
   item, 
@@ -12,6 +13,12 @@ const GroupCard = ({
   onThirdAction
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCardPress = (item) => {
+    setModalVisible(true);
+  };
+
+  const { theme } = useContext(ThemeContext);
 
   const formatDate = (date) => {
     if (!date) return 'TBD';
@@ -29,7 +36,7 @@ const GroupCard = ({
   return (
     <>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Card style={{ marginVertical: 10, marginHorizontal: 10 }}>
+        <Card style={{ marginVertical: 10, marginHorizontal: 10 , backgroundColor: theme.colors.cardBackgroundColor}}>
           <Card.Title title={item.Title} subtitle={`Location: ${item.Location}`} />
           <Card.Content>
             <Text variant="bodyMedium" style={{ marginBottom: 5 }}>
@@ -38,7 +45,11 @@ const GroupCard = ({
             {item.Tags && item.Tags.length > 0 && (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
                 {item.Tags.map((tag, index) => (
-                  <Chip key={index} style={{ marginRight: 5, marginBottom: 5 }}>
+                  <Chip 
+                    key={index} 
+                    style={[styles.tag, { marginRight: 5, marginBottom: 5, backgroundColor: theme.colors.groupCardTag }]}
+                    textStyle={{ color: theme.colors.text }}
+                  >
                     {tag}
                   </Chip>
                 ))}
@@ -63,16 +74,33 @@ const GroupCard = ({
           <Divider />
           <Card.Actions>
             <View style={styles.buttonContainer}>
-              <Button onPress={() => onPrimaryAction(item.id)}>{primaryActionLabel}</Button>
+              <Button 
+                mode="contained"
+                onPress={() => onPrimaryAction(item.id)}
+                buttonColor={theme.colors.primary}
+                textColor={theme.colors.text}
+              >
+                {primaryActionLabel}
+              </Button>
 
               {thirdActionLabel && onThirdAction && (
-                <Button onPress={() => onThirdAction(item.id)}>
+                <Button 
+                  mode="contained"
+                  onPress={() => onThirdAction(item.id)}
+                  buttonColor={theme.colors.primary}
+                  textColor={theme.colors.text}
+                >
                   {thirdActionLabel}
                 </Button>
               )}
               
               {secondaryActionLabel && onSecondaryAction && (
-                <Button onPress={() => onSecondaryAction(item.id)} textColor="red">
+                <Button 
+                  mode="contained" 
+                  onPress={() => onSecondaryAction(item.id)} 
+                  buttonColor={theme.colors.cancel}
+                  textColor={theme.colors.text}
+                >
                   {secondaryActionLabel}
                 </Button>
               )}
@@ -89,7 +117,7 @@ const GroupCard = ({
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.cardBackgroundColor}]}>
             <View style={styles.modalHeader}>
               <Text variant="headlineMedium">{item.Title}</Text>
               <IconButton icon="close" onPress={() => setModalVisible(false)} />
@@ -104,7 +132,11 @@ const GroupCard = ({
                   <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
                   <View style={styles.tagsContainer}>
                     {item.Tags.map((tag, index) => (
-                      <Chip key={index} style={styles.tag}>
+                      <Chip 
+                        key={index} 
+                        style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
+                        textStyle={{ color: theme.colors.text }}
+                      >
                         {tag}
                       </Chip>
                     ))}
@@ -121,7 +153,13 @@ const GroupCard = ({
                 </Text>
               </View>
             </ScrollView>
-            <Button mode="contained" onPress={() => setModalVisible(false)} style={styles.closeButton}>
+            <Button 
+              mode="contained" 
+              onPress={() => setModalVisible(false)} 
+              style={styles.closeButton}
+              textColor = {theme.colors.text}
+              buttonColor={theme.colors.cancel}
+            >
               Close
             </Button>
           </View>

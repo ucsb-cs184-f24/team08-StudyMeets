@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     alignSelf: 'center',
-    color: '#674fa3',
+    color: '#6495ed',
   },
   subheadingContainer: {
     flexDirection: 'row',
@@ -361,10 +361,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tagSelected: {
-    backgroundColor: '#674fa3',
+    backgroundColor: '#6495ed',
+    borderColor: '#6495ed',
+    borderWidth: 1,
   },
   tagText: {
     textAlign: 'center',
+    color: 'black',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -379,5 +382,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+
 
 export default ExploreGroups;

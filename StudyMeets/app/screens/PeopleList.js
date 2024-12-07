@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Modal, View, FlatList, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const PeopleList = ({ visible, onClose, members, owner }) => {
   const navigation = useNavigation();
   const placeholderImage = 'https://via.placeholder.com/80';
+  const { theme } = useContext(ThemeContext);
 
   const handlePress = (user) => {
     onClose()
@@ -15,7 +17,7 @@ const PeopleList = ({ visible, onClose, members, owner }) => {
   const renderUser = ({ item }) => (
     <TouchableOpacity onPress={() => handlePress(item)} style={styles.userRow}>
       <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
-      <Text style={styles.userName}>{item.username || 'Unknown User'}</Text>
+      <Text style={[styles.userName, { color: theme.colors.text }]}>{item.username || 'Unknown User'}</Text>
     </TouchableOpacity>
   );
 
@@ -27,31 +29,31 @@ const PeopleList = ({ visible, onClose, members, owner }) => {
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
           {/* Owner Section */}
-          <Text style={styles.sectionTitle}>Owner</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Owner</Text>
           <View style={styles.ownerContainer}>
             <TouchableOpacity onPress={() => handlePress(owner)} style={styles.ownerRow}>
               <Avatar.Image size={70} source={{ uri: owner?.profileImageURL || placeholderImage }} />
-              <Text style={styles.ownerName}>{owner?.username || 'Unknown Owner'}</Text>
+              <Text style={[styles.ownerName, { color: theme.colors.text }]}>{owner?.username || 'Unknown Owner'}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Members Section */}
-          <Text style={styles.sectionTitle}>Members</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Members</Text>
           <FlatList
             data={members}
             keyExtractor={(item) => item.id}
             renderItem={renderUser}
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No members found.</Text>
+                <Text style={[styles.emptyText, { color: theme.colors.text }]}>No members found.</Text>
               </View>
             )}
             contentContainerStyle={{ paddingBottom: 20 }}
           />
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={[styles.closeButtonText, { color: theme.colors.text }]}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>

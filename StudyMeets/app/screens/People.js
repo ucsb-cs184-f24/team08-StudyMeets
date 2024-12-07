@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { auth } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '../../firebase';
@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Friends from './Friends';
 import Following from './Following';
 import Followers from './Followers';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,6 +18,7 @@ const People = () => {
   const [user, setUser] = useState(null);
   const [imageUri, setImageUri] = useState(null);
   const placeholderImage = 'https://via.placeholder.com/80';
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -49,11 +51,13 @@ const People = () => {
       <Tab.Navigator
         lazy={true}
         screenOptions={{
-          tabBarActiveTintColor: '#000',
-          tabBarIndicatorStyle: { backgroundColor: '#000' },
+          tabBarActiveTintColor: theme.colors.tabBarActive,
+          tabBarInactiveTintColor: theme.colors.tabBarInactive,
           tabBarLabelStyle: { fontSize: 16 },
-          tabBarStyle: { backgroundColor: '#f5f5f5' },
-          tabBarItemStyle: { padding: 5 }
+          tabBarStyle: { backgroundColor: theme.colors.tabBar },
+          tabBarItemStyle: { margin: 0, padding: 5 },
+          headerStyle: { backgroundColor: theme.colors.tabBar },
+          headerTintColor: theme.colors.text
         }}
       >
         <Tab.Screen name="Friends" component={Friends} options={{ headerShown: false }} />

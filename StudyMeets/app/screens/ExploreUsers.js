@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, getDocs } from 'firebase/firestore';
@@ -6,6 +6,7 @@ import { firestore, auth } from '../../firebase';
 import { Avatar, TextInput as PaperTextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { CircleX, Search } from 'lucide-react-native';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const ExploreUsers = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -14,6 +15,7 @@ const ExploreUsers = () => {
   const navigation = useNavigation();
   const placeholderImage = 'https://via.placeholder.com/80';
   const currentUserId = auth.currentUser.uid;
+  const { theme } = useContext(ThemeContext);
 
   const fetchAllUsers = async () => {
     try {
@@ -53,7 +55,7 @@ const ExploreUsers = () => {
   const clearSearch = () => setSearchQuery('');
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <PaperTextInput
         mode="outlined"
         placeholder="Search users by username..."
@@ -75,9 +77,9 @@ const ExploreUsers = () => {
         data={filteredUsers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
+          <TouchableOpacity onPress={() => handlePress(item)} style={[styles.userCard, { backgroundColor: theme.colors.cardBackgroundColor }]}>
             <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
-            <Text style={styles.username}>{item.username || 'Unknown'}</Text>
+            <Text style={[styles.username, { color: theme.colors.text }]}>{item.username || 'Unknown'}</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={() => (

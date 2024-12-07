@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Alert, View, Text, StyleSheet, ScrollView, TextInput, Modal } from 'react-native';
 import { Avatar, Button as PaperButton, IconButton } from 'react-native-paper';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -6,6 +6,7 @@ import { firestore, auth } from '../../firebase';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Edit3 } from 'lucide-react-native';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const MyProfile = ({ imageUri, setImageUri }) => {
   const [user, setUser] = useState(null);
@@ -13,8 +14,10 @@ const MyProfile = ({ imageUri, setImageUri }) => {
   const [editingField, setEditingField] = useState(null);
   const [fieldValue, setFieldValue] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const placeholderImage = 'https://via.placeholder.com/80';
   const storage = getStorage();
+
+  const placeholderImage = 'https://via.placeholder.com/80';
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   const fetchUserData = async () => {
     try {
@@ -122,7 +125,7 @@ const MyProfile = ({ imageUri, setImageUri }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.avatarContainer}>
         <Avatar.Image size={120} source={{ uri: imageUri || placeholderImage }} />
       </View>
@@ -137,35 +140,35 @@ const MyProfile = ({ imageUri, setImageUri }) => {
         {uploading ? "Uploading..." : "Change Profile Image"}
       </PaperButton>
 
-      <Text style={styles.username}>{user.username || "Unknown User"}</Text>
-      <Text style={styles.email}>{user.email || "No email provided"}</Text>
+      <Text style={[styles.username, { color: theme.colors.text }]}>{user.username || "Unknown User"}</Text>
+      <Text style={[styles.email, { color: theme.colors.secondaryText }]}>{user.email || "No email provided"}</Text>
 
-      <Text style={styles.detailsTextBold}>University:</Text>
+      <Text style={[styles.detailsTextBold, { color: theme.colors.text }]}>University:</Text>
       <View style={styles.detailsRow}>
-        <Text style={styles.detailsText}>{user.university}</Text>
+        <Text style={[styles.detailsText, { color: theme.colors.secondaryText }]}>{user.university}</Text>
         <IconButton icon={() => <Edit3 size={16} color="black" />} onPress={() => handleEditField('university')} style={styles.editIcon} />
       </View>
 
-      <Text style={styles.detailsTextBold}>Major:</Text>
+      <Text style={[styles.detailsTextBold, { color: theme.colors.text }]}>Major:</Text>
       <View style={styles.detailsRow}>
-        <Text style={styles.detailsText}>{user.major}</Text>
+        <Text style={[styles.detailsText, { color: theme.colors.secondaryText }]}>{user.major}</Text>
         <IconButton icon={() => <Edit3 size={16} color="black" />} onPress={() => handleEditField('major')} style={styles.editIcon} />
       </View>
   
-      <View style={styles.bioContainer}>
+      <View style={[styles.bioContainer, { backgroundColor: theme.colors.cardBackgroundColor }]}>
         <View style={styles.editRow}>
-          <Text style={styles.bioTitle}>Bio</Text>
+          <Text style={[styles.bioTitle, { color: theme.colors.text }]}>Bio</Text>
           <IconButton icon={() => <Edit3 size={18} color="black" />} onPress={() => handleEditField('bio')} />
         </View>
-        <Text style={styles.bioText}>{user.bio}</Text>
+        <Text style={[styles.bioText, { color: theme.colors.text }]}>{user.bio}</Text>
       </View>
 
-      <View style={styles.bioContainer}>
+      <View style={[styles.bioContainer, { backgroundColor: theme.colors.cardBackgroundColor }]}>
         <View style={styles.editRow}>
-          <Text style={styles.bioTitle}>Interests</Text>
+          <Text style={[styles.bioTitle, { color: theme.colors.text }]}>Interests</Text>
           <IconButton icon={() => <Edit3 size={18} color="black" />} onPress={() => handleEditField('interests')} />
         </View>
-        <Text style={styles.bioText}>{user.interests}</Text>
+        <Text style={[styles.bioText, { color: theme.colors.text }]}>{user.interests}</Text>
       </View>
 
       <Modal visible={modalVisible} transparent>
