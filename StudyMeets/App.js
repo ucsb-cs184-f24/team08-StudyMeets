@@ -13,6 +13,7 @@ import People from './app/screens/People';
 import CreateProfile from './app/screens/CreateProfile';
 import Profile from './app/screens/Profile';
 import Notifications from './app/screens/Notifications';
+import { SubjectsClassesProvider } from './app/screens/SubjectsClasses';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -77,6 +78,7 @@ const MainTabs = () => {
 
 const App = () => {
   return (
+    <SubjectsClassesProvider>
     <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
@@ -91,6 +93,7 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
+    </SubjectsClassesProvider>
   );
 };
 
