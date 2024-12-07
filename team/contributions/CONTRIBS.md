@@ -1,5 +1,11 @@
 ### Luis Miguel ###
-
+- Created the group search bar, so users can search for specific groups
+- Developed group cards to be expand upon clicking. This pop-up feature shows a little more info on the group.
+- Implemented delete account feature for user.
+- Worked on UI with Kai on page setup.
+- Implemented ability to add a picture to the group card.
+- Developed CreateProfile page, so user can be specify major, university, graduation year.
+- Gave in-person demo on demo day.
 
 ### Garvin Young ###
 
