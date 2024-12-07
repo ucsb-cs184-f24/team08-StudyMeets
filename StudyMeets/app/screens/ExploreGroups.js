@@ -201,32 +201,36 @@ const ExploreGroups = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.topBar}>
-        <PaperTextInput
-          mode="outlined"
-          placeholder="Search study groups..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={styles.searchBar}
-          right={
-            searchQuery ? (
-              <PaperTextInput.Icon
-                icon={() => <CircleX size={25} color="black" />}
-                onPress={() => setSearchQuery('')}
-              />
-            ) : null
-          }
-          left={<PaperTextInput.Icon icon={() => <Search size={25} color="grey" />} />}
-        />
-        <Button mode="contained" onPress={openFilterModal} style={styles.filterButton}>
-          Filter
-        </Button>
+        {!isModalVisible && (
+          <>
+            <PaperTextInput
+              mode="outlined"
+              placeholder="Search study groups..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={styles.searchBar}
+              right={
+                searchQuery ? (
+                  <PaperTextInput.Icon
+                    icon={() => <CircleX size={25} color="black" />}
+                    onPress={() => setSearchQuery('')}
+                  />
+                ) : null
+              }
+              left={<PaperTextInput.Icon icon={() => <Search size={25} color="grey" />} />}
+            />
+            <Button mode="contained" onPress={openFilterModal} style={styles.filterButton}>
+              Filter
+            </Button>
+          </>
+        )}
       </View>
       <FlatList
         data={filteredPosts}
         renderItem={({ item }) => {
           const isOwner = item.OwnerEmail === auth.currentUser?.email;
           const isJoined = joinedGroups.includes(item.id);
-
+  
           return (
             <GroupCard
               item={item}
@@ -268,7 +272,7 @@ const ExploreGroups = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter by Tags</Text>
-
+            {/* Days Section */}
             <TouchableOpacity
               onPress={() => toggleSection('Days')}
               style={styles.subheadingContainer}
@@ -297,7 +301,8 @@ const ExploreGroups = () => {
                 )}
               />
             )}
-
+  
+            {/* Locations Section */}
             <TouchableOpacity
               onPress={() => toggleSection('Locations')}
               style={styles.subheadingContainer}
@@ -326,7 +331,8 @@ const ExploreGroups = () => {
                 )}
               />
             )}
-
+  
+            {/* Subjects Section */}
             <TouchableOpacity
               onPress={() => toggleSection('Subjects')}
               style={styles.subheadingContainer}
@@ -355,7 +361,8 @@ const ExploreGroups = () => {
                 )}
               />
             )}
-
+  
+            {/* Classes Section */}
             <TouchableOpacity
               onPress={() => toggleSection('Classes')}
               style={styles.subheadingContainer}
@@ -388,7 +395,8 @@ const ExploreGroups = () => {
                 />
               )
             )}
-
+  
+            {/* Misc Section */}
             <TouchableOpacity
               onPress={() => toggleSection('Misc')}
               style={styles.subheadingContainer}
@@ -417,7 +425,7 @@ const ExploreGroups = () => {
                 )}
               />
             )}
-
+  
             <View style={styles.buttonRow}>
               <Button mode="contained" onPress={clearFilters} style={styles.clearButton}>
                 Clear Filters
