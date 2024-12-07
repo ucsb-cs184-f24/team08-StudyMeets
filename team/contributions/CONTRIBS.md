@@ -33,7 +33,12 @@
 - Created demo video for app at first code check
 
 ### Wesley Chiba ###
-
+- Added support for picking user location with a basic UI component
+- Added many UI enhancements throughout the app
+- Helped resolve teammates' problems with Git and resolving merge conflicts
+- Reviewed 20+ PRs and merged many changes into the main project
+- Added dark theme support throughout the app
+- Added detailed documentation in the README.md
 
 ### David Joyner ###
 
