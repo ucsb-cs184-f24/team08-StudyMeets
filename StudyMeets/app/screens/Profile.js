@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Alert, View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Avatar, Button } from 'react-native-paper';
 import { doc, getDoc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { firestore, auth } from '../../firebase';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const Profile = ({ route }) => {
   const { user } = route.params;
@@ -10,6 +11,7 @@ const Profile = ({ route }) => {
   const [isFriendRequested, setIsFriendRequested] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
   const currentUserId = auth.currentUser.uid;
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const checkFollowingStatus = async () => {
@@ -211,7 +213,7 @@ const Profile = ({ route }) => {
   
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.avatarContainer}>
         <Avatar.Image
           size={120}
@@ -219,8 +221,8 @@ const Profile = ({ route }) => {
         />
       </View>
 
-      <Text style={styles.username}>{user.username}</Text>
-      <Text style={styles.email}>{user.email}</Text>
+      <Text style={[styles.username, { color: theme.colors.text }]}>{user.username}</Text>
+      <Text style={[styles.email, { color: theme.colors.text }]}>{user.email}</Text>
 
       <Button
         mode="contained"
@@ -248,20 +250,20 @@ const Profile = ({ route }) => {
       </Button>
       }
 
-      <Text style={[styles.detailsTextBold]}>University: </Text>
-      <Text style={styles.detailsText}>{user.university}</Text>
+      <Text style={[styles.detailsTextBold, { color: theme.colors.text }]}>University: </Text>
+      <Text style={[styles.detailsText, { color: theme.colors.text }]}>{user.university}</Text>
 
-      <Text style={[styles.detailsTextBold]}>Major: </Text>
-      <Text style={styles.detailsText}>{user.major}</Text>
+      <Text style={[styles.detailsTextBold, { color: theme.colors.text }]}>Major: </Text>
+      <Text style={[styles.detailsText, { color: theme.colors.text }]}>{user.major}</Text>
 
-      <View style={styles.bioContainer}>
-        <Text style={styles.bioTitle}>Bio</Text>
-        <Text style={styles.bioText}>{user.bio}</Text>
+      <View style={[styles.bioContainer, { backgroundColor: theme.colors.cardBackgroundColor }]}>
+        <Text style={[styles.bioTitle, { color: theme.colors.text }]}>Bio</Text>
+        <Text style={[styles.bioText, { color: theme.colors.text }]}>{user.bio}</Text>
       </View>
 
-      <View style={styles.bioContainer}>
-        <Text style={styles.bioTitle}>Interests</Text>
-        <Text style={styles.bioText}>{user.interests}</Text>
+      <View style={[styles.bioContainer, { backgroundColor: theme.colors.cardBackgroundColor }]}>
+        <Text style={[styles.bioTitle, { color: theme.colors.text }]}>Interests</Text>
+        <Text style={[styles.bioText, { color: theme.colors.text }]}>{user.interests}</Text>
       </View>
     </ScrollView>
   );

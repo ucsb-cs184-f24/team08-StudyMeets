@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, FlatList, Alert, StyleSheet } from 'react-native';
 import { firestore, auth } from '../../firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
@@ -6,6 +6,7 @@ import GroupCard from './GroupCard';
 import EditPost from './EditPost';
 import PeopleList from './PeopleList'; 
 import { Text } from 'react-native-paper';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const CreatedGroups = () => {
   const [createdPosts, setCreatedPosts] = useState([]);
@@ -14,6 +15,7 @@ const CreatedGroups = () => {
   const [isPeopleModalVisible, setIsPeopleModalVisible] = useState(false);
   const [members, setMembers] = useState([]);
   const [owner, setOwner] = useState(null);
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const currentUser = auth.currentUser;
@@ -107,7 +109,7 @@ const CreatedGroups = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Text variant="titleLarge" style={styles.sectionTitle}>
         Groups You Created
       </Text>

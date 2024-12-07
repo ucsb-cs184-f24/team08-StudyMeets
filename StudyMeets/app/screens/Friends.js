@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore, auth } from '../../firebase';
 import { Avatar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const Friends = () => {
   const [friendUsers, setFriendUsers] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const placeholderImage = 'https://via.placeholder.com/80';
+  const { theme } = useContext(ThemeContext);
   const currentUserId = auth.currentUser.uid;
 
   const fetchFriendUsers = async () => {
@@ -48,19 +50,19 @@ const Friends = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <FlatList
         data={friendUsers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)} style={styles.userCard}>
+          <TouchableOpacity onPress={() => handlePress(item)} style={[styles.userCard, { backgroundColor: theme.colors.cardBackgroundColor }]}>
             <Avatar.Image size={50} source={{ uri: item.profileImageURL || placeholderImage }} />
-            <Text style={styles.username}>{item.username || 'Unknown'}</Text>
+            <Text style={[styles.username, { color: theme.colors.text }]}>{item.username || 'Unknown'}</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={() => (
           <View style={styles.noUsersContainer}>
-            <Text style={styles.noUsersText}>You're not friends with anyone yet.</Text>
+            <Text style={[styles.noUsersText, { color: theme.colors.text }]}>You're not friends with anyone yet.</Text>
           </View>
         )}
         refreshControl={

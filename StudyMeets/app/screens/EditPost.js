@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { View, FlatList, ScrollView, Alert, StyleSheet } from 'react-native';
 import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
@@ -12,6 +13,7 @@ const EditPost = ({ visible, onClose, postId }) => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
   const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
   const [isTBD, setIsTBD] = useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
@@ -108,7 +110,7 @@ const EditPost = ({ visible, onClose, postId }) => {
 
   return (
     <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
-      <View style={styles.modalContent}>
+      <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Card>
             <Card.Title title="Edit StudyMeet" />
@@ -118,14 +120,16 @@ const EditPost = ({ visible, onClose, postId }) => {
                 mode="outlined"
                 value={title}
                 onChangeText={setTitle}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Location"
                 mode="outlined"
                 value={location}
                 onChangeText={setLocation}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Description"
@@ -134,14 +138,16 @@ const EditPost = ({ visible, onClose, postId }) => {
                 numberOfLines={3}
                 value={description}
                 onChangeText={setDescription}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Search Tags"
                 mode="outlined"
                 value={searchText}
                 onChangeText={setSearchText}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <FlatList
                 data={tagsList.filter((tag) =>
@@ -150,7 +156,8 @@ const EditPost = ({ visible, onClose, postId }) => {
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <Chip
-                    style={styles.chip}
+                    style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
+                    textStyle={{ color: theme.colors.text }}
                     onPress={() => handleTagToggle(item)}
                     selected={tags.includes(item)}
                   >
@@ -165,7 +172,8 @@ const EditPost = ({ visible, onClose, postId }) => {
                 {tags.map((tag) => (
                   <Chip
                     key={tag}
-                    style={styles.chip}
+                    style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
+                    textStyle={{ color: theme.colors.text }}
                     onClose={() => handleRemoveTag(tag)}
                   >
                     {tag}
@@ -180,6 +188,7 @@ const EditPost = ({ visible, onClose, postId }) => {
                 mode="outlined"
                 onPress={() => setDatePickerVisible(true)}
                 style={styles.input}
+                textColor = {theme.colors.text}
               >
                 Pick Date
               </Button>
@@ -187,6 +196,7 @@ const EditPost = ({ visible, onClose, postId }) => {
                 mode="outlined"
                 onPress={() => setTimePickerVisible(true)}
                 style={styles.input}
+                textColor = {theme.colors.text}
               >
                 Pick Time
               </Button>
@@ -207,10 +217,20 @@ const EditPost = ({ visible, onClose, postId }) => {
           </Card>
         </ScrollView>
         <View style={styles.actions}>
-          <Button mode="contained" onPress={handleUpdatePost}>
+        <Button 
+            mode="contained" 
+            onPress={handleUpdatePost} 
+            buttonColor={theme.colors.primary}
+            textColor = {theme.colors.text}
+          >
             Update
           </Button>
-          <Button mode="outlined" onPress={onClose} color="red">
+          <Button 
+            mode="contained" 
+            onPress={onClose}
+            buttonColor={theme.colors.cancel}
+            textColor = {theme.colors.text}
+          >
             Cancel
           </Button>
         </View>

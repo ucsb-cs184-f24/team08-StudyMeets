@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore, auth } from '../../firebase';
@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupCard from './GroupCard';
 import { PlusCircle, CircleX, Search } from 'lucide-react-native';
 import PeopleList from './PeopleList'
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const ExploreGroups = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -19,6 +20,7 @@ const ExploreGroups = () => {
   const [members, setMembers] = useState([]);
   const [owner, setOwner] = useState(null); 
   const navigation = useNavigation();
+  const { theme } = useContext(ThemeContext);
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
@@ -175,7 +177,7 @@ const ExploreGroups = () => {
   const clearSearch = () => setSearchQuery('');
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <PaperTextInput
         mode="outlined"
         placeholder="Search study groups..."
