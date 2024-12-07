@@ -23,7 +23,14 @@
 - Implemented a Setup Meeting Time to be displayed on the GroupCard and allow editting from the Edit button and Create button. If no meeting time is established, it defaults to TBD.
 
 ### Meron Tesfandrias ###
-
+- Implemented Filter functionality to Explore page in the form of button next to search bar
+- Added UCSB API to take classes from GOLD
+- Fixed issue with user ability to create empty groups
+- Fixed issue with display differences between android and IOS on explore
+- Created version of Sign Up page which was not used due to another PR after including it
+- Implemented ability for user to join groups from explore page
+- Implemented display of groups on MyGroups page which displayed own groups at top of list and joined under, this was replaced by another implementation in a PR that was created after
+- Created demo video for app at first code check
 
 ### Wesley Chiba ###
 
