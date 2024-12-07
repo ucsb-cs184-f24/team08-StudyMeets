@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, ScrollView, Alert, StyleSheet } from 'react-native';
 import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
 import { firestore } from '../../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { tagsList } from '../../definitions/Definitions.js';
+import { useSubjectsClasses } from './SubjectsClasses';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { ThemeContext } from '../../theme/ThemeContext';
 
@@ -11,9 +12,12 @@ const EditPost = ({ visible, onClose, postId }) => {
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedClasses, setSelectedClasses] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
+  const { subjects, classes } = useSubjectsClasses();
   const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
   const [isTBD, setIsTBD] = useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
@@ -28,7 +32,9 @@ const EditPost = ({ visible, onClose, postId }) => {
           setTitle(postData.Title);
           setLocation(postData.Location);
           setDescription(postData.Description);
-          setTags(postData.Tags || []);
+          setSelectedTags(postData.Tags || []);
+          setSelectedSubjects(postData.Subjects || []);
+          setSelectedClasses(postData.Classes || []);
           if (postData.NextMeetingDate) {
             setNextMeetingDate(new Date(postData.NextMeetingDate));
             setIsTBD(postData.NextMeetingDate === 'TBD');
@@ -45,15 +51,14 @@ const EditPost = ({ visible, onClose, postId }) => {
     if (postId) fetchPostData();
   }, [postId]);
 
-  const handleTagToggle = (tag) => {
-    setTags((prevTags) =>
-      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+  const handleTagToggle = (tag, setSelectedList) => {
+    setSelectedList((prevList) =>
+      prevList.includes(tag) ? prevList.filter((item) => item !== tag) : [...prevList, tag]
     );
-    setSearchText('');
   };
 
-  const handleRemoveTag = (tag) => {
-    setTags((prevTags) => prevTags.filter((t) => t !== tag));
+  const handleRemoveTag = (tag, setSelectedList) => {
+    setSelectedList((prevList) => prevList.filter((item) => item !== tag));
   };
 
   const handleDateChange = (selectedDate) => {
@@ -82,21 +87,19 @@ const EditPost = ({ visible, onClose, postId }) => {
   };
 
   const handleUpdatePost = async () => {
-    if (title.trim() === '') {
-      Alert.alert('Error', 'The Title cannot be empty, please enter a Title.');
+    if (title.trim() === '' || location.trim() === '') {
+      Alert.alert('Error', 'Title and Location cannot be empty.');
       return;
     }
-    if (location.trim() === '') {
-      Alert.alert('Error', 'The Location cannot be empty, please enter a Location.');
-      return;
-    }    
 
     try {
       await updateDoc(doc(firestore, 'studymeets', postId), {
         Title: title,
         Location: location,
         Description: description,
-        Tags: tags,
+        Tags: selectedTags,
+        Subjects: selectedSubjects,
+        Classes: selectedClasses,
         NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
         UpdatedAt: new Date(),
       });
@@ -107,6 +110,12 @@ const EditPost = ({ visible, onClose, postId }) => {
       Alert.alert('Error', error.message);
     }
   };
+
+  const filteredItems = [
+    ...tagsList,
+    ...subjects,
+    ...classes,
+  ].filter((item) => item.toLowerCase().includes(searchText.toLowerCase()));
 
   return (
     <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
@@ -121,7 +130,6 @@ const EditPost = ({ visible, onClose, postId }) => {
                 value={title}
                 onChangeText={setTitle}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Location"
@@ -129,7 +137,6 @@ const EditPost = ({ visible, onClose, postId }) => {
                 value={location}
                 onChangeText={setLocation}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Description"
@@ -139,7 +146,6 @@ const EditPost = ({ visible, onClose, postId }) => {
                 value={description}
                 onChangeText={setDescription}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Search Tags"
@@ -147,19 +153,23 @@ const EditPost = ({ visible, onClose, postId }) => {
                 value={searchText}
                 onChangeText={setSearchText}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <FlatList
-                data={tagsList.filter((tag) =>
-                  tag.toLowerCase().includes(searchText.toLowerCase())
-                )}
+                data={filteredItems}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <Chip
-                    style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
-                    textStyle={{ color: theme.colors.text }}
-                    onPress={() => handleTagToggle(item)}
-                    selected={tags.includes(item)}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onPress={() => {
+                      if (tagsList.includes(item)) handleTagToggle(item, setSelectedTags);
+                      else if (subjects.includes(item)) handleTagToggle(item, setSelectedSubjects);
+                      else if (classes.includes(item)) handleTagToggle(item, setSelectedClasses);
+                    }}
+                    selected={
+                      selectedTags.includes(item) ||
+                      selectedSubjects.includes(item) ||
+                      selectedClasses.includes(item)
+                    }
                   >
                     {item}
                   </Chip>
@@ -169,14 +179,31 @@ const EditPost = ({ visible, onClose, postId }) => {
               <Divider style={styles.divider} />
               <Text variant="bodyMedium">Selected Tags:</Text>
               <View style={styles.tagsContainer}>
-                {tags.map((tag) => (
+                {selectedTags.map((tag) => (
                   <Chip
                     key={tag}
-                    style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
-                    textStyle={{ color: theme.colors.text }}
-                    onClose={() => handleRemoveTag(tag)}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onClose={() => handleRemoveTag(tag, setSelectedTags)}
                   >
                     {tag}
+                  </Chip>
+                ))}
+                {selectedSubjects.map((subject) => (
+                  <Chip
+                    key={subject}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onClose={() => handleRemoveTag(subject, setSelectedSubjects)}
+                  >
+                    {subject}
+                  </Chip>
+                ))}
+                {selectedClasses.map((cls) => (
+                  <Chip
+                    key={cls}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onClose={() => handleRemoveTag(cls, setSelectedClasses)}
+                  >
+                    {cls}
                   </Chip>
                 ))}
               </View>
@@ -188,7 +215,6 @@ const EditPost = ({ visible, onClose, postId }) => {
                 mode="outlined"
                 onPress={() => setDatePickerVisible(true)}
                 style={styles.input}
-                textColor = {theme.colors.text}
               >
                 Pick Date
               </Button>
@@ -196,7 +222,6 @@ const EditPost = ({ visible, onClose, postId }) => {
                 mode="outlined"
                 onPress={() => setTimePickerVisible(true)}
                 style={styles.input}
-                textColor = {theme.colors.text}
               >
                 Pick Time
               </Button>
@@ -217,20 +242,10 @@ const EditPost = ({ visible, onClose, postId }) => {
           </Card>
         </ScrollView>
         <View style={styles.actions}>
-        <Button 
-            mode="contained" 
-            onPress={handleUpdatePost} 
-            buttonColor={theme.colors.primary}
-            textColor = {theme.colors.text}
-          >
+          <Button mode="contained" onPress={handleUpdatePost} buttonColor={theme.colors.primary}>
             Update
           </Button>
-          <Button 
-            mode="contained" 
-            onPress={onClose}
-            buttonColor={theme.colors.cancel}
-            textColor = {theme.colors.text}
-          >
+          <Button mode="contained" onPress={onClose} buttonColor={theme.colors.cancel}>
             Cancel
           </Button>
         </View>
