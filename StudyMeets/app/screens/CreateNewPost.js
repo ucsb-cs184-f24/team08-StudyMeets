@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, FlatList, ScrollView, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Modal, Text, TextInput, Button, Chip, Divider, Card } from 'react-native-paper';
 import { firestore, auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
+import { ThemeContext } from '../../theme/ThemeContext';
 import { tagsList } from '../../definitions/Definitions.js';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
@@ -14,6 +15,7 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const { theme } = useContext(ThemeContext);
   const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
   const [isTBD, setIsTBD] = useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
@@ -21,14 +23,18 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [image, setImage] = useState(null);
 
   const handleTagToggle = (tag) => {
-    setSelectedTags((prevTags) =>
-      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
-    );
-    setSearchText('');
+    setSelectedTags(prevTags => {
+      if (prevTags.includes(tag)) {
+        return prevTags.filter(t => t !== tag);
+      } else {
+        return [...prevTags, tag];
+      }
+    });
+    setSearchText(''); 
   };
 
   const handleRemoveTag = (tag) => {
-    setSelectedTags((prevTags) => prevTags.filter((t) => t !== tag));
+    setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
   };
 
   const handleDateChange = (selectedDate) => {
@@ -50,6 +56,10 @@ const CreateNewPost = ({ visible, onClose }) => {
     setDatePickerVisible(false);
     setTimePickerVisible(false);
   };
+
+  const filteredTags = tagsList.filter(tag =>
+    tag.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   const handleSetTBD = () => {
     setIsTBD(true);
@@ -86,7 +96,25 @@ const CreateNewPost = ({ visible, onClose }) => {
 
     try {
       const currentUser = auth.currentUser;
-      if (!currentUser) throw new Error('User not authenticated');
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      let imageUrl = null;
+      if (image) {
+        // Upload image to Firebase Storage
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const imageRef = ref(storage, `studymeet-images/${Date.now()}`);
+        await uploadBytes(imageRef, blob);
+        imageUrl = await getDownloadURL(imageRef);
+      }
+
+      console.log('Title:', title);
+      console.log('Location:', location);
+      console.log('Description:', description);
+      console.log('Tags:', selectedTags);
+      console.log('Image"', image)
 
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
       
@@ -114,7 +142,7 @@ const CreateNewPost = ({ visible, onClose }) => {
 
   return (
     <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
-      <View style={styles.modalContent}>
+      <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Card>
             <Card.Title title="Create New StudyMeet" />
@@ -124,14 +152,15 @@ const CreateNewPost = ({ visible, onClose }) => {
                 mode="outlined"
                 value={title}
                 onChangeText={setTitle}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
               />
               <TextInput
                 label="Location"
                 mode="outlined"
                 value={location}
                 onChangeText={setLocation}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Description"
@@ -140,25 +169,26 @@ const CreateNewPost = ({ visible, onClose }) => {
                 numberOfLines={3}
                 value={description}
                 onChangeText={setDescription}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Search Tags"
                 mode="outlined"
                 value={searchText}
                 onChangeText={setSearchText}
-                style={styles.input}
+                style={[styles.input, { color: theme.colors.text }]}
+                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <FlatList
-                data={tagsList.filter((tag) =>
-                  tag.toLowerCase().includes(searchText.toLowerCase())
-                )}
-                keyExtractor={(item) => item}
+                data={filteredTags}
+                keyExtractor={item => item}
                 renderItem={({ item }) => (
                   <Chip
-                    style={styles.chip}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
                     onPress={() => handleTagToggle(item)}
                     selected={selectedTags.includes(item)}
+                    textStyle={{ color: theme.colors.text }}
                   >
                     {item}
                   </Chip>
@@ -171,8 +201,9 @@ const CreateNewPost = ({ visible, onClose }) => {
                 {selectedTags.map((tag) => (
                   <Chip
                     key={tag}
-                    style={styles.chip}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
                     onClose={() => handleRemoveTag(tag)}
+                    textStyle={{ color: theme.colors.text }}
                   >
                     {tag}
                   </Chip>
@@ -231,10 +262,20 @@ const CreateNewPost = ({ visible, onClose }) => {
           </Card>
         </ScrollView>
         <View style={styles.actions}>
-          <Button mode="contained" onPress={handleCreatePost}>
+          <Button 
+            mode="contained" 
+            onPress={handleCreatePost} 
+            buttonColor={theme.colors.primary}
+            textColor = {theme.colors.text}
+          >
             Create
           </Button>
-          <Button mode="outlined" onPress={onClose} color="red">
+          <Button 
+            mode="contained" 
+            onPress={onClose}
+            buttonColor={theme.colors.cancel}
+            textColor = {theme.colors.text}
+          >
             Cancel
           </Button>
         </View>
@@ -253,71 +294,124 @@ const CreateNewPost = ({ visible, onClose }) => {
   );
 };
 
+export default CreateNewPost;
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    width: '80%',
+    padding: 20,
     backgroundColor: 'white',
-    width: '90%',
-    maxHeight: '90%',
     borderRadius: 10,
-    overflow: 'hidden',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 20,
+    alignItems: 'center',
   },
   input: {
-    marginBottom: 10,
-  },
-  chip: {
-    margin: 2,
-  },
-  divider: {
-    marginVertical: 10,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  sectionTitle: {
-    marginBottom: 10,
-  },
-  selectedDate: {
-    marginTop: 10,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-  },
-  imageUploadButton: {
+    width: '100%',
     padding: 10,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    alignItems: 'center',
     marginBottom: 10,
+  },
+  largeInput: {
+    width: '100%',
+    height: 100,
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    textAlignVertical: 'top',
+  },
+  label: {
+    alignSelf: 'flex-start',
+    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  tagSuggestions: {
+    width: '100%',
+    maxHeight: 150, // Set a maximum height for the suggestions box
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingVertical: 5,
+    overflow: 'hidden', // Hide overflow to create a clean border
+  },
+  tagItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  tagText: {
+    flex: 1,
+  },
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+  },
+  selectedTagContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 15,
+    padding: 5,
+    margin: 5,
+  },
+  selectedTag: {
+    marginRight: 5,
+  },
+  removeTag: {
+    color: 'red',
+    fontWeight: 'bold',
+    padding: 5,
+  },
+  imageUploadButton: {
+    width: '100%',
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: 'center',
   },
   imageUploadText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
   imagePreviewContainer: {
-    marginVertical: 10,
-    alignItems: 'center',
+    width: '100%',
+    height: 200,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    overflow: 'hidden',
   },
   imagePreview: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   removeImageButton: {
-    marginTop: 10,
+    position: 'absolute',
+    top: 5,
+    right: 5,
     backgroundColor: 'red',
     padding: 5,
     borderRadius: 5,
@@ -326,6 +420,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  }
 });
-
-export default CreateNewPost;

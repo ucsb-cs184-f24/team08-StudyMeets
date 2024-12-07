@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
+import React, { useEffect, useState, useContext } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Alert, Switch } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Mail } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,10 +7,12 @@ import { auth } from '../../firebase';
 import { Button as PaperButton } from 'react-native-paper';
 import { signOut } from "firebase/auth";
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { ThemeContext } from "../../theme/ThemeContext";
 
 const SettingsTab = () => {
     
     const navigation = useNavigation();
+    const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -49,29 +51,31 @@ const SettingsTab = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container}
+          backgroundColor={theme.colors.background}
+        >
 
-          <Text style={styles.title}>Settings</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>Settings</Text>
 
           <TouchableOpacity style={styles.mailIcon} onPress={() => navigation.navigate('Notifications')}>
-            <Mail size={40} color="black" />
+            <Mail size={40} color={theme.colors.icon} />
           </TouchableOpacity>
 
           <View style={styles.settingsContainer}>
             <TouchableOpacity
-              style={styles.settingOption}
+              style={[styles.settingOption, { backgroundColor: theme.colors.secondary }]}
               onPress={() => navigation.navigate('Notification Settings')}>
               <Text style={styles.settingText}>Notification Settings</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.settingOption}
+              style={[styles.settingOption, { backgroundColor: theme.colors.secondary }]}
               onPress={() => navigation.navigate('Profile Privacy Settings')}>
               <Text style={styles.settingText}>Profile Privacy Settings</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.settingOption}
+              style={[styles.settingOption, { backgroundColor: theme.colors.secondary }]}
               onPress={() => navigation.navigate('General Settings')}>
               <Text style={styles.settingText}>General Settings</Text>
             </TouchableOpacity>
@@ -92,6 +96,11 @@ const SettingsTab = () => {
           >
             Logout
           </PaperButton>
+
+          <View style={styles.switchContainer}>
+            <Text style={[styles.settingText, { color: theme.colors.text }]}>Dark Mode</Text>
+            <Switch value={isDarkTheme} onValueChange={toggleTheme} style={styles.switch}/>
+          </View>
 
         </SafeAreaView>
     );
@@ -132,4 +141,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#000',
     },
+    switchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20
+    }
 });
+    

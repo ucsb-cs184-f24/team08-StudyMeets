@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, FlatList, Alert, StyleSheet } from 'react-native';
 import { firestore, auth } from '../../firebase';
 import { collection, query, where, onSnapshot, getDocs, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import GroupCard from './GroupCard';
 import PeopleList from './PeopleList';
 import { Text } from 'react-native-paper';
+import { ThemeContext } from '../../theme/ThemeContext';
 
 const JoinedGroups = () => {
   const [joinedPosts, setJoinedPosts] = useState([]);
   const [isPeopleModalVisible, setPeopleModalVisible] = useState(false);
   const [members, setMembers] = useState([]);
   const [owner, setOwner] = useState(null);
+  const { theme, isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const currentUser = auth.currentUser;
@@ -121,7 +123,7 @@ const JoinedGroups = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Text variant="titleLarge" style={styles.sectionTitle}>
         Groups You Joined
       </Text>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ import People from './app/screens/People';
 import CreateProfile from './app/screens/CreateProfile';
 import Profile from './app/screens/Profile';
 import Notifications from './app/screens/Notifications';
+import { ThemeProvider, ThemeContext } from './theme/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,8 +38,18 @@ const GeneralScreen = () => (
 );
 
 const MainTabs = () => {
+  const { theme } = useContext(ThemeContext);
+
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: theme.colors.tabBarActive,
+        tabBarInactiveTintColor: theme.colors.tabBarInactive,
+        tabBarStyle: { backgroundColor: theme.colors.tabBar },
+        headerStyle: { backgroundColor: theme.colors.tabBar },
+        headerTintColor: theme.colors.text
+      }}
+    >
       <Tab.Screen
         name="Explore"
         component={Explore}
@@ -78,19 +89,32 @@ const MainTabs = () => {
 const App = () => {
   return (
     <PaperProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-          <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-          <Stack.Screen name="CreateProfile" component={CreateProfile} options={{ headerShown: false }} />
-          <Stack.Screen name="Profile" component={Profile} options={{ headerTitle: '' }} />
-          <Stack.Screen name="Notifications" component={Notifications} />
-          <Stack.Screen name="Notification Settings" component={NotificationSettingsScreen} />
-          <Stack.Screen name="Profile Privacy Settings" component={ProfilePrivacyScreen} />
-          <Stack.Screen name="General Settings" component={GeneralScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </PaperProvider>
+      <ThemeProvider>
+      <ThemeContext.Consumer>
+        {({ theme }) => (
+          <PaperProvider theme={theme}>
+            <NavigationContainer>
+                <Stack.Navigator initialRouteName="Login"
+                screenOptions={{
+                  headerStyle: { backgroundColor: theme.colors.tabBar },
+                  headerTintColor: theme.colors.text,
+                }}
+              >
+                  <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+                  <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+                  <Stack.Screen name="CreateProfile" component={CreateProfile} options={{ headerShown: false }} />
+                  <Stack.Screen name="Profile" component={Profile} options={{ headerTitle: '' }} />
+                  <Stack.Screen name="Notifications" component={Notifications} />
+                  <Stack.Screen name="Notification Settings" component={NotificationSettingsScreen} />
+                  <Stack.Screen name="Profile Privacy Settings" component={ProfilePrivacyScreen} />
+                  <Stack.Screen name="General Settings" component={GeneralScreen} />
+                </Stack.Navigator>
+              </NavigationContainer>
+          </PaperProvider>
+        )}
+      </ThemeContext.Consumer>
+    </ThemeProvider>
+  </PaperProvider>  
   );
 };
 
