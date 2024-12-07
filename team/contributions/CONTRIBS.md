@@ -30,7 +30,7 @@
 - Created version of Sign Up page which was not used due to another PR after including it
 - Implemented ability for user to join groups from explore page
 - Implemented display of groups on MyGroups page which displayed own groups at top of list and joined under, this was replaced by another implementation in a PR that was created after
-- Created demo video for app at first code check
+- Created demo video for app at first MVP
 
 ### Wesley Chiba ###
 - Added support for picking user location with a basic UI component
