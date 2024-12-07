@@ -5,6 +5,7 @@ import { firestore, auth } from '../../firebase';
 import { addDoc, collection, getDoc, doc } from 'firebase/firestore';
 import { ThemeContext } from '../../theme/ThemeContext';
 import { tagsList } from '../../definitions/Definitions.js';
+import { useSubjectsClasses } from './SubjectsClasses';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
@@ -12,29 +13,26 @@ const CreateNewPost = ({ visible, onClose }) => {
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [userName, setUserName] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedClasses, setSelectedClasses] = useState([]);
   const [searchText, setSearchText] = useState('');
   const { theme } = useContext(ThemeContext);
+  const { subjects, classes } = useSubjectsClasses();
   const [nextMeetingDate, setNextMeetingDate] = useState(new Date());
   const [isTBD, setIsTBD] = useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const [image, setImage] = useState(null);
 
-  const handleTagToggle = (tag) => {
-    setSelectedTags(prevTags => {
-      if (prevTags.includes(tag)) {
-        return prevTags.filter(t => t !== tag);
-      } else {
-        return [...prevTags, tag];
-      }
-    });
-    setSearchText(''); 
+  const handleTagToggle = (tag, setSelectedList) => {
+    setSelectedList((prevList) =>
+      prevList.includes(tag) ? prevList.filter((item) => item !== tag) : [...prevList, tag]
+    );
   };
 
-  const handleRemoveTag = (tag) => {
-    setSelectedTags(prevTags => prevTags.filter(t => t !== tag));
+  const handleRemoveTag = (tag, setSelectedList) => {
+    setSelectedList((prevList) => prevList.filter((item) => item !== tag));
   };
 
   const handleDateChange = (selectedDate) => {
@@ -56,10 +54,6 @@ const CreateNewPost = ({ visible, onClose }) => {
     setDatePickerVisible(false);
     setTimePickerVisible(false);
   };
-
-  const filteredTags = tagsList.filter(tag =>
-    tag.toLowerCase().includes(searchText.toLowerCase())
-  );
 
   const handleSetTBD = () => {
     setIsTBD(true);
@@ -92,7 +86,7 @@ const CreateNewPost = ({ visible, onClose }) => {
     if (location.trim() === '') {
       Alert.alert('Error', 'The Location cannot be empty, please enter a Location.');
       return;
-    }    
+    }
 
     try {
       const currentUser = auth.currentUser;
@@ -100,45 +94,37 @@ const CreateNewPost = ({ visible, onClose }) => {
         throw new Error('User not authenticated');
       }
 
-      let imageUrl = null;
-      if (image) {
-        // Upload image to Firebase Storage
-        const response = await fetch(image);
-        const blob = await response.blob();
-        const imageRef = ref(storage, `studymeet-images/${Date.now()}`);
-        await uploadBytes(imageRef, blob);
-        imageUrl = await getDownloadURL(imageRef);
-      }
-
-      console.log('Title:', title);
-      console.log('Location:', location);
-      console.log('Description:', description);
-      console.log('Tags:', selectedTags);
-      console.log('Image"', image)
-
       const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      
+
       if (userDoc.exists()) {
         await addDoc(collection(firestore, 'studymeets'), {
           Title: title,
           Location: location,
           Description: description,
           Tags: selectedTags,
+          Subjects: selectedSubjects,
+          Classes: selectedClasses,
           OwnerEmail: currentUser.email,
           OwnerName: userDoc.data().username,
           CreatedAt: new Date(),
           NextMeetingDate: isTBD ? 'TBD' : nextMeetingDate.toISOString(),
-          ImageUrl: image,
+          ImageUrl: image || null,
         });
       }
 
-      setImage(null); 
+      setImage(null);
       onClose();
     } catch (error) {
       console.error('Error creating document:', error);
       Alert.alert('Error', error.message);
     }
   };
+
+  const filteredTags = [
+    ...tagsList,
+    ...subjects,
+    ...classes,
+  ].filter((item) => item.toLowerCase().includes(searchText.toLowerCase()));
 
   return (
     <Modal visible={visible} onDismiss={onClose} contentContainerStyle={styles.modalContainer}>
@@ -160,7 +146,6 @@ const CreateNewPost = ({ visible, onClose }) => {
                 value={location}
                 onChangeText={setLocation}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Description"
@@ -170,7 +155,6 @@ const CreateNewPost = ({ visible, onClose }) => {
                 value={description}
                 onChangeText={setDescription}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <TextInput
                 label="Search Tags"
@@ -178,17 +162,23 @@ const CreateNewPost = ({ visible, onClose }) => {
                 value={searchText}
                 onChangeText={setSearchText}
                 style={[styles.input, { color: theme.colors.text }]}
-                placeholderTextColor={theme.colors.placeholderTextColor}
               />
               <FlatList
                 data={filteredTags}
-                keyExtractor={item => item}
+                keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <Chip
                     style={[styles.chip, { backgroundColor: theme.colors.background }]}
-                    onPress={() => handleTagToggle(item)}
-                    selected={selectedTags.includes(item)}
-                    textStyle={{ color: theme.colors.text }}
+                    onPress={() => {
+                      if (tagsList.includes(item)) handleTagToggle(item, setSelectedTags);
+                      else if (subjects.includes(item)) handleTagToggle(item, setSelectedSubjects);
+                      else if (classes.includes(item)) handleTagToggle(item, setSelectedClasses);
+                    }}
+                    selected={
+                      selectedTags.includes(item) ||
+                      selectedSubjects.includes(item) ||
+                      selectedClasses.includes(item)
+                    }
                   >
                     {item}
                   </Chip>
@@ -196,16 +186,35 @@ const CreateNewPost = ({ visible, onClose }) => {
                 horizontal
               />
               <Divider style={styles.divider} />
-              <Text variant="bodyMedium">Selected Tags:</Text>
+              <Text variant="bodyMedium" style={styles.sectionTitle}>
+                Selected Tags:
+              </Text>
               <View style={styles.tagsContainer}>
                 {selectedTags.map((tag) => (
                   <Chip
                     key={tag}
                     style={[styles.chip, { backgroundColor: theme.colors.background }]}
-                    onClose={() => handleRemoveTag(tag)}
-                    textStyle={{ color: theme.colors.text }}
+                    onClose={() => handleRemoveTag(tag, setSelectedTags)}
                   >
                     {tag}
+                  </Chip>
+                ))}
+                {selectedSubjects.map((subject) => (
+                  <Chip
+                    key={subject}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onClose={() => handleRemoveTag(subject, setSelectedSubjects)}
+                  >
+                    {subject}
+                  </Chip>
+                ))}
+                {selectedClasses.map((cls) => (
+                  <Chip
+                    key={cls}
+                    style={[styles.chip, { backgroundColor: theme.colors.background }]}
+                    onClose={() => handleRemoveTag(cls, setSelectedClasses)}
+                  >
+                    {cls}
                   </Chip>
                 ))}
               </View>
@@ -262,20 +271,10 @@ const CreateNewPost = ({ visible, onClose }) => {
           </Card>
         </ScrollView>
         <View style={styles.actions}>
-          <Button 
-            mode="contained" 
-            onPress={handleCreatePost} 
-            buttonColor={theme.colors.primary}
-            textColor = {theme.colors.text}
-          >
+          <Button mode="contained" onPress={handleCreatePost} buttonColor={theme.colors.primary}>
             Create
           </Button>
-          <Button 
-            mode="contained" 
-            onPress={onClose}
-            buttonColor={theme.colors.cancel}
-            textColor = {theme.colors.text}
-          >
+          <Button mode="contained" onPress={onClose} buttonColor={theme.colors.cancel}>
             Cancel
           </Button>
         </View>
@@ -294,8 +293,6 @@ const CreateNewPost = ({ visible, onClose }) => {
   );
 };
 
-export default CreateNewPost;
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
@@ -304,109 +301,44 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
+    width: '90%',
     padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
-    alignItems: 'center',
   },
   input: {
     width: '100%',
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
     marginBottom: 10,
   },
-  largeInput: {
-    width: '100%',
-    height: 100,
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    textAlignVertical: 'top',
+  chip: {
+    margin: 2,
   },
-  label: {
-    alignSelf: 'flex-start',
-    marginBottom: 5,
-    fontSize: 16,
-    fontWeight: 'bold',
+  divider: {
+    marginVertical: 10,
   },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  tagSuggestions: {
-    width: '100%',
-    maxHeight: 150, // Set a maximum height for the suggestions box
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingVertical: 5,
-    overflow: 'hidden', // Hide overflow to create a clean border
-  },
-  tagItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  tagText: {
-    flex: 1,
-  },
-  selectedTagsContainer: {
+  tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 15,
   },
-  selectedTagContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
-    borderRadius: 15,
-    padding: 5,
-    margin: 5,
-  },
-  selectedTag: {
-    marginRight: 5,
-  },
-  removeTag: {
-    color: 'red',
-    fontWeight: 'bold',
-    padding: 5,
+  sectionTitle: {
+    marginBottom: 10,
   },
   imageUploadButton: {
-    width: '100%',
-    padding: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
     alignItems: 'center',
-  },
-  imageUploadText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    padding: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
   },
   imagePreviewContainer: {
     width: '100%',
     height: 200,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
     marginBottom: 10,
-    overflow: 'hidden',
   },
   imagePreview: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   removeImageButton: {
     position: 'absolute',
@@ -418,11 +350,11 @@ const styles = StyleSheet.create({
   },
   removeImageText: {
     color: 'white',
-    fontWeight: 'bold',
   },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
-  }
+  },
 });
+
+export default CreateNewPost;

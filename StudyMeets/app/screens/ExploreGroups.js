@@ -16,7 +16,13 @@ const ExploreGroups = () => {
   const [posts, setPosts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
-  const [expandedSections, setExpandedSections] = useState({Days: false, Locations: false, Subjects: false, Classes: false, Misc: false});
+  const [expandedSections, setExpandedSections] = useState({
+    Days: false,
+    Locations: false,
+    Subjects: false,
+    Classes: false,
+    Misc: false,
+  });
   const { subjects, classes, loading: isLoadingClasses } = useSubjectsClasses();
 
   useEffect(() => {
@@ -62,7 +68,11 @@ const ExploreGroups = () => {
     const matchesSearch = post.Title?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTags =
       selectedTags.length === 0 || selectedTags.some((tag) => post.Tags?.includes(tag));
-    return matchesSearch && matchesTags;
+    const matchesSubjects =
+      selectedTags.length === 0 || selectedTags.some((subject) => post.Subjects?.includes(subject));
+    const matchesClasses =
+      selectedTags.length === 0 || selectedTags.some((cls) => post.Classes?.includes(cls));
+    return matchesSearch && (matchesTags || matchesSubjects || matchesClasses);
   });
 
   return (
@@ -113,16 +123,10 @@ const ExploreGroups = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter by Tags</Text>
 
-            <TouchableOpacity
-              onPress={() => toggleSection('Days')}
-              style={styles.subheadingContainer}
-            >
+            {/* Days Section */}
+            <TouchableOpacity onPress={() => toggleSection('Days')} style={styles.subheadingContainer}>
               <Text style={styles.subheading}>Days</Text>
-              {expandedSections.Days ? (
-                <ChevronUp size={20} color="black" />
-              ) : (
-                <ChevronDown size={20} color="black" />
-              )}
+              {expandedSections.Days ? <ChevronUp size={20} color="black" /> : <ChevronDown size={20} color="black" />}
             </TouchableOpacity>
             {expandedSections.Days && (
               <FlatList
@@ -142,10 +146,8 @@ const ExploreGroups = () => {
               />
             )}
 
-            <TouchableOpacity
-              onPress={() => toggleSection('Locations')}
-              style={styles.subheadingContainer}
-            >
+            {/* Locations Section */}
+            <TouchableOpacity onPress={() => toggleSection('Locations')} style={styles.subheadingContainer}>
               <Text style={styles.subheading}>Locations</Text>
               {expandedSections.Locations ? (
                 <ChevronUp size={20} color="black" />
@@ -171,10 +173,8 @@ const ExploreGroups = () => {
               />
             )}
 
-            <TouchableOpacity
-              onPress={() => toggleSection('Subjects')}
-              style={styles.subheadingContainer}
-            >
+            {/* Subjects Section */}
+            <TouchableOpacity onPress={() => toggleSection('Subjects')} style={styles.subheadingContainer}>
               <Text style={styles.subheading}>Subjects</Text>
               {expandedSections.Subjects ? (
                 <ChevronUp size={20} color="black" />
@@ -200,10 +200,8 @@ const ExploreGroups = () => {
               />
             )}
 
-            <TouchableOpacity
-              onPress={() => toggleSection('Classes')}
-              style={styles.subheadingContainer}
-            >
+            {/* Classes Section */}
+            <TouchableOpacity onPress={() => toggleSection('Classes')} style={styles.subheadingContainer}>
               <Text style={styles.subheading}>Classes</Text>
               {expandedSections.Classes ? (
                 <ChevronUp size={20} color="black" />
@@ -233,16 +231,10 @@ const ExploreGroups = () => {
               )
             )}
 
-            <TouchableOpacity
-              onPress={() => toggleSection('Misc')}
-              style={styles.subheadingContainer}
-            >
+            {/* Misc Section */}
+            <TouchableOpacity onPress={() => toggleSection('Misc')} style={styles.subheadingContainer}>
               <Text style={styles.subheading}>Misc</Text>
-              {expandedSections.Misc ? (
-                <ChevronUp size={20} color="black" />
-              ) : (
-                <ChevronDown size={20} color="black" />
-              )}
+              {expandedSections.Misc ? <ChevronUp size={20} color="black" /> : <ChevronDown size={20} color="black" />}
             </TouchableOpacity>
             {expandedSections.Misc && (
               <FlatList
