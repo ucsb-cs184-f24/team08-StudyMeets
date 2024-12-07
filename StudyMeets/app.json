@@ -17,7 +17,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to select profile images."
-      }
+      },
+      "bundleIdentifier": "com.garviny.StudyMeets"
     },
     "android": {
       "adaptiveIcon": {
