@@ -39,33 +39,33 @@ These are the following dependencies used in the project.
   - A stack navigator for React Navigation, providing a way to transition between screens.
 * expo ~51.0.28  
   - A framework and platform for universal React applications.
-* expo-constants ~16.0.2  
+* expo-constants ~17.0.2 
   - Provides system information that remains constant throughout the lifetime of your app.
-* expo-image-picker ~15.0.7  
+* expo-image-picker ~16.0.1  
   - Allows the user to pick images and videos from their library or take a photo with the camera.
-* expo-linking ~6.3.1  
+* expo-linking ~7.0.2  
   - Provides utilities for handling deep links and URLs.
-* expo-location ~17.0.1  
+* expo-location ~18.0.1  
   - Provides access to the device's location services.
-* expo-status-bar ~1.12.1  
+* expo-status-bar ~2.0.0  
   - A component for controlling the app's status bar appearance.
 * firebase ^11.0.1  
   - The Firebase JavaScript SDK, providing backend services for authentication, database, and more.
-* react ^18.2.0  
+* react ^18.3.1  
   - A JavaScript library for building user interfaces.
-* react-native 0.74.5  
+* react-native 0.76.1  
   - A framework for building native apps using React.
 * react-native-elements ^3.4.3 
   - A UI toolkit for React Native with customizable components.
 * react-native-paper ^5.12.5  
   - A high-quality, standard-compliant Material Design library for React Native.
-* react-native-safe-area-context 4.10.5 
+* react-native-safe-area-context 4.12.0 
   - A library for handling safe area insets in React Native.
-* react-native-screens 3.31.1 
+* react-native-screens 4.0.0 
   - Provides native primitives to represent screens in React Native.
 * tamagui ^1.116.12  
   - A UI kit for React Native and web, providing a consistent design system.
-* expo-file-system ~17.0.1  
+* expo-file-system ~18.3.1  
   - Provides access to the file system on the device.
 
 # Installation Steps
