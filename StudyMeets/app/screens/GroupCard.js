@@ -42,6 +42,8 @@ const GroupCard = ({
             <Text variant="bodyMedium" style={{ marginBottom: 5 }}>
               {item.Description}
             </Text>
+
+            {/* Tags */}
             {item.Tags && item.Tags.length > 0 && (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
                 {item.Tags.map((tag, index) => (
@@ -55,6 +57,37 @@ const GroupCard = ({
                 ))}
               </View>
             )}
+
+            {/* Subjects */}
+            {item.Subjects && item.Subjects.length > 0 && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
+                {item.Subjects.map((subject, index) => (
+                  <Chip 
+                    key={index} 
+                    style={[styles.tag, { marginRight: 5, marginBottom: 5, backgroundColor: theme.colors.groupCardTag }]}
+                    textStyle={{ color: theme.colors.text }}
+                  >
+                    {subject}
+                  </Chip>
+                ))}
+              </View>
+            )}
+
+            {/* Classes */}
+            {item.Classes && item.Classes.length > 0 && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 5 }}>
+                {item.Classes.map((cls, index) => (
+                  <Chip 
+                    key={index} 
+                    style={[styles.tag, { marginRight: 5, marginBottom: 5, backgroundColor: theme.colors.groupCardTag }]}
+                    textStyle={{ color: theme.colors.text }}
+                  >
+                    {cls}
+                  </Chip>
+                ))}
+              </View>
+            )}
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
               <Text variant="bodySmall">Created by: {item.OwnerName}</Text>
               <Text variant="bodySmall">
@@ -127,6 +160,8 @@ const GroupCard = ({
               <Text variant="bodyLarge">{item.Location}</Text>
               <Text variant="titleMedium" style={styles.sectionTitle}>Description</Text>
               <Text variant="bodyLarge">{item.Description}</Text>
+
+              {/* Tags */}
               {item.Tags && item.Tags.length > 0 && (
                 <>
                   <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
@@ -143,6 +178,43 @@ const GroupCard = ({
                   </View>
                 </>
               )}
+
+              {/* Subjects */}
+              {item.Subjects && item.Subjects.length > 0 && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>Subjects</Text>
+                  <View style={styles.tagsContainer}>
+                    {item.Subjects.map((subject, index) => (
+                      <Chip 
+                        key={index} 
+                        style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
+                        textStyle={{ color: theme.colors.text }}
+                      >
+                        {subject}
+                      </Chip>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              {/* Classes */}
+              {item.Classes && item.Classes.length > 0 && (
+                <>
+                  <Text variant="titleMedium" style={styles.sectionTitle}>Classes</Text>
+                  <View style={styles.tagsContainer}>
+                    {item.Classes.map((cls, index) => (
+                      <Chip 
+                        key={index} 
+                        style={[styles.tag, { backgroundColor: theme.colors.groupCardTag }]}
+                        textStyle={{ color: theme.colors.text }}
+                      >
+                        {cls}
+                      </Chip>
+                    ))}
+                  </View>
+                </>
+              )}
+
               <View style={styles.detailsContainer}>
                 <Text variant="bodyMedium">Created by: {item.OwnerName}</Text>
                 <Text variant="bodyMedium">

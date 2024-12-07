@@ -14,6 +14,7 @@ import CreateProfile from './app/screens/CreateProfile';
 import Profile from './app/screens/Profile';
 import Notifications from './app/screens/Notifications';
 import { ThemeProvider, ThemeContext } from './theme/ThemeContext';
+import { SubjectsClassesProvider } from './app/screens/SubjectsClasses';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +94,7 @@ const App = () => {
       <ThemeContext.Consumer>
         {({ theme }) => (
           <PaperProvider theme={theme}>
+            <SubjectsClassesProvider>
             <NavigationContainer>
                 <Stack.Navigator initialRouteName="Login"
                 screenOptions={{
@@ -110,6 +112,7 @@ const App = () => {
                   <Stack.Screen name="General Settings" component={GeneralScreen} />
                 </Stack.Navigator>
               </NavigationContainer>
+              </SubjectsClassesProvider>
           </PaperProvider>
         )}
       </ThemeContext.Consumer>

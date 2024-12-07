@@ -113,3 +113,6 @@ To contribute to the project, follow these steps:
 
 # License
 The app license can be found in LICENSE.md of this repository.
+
+# Deployment
+[link]
