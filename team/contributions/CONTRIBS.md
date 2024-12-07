@@ -41,7 +41,10 @@
 - Added detailed documentation in the README.md
 
 ### David Joyner ###
-
+- Added Unit testing for settings.js, following.js, friends.js, profile.js, & login.js
+- Implemented abilitiy to use tags
+- added ability to hide password
+- added ability to refresh on swipe
 
 ### Kai Han ###
 
