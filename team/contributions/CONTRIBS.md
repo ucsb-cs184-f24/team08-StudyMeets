@@ -36,9 +36,9 @@
 - Established the initial project framework, including navigation between pages. Implemented a three-page structure: Explore, MyGroups, and Profile, serving as the foundation for the first version of the app.
 - Designed the process for creating Study Meet sessions and integrated Firebase email verification, connected the app’s Study Meet data with Firestore for real-time updates and seamless synchronization.
 - Enhanced the layout design of the Sign In and People pages, resolving issues such as blank pages failing to refresh and ensuring a smoother user experience.
-- Wrote the initial drafts of DESIGN and MANUAL documentation, including designing process flowcharts to outline the app’s functionalities and user workflows.
 - Set the function that when a user creates a Post, his friends will receive notifications, ensuring that users can get notifications when a friend creates a new Post.
 - Create a People button on the Group Card to ensure that users can view the composition of the people participating in the current StudyMeet.
+- Wrote the initial drafts of DESIGN and MANUAL documentation, including designing process flowcharts to outline the app’s functionalities and user workflows.
 
 ## Contribution Graph Analysis ##
 
