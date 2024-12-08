@@ -115,4 +115,4 @@ To contribute to the project, follow these steps:
 The app license can be found in LICENSE.md of this repository.
 
 # Deployment
-[link]
+For Android, a .apk file is provided in the releases tab [here.](https://github.com/ucsb-cs184-f24/team08-StudyMeets/releases/tag/1.0)
