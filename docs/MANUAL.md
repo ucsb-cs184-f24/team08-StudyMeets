@@ -10,6 +10,10 @@ UCSB students looking to create local study or social groups. These users are ve
 UCSB students interested in joining study groups that match their location and interests. These users can search for groups and join them after reviewing details such as tags.
 
 ## Introduction  ##
+// Do we need to write a introduction for this part?
+
+## System Logic Diagram ##
+![image](https://github.com/user-attachments/assets/2f0e91a2-6fcf-44f5-92ea-58c3da44cfb9)
 
 
 ## Installation  ##
@@ -25,44 +29,53 @@ In the future, .apk, .ipa files will be provided for users to directly install t
 ### Create Account ###
 If the user does not have an account yet, he needs to register an account, enter the email address, username, and password to register the account. After registration, the corresponding email address will receive a verification email. Click the verification email, then log in and you can enter the App.
 
-<img src="https://github.com/user-attachments/assets/d3f6fa31-8683-4b6c-a87c-6c04c089692e" alt="Create Account" width="500"/>
+<img src="https://github.com/user-attachments/assets/ccf896f4-84a1-4a45-84e6-7872d9c30989" alt="Create Account" width="200"/>
 
 
 ### Sign In ###
 If the user already has an account, he can directly enter the email address and password to enter the App.
 
-<img src="https://github.com/user-attachments/assets/57020f7e-d918-4d6a-8a6d-5da31fe2ee71" alt="Sign In" width="500"/>
+<img src="https://github.com/user-attachments/assets/168c822c-661a-41fe-9d5c-396a299b8014" alt="Sign In" width="200"/>
 
-## Functions  ##
-### Create New StudyMeet ###
-<img src="https://github.com/user-attachments/assets/fac0afb6-4dbd-4a20-8d69-91e358318109" alt="Create New StudyMeet" width="500"/>
+## Explore ##
+### Search StudyMeet Group ###
+<img src="https://github.com/user-attachments/assets/7dde1c15-84b7-4faa-831c-527f668f1498" alt="Create New StudyMeet" width="200"/>
+<img src="https://github.com/user-attachments/assets/ca5efc31-b21b-4fc2-9e8b-f516817a3ced" alt="Create New StudyMeet" width="200"/>
 
-### Explore StudyMeets ###
-<img src="https://github.com/user-attachments/assets/1f7e58a5-626d-4ef2-806e-60152736c67d" alt="Explore StudyMeets" width="500"/>
+### Create StudyMeet Group ###
+<img src="https://github.com/user-attachments/assets/fad31ec9-8d52-41ad-9496-c65c0b844c5e" alt="Explore StudyMeets" width="200"/>
+<img src="https://github.com/user-attachments/assets/371749aa-d494-4b9b-91d3-a8e750a45693" alt="Explore StudyMeets" width="200"/>
 
-### Search StudyMeet ###
-<img src="https://github.com/user-attachments/assets/194b1a3a-b4fe-42fb-a3e1-ccde9d0b840b" alt="Search StudyMeet" width="500"/>
+### Join StudyMeet Group ###
+<img src="https://github.com/user-attachments/assets/916f453e-8ad5-4ba7-b1f5-daa06ed33490" alt="Search StudyMeet" width="200"/>
+<img src="https://github.com/user-attachments/assets/3635647a-5d08-4fea-9e85-3418b5dbb7fb" alt="Search StudyMeet" width="200"/>
 
-### Join StudyMeet ###
-<img src="https://github.com/user-attachments/assets/c332eca2-eb81-4bf1-b37b-fb1e226a54da" alt="Join StudyMeet" width="500"/>
+### Search People ###
 
-### Delete StudyMeet ###
-<img src="https://github.com/user-attachments/assets/e8b8d9c7-49e2-4075-980e-6a2c9d7bf5c2" alt="Delete StudyMeet" width="500"/>
-<img src="https://github.com/user-attachments/assets/17767d85-582c-4a34-a1fc-bec89a49a519" alt="Delete StudyMeet Step 2" width="500"/>
+<img src="https://github.com/user-attachments/assets/8ff62b19-ce7a-4aff-9855-81963ddcaa20" alt="Join StudyMeet" width="200"/>
+<img src="https://github.com/user-attachments/assets/bdd420cf-2983-4e84-a32f-86cffc8a16e9" alt="Join StudyMeet" width="200"/>
+<img src="https://github.com/user-attachments/assets/f601965e-c722-4b64-8f6c-ddaae045db80" alt="Join StudyMeet" width="200"/>
+<img src="https://github.com/user-attachments/assets/9d754330-5318-4259-ad57-62b760fd30df" alt="Join StudyMeet" width="200"/>
 
-### Leave StudyMeet ###
-<img src="https://github.com/user-attachments/assets/4ef35afd-c3af-4bb4-a0c6-7795d9d5e353" alt="Leave StudyMeet" width="500"/>
-<img src="https://github.com/user-attachments/assets/73e979c0-f31e-4f39-ae83-05a8568e61b2" alt="Leave StudyMeet Step 2" width="500"/>
 
-## Profile Management  ##
+## MyGroups ##
+### Edit Group You Created ###
+### Delete Group You Created ###
+### Leave Group You Joined ###
 
+
+## People ##
+### Check Friends, Following, Followers ###
+### Change Profile Information ###
+
+## Setting ##
+### Check Notification ###
+### Change Password ###
+### Set Dark Mode ###
+### Logout ###
 
 ## Known Issues  ##
 - Some permission errors can occur when trying to sign in
 - Changing the profile picture repeatedly can cause a visual error
 - App goes blank when an internal error occurs, and needs to be force stopped
 
-
-MANUAL doc Link:
-
-https://docs.google.com/document/d/1h7l2DDPGXwKLuZd8fbpnwqAa4yEeatD-d019r0OAiok/edit?usp=sharing
