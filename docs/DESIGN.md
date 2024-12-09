@@ -26,7 +26,7 @@
 
 - **Verification Methods:** Chose email domain-based verification for simplicity, with plans to expand to LinkedIn and campus networks in later iterations.
 
-### Details ###
+### Meeting Details ###
 
 **10 - 14**
 
@@ -89,26 +89,116 @@ Optimize features like the Explore and Home pages, implement account deletion, i
 
 Finalize features such as meeting date/time setup, explore notifications, and fixing tags, as well as continuing with unit testing and updating the Explore page. Progress includes implementing account deletion and add friend components.
 
+### RETRO Details ###
+
+**RETRO_1_Plan:**
+- A goal: Communicate more, helping each other with the project/HW and letting everyone know where you are. Also sharing useful resources with the group.
+- A change: We plan to utilize slack more and the messaging group chat, updating each other on our progress/issues and sending resources or tips to help others.
+- A measurement: We can check if our experiment worked if there have been more messages in the group chat and slack by our next retro.
+- Result: There have been more messages in both the group chat and slack including: asking for help, sending resources, updating group on progress, and asking for peer reviews on code.
+
+**RETRO_1_Outcome:**
+- Result: There have been more messages in both the group chat and slack including: asking for help, sending resources, updating group on progress, and asking for peer reviews on code
+- We used a group discussion similar to the daily standups where everyone had a chance to speak. Once everyone had spoken I asked if there was anything else anyone wanted to add, when everyone was done with their thoughts we moved on.
+- The retro went well, since we are at the beginning of the project it felt like there wasn't much we wanted to change.
+- For the next retrospective I would recommend giving people more time to think before jumping into discussion, I was speaking first a lot and maybe not giving everyone enough time to formulate their thoughts.
+
+**RETRO_2_Plan:**
+- A goal: communicate more especially when people's work are dependent on others'
+- A change: be more active approving pull requests, properly making pull requests and using the kanban board
+- A measurement: see how long each pull request stays up (timestamps)
+- Discussion was productive and made sure everyone was on board with the same things
+- Make sure everyone can speak openly and hear all ideas from all team members
+
+**RETRO_2_Outcome:**
+- Result: Getting pull requests accepted is still somewhat slow, usually requires someone to ask in person during a class or discussion for a pr to get approved. Weren't too many new prs made out of class so it's hard to see how long those will last given it's a new sprint.
+- We used a group discussion similar to the daily standups where everyone had a chance to speak. Once everyone had spoken I asked if there was anything else anyone wanted to add, when everyone was done with their thoughts we moved on.
+- Not much talking during the retro, but we all seemed to be on the smae page
+- For the next retrospective I would recommend not giving too open ended of questions since that doesn't necessarily encourage someone to speak. Possibly make more directed questions while be conscious to maintain neutrality and not trying to steer the conversation
+
 ## User Experience (UX) Considerations ##
 ### High-Level Task/User Flow ###
 ![image](https://github.com/user-attachments/assets/2f0e91a2-6fcf-44f5-92ea-58c3da44cfb9)
 
-#### Task: Joining a Study Group ####
-- **Sign In:** User logs in or registers with a UCSB email address.
 
-- **Explore Groups:** Browse or search for groups based on tags, topics, or location.
+### Task: Join a Study Meet ###
 
-- **View Group Details:** Check group name, description, location, and participant limit.
+**1. Sign In**
 
-- **Join Group:** Request to join; if accepted, group details are added to “My Study Groups.”
+- If User has account, log in with their email address.
+- If no account, tap “Create Account” to register.
+- Email verification is required before completing registration.
+- Profile setup includes entering a name, profile picture (optional), and basic information.
 
-#### Task: Creating a Study Group ####
+**2. Explore Groups**
 
-- **Navigate to “My Study Groups”:** Open the tab and tap “Create Group.”
+- Users can search for groups using tags, topics, or location.
+- View trending or recommended groups based on user interests.
 
-- **Enter Details:** Fill in title, description, location, tags, and participant limit.
+**3. View Group Details**
 
-- **Submit:** Create the group and make it visible to others in the Explore tab.
+- Tap on a group to view detailed information.
+- Group Name, Description, Tags, etc will display on the group card.
+
+**4. Join Group**
+
+- Tap “Join Group” on the group details page.
+- User Successfully Join a Group
+
+### Task: Create a Study Meet ###
+
+**1. Sign In**
+
+- If User has account, log in with their email address.
+- If no account, tap “Create Account” to register.
+- Email verification is required before completing registration.
+- Profile setup includes entering a name, profile picture (optional), and basic information.
+
+**2. Navigate to the Explore Page and Click add icon**
+
+- A window will pop up for the user to enter information about StudyMeet.
+- This includes Title, Location, Description, etc.
+- After entering, click Create to complete the creation.
+
+**3. View On Study Groups**
+
+- The newly created StudyMeet will be displayed on the Study Groups Tab in the Explore Page.
+
+### Task: Managing Groups in “My Groups” ###
+
+**1. View Joined Groups**
+- Display a list of groups the user has joined or created.
+- Include options to view group details, leave a group, or manage created groups.
+
+**2. Manage Created Groups**
+- Edit Group Information: Update the title, description, location, tags, etc.
+- Delete Group: Permanently remove the group from the system.
+
+
+### Task: Interacting with People ###
+
+**1. Check Friends, Followers, and Following**
+
+- View a list of friends and manage connections.
+- Follow other group members or add them as your friends.
+
+**2. Change Profile Information**
+
+- Edit user profile details such as name, picture, and Interests.
+
+### Task: System Settings ###
+
+**1. Notifications**
+
+Check all notifications of new friends request, User can click Accept or Reject to reply this request.
+Before Accept or Reject, User can view new friend profile
+
+**2. Dark Mode**
+- Toggle dark mode for the app interface.
+
+**3. Account Management**
+
+- Change password or logout securely.
 
 ### UI/UX Principles ###
 
@@ -118,17 +208,20 @@ Finalize features such as meeting date/time setup, explore notifications, and fi
 
 - **Consistency:** Maintain a uniform design style across all screens using React Native Paper and Tamagui.
 
+## External Resources ##
 
-## Next Steps ##
-### Features to Design ###
-- Friend Recommendations: Propose a design for suggesting study partners based on shared interests and participation history.
-- College-Specific Events: Create a dedicated section for events tied to UCSB activities or departments.
-### Iterative Improvements ###
-- Incorporate user feedback into UX designs.
-- Optimize backend queries for better performance.
+https://reactnative.dev/docs/style
 
+https://www.youtube.com/watch?v=8ejuHsaXiwU
 
+https://blog.logrocket.com/react-native-styling-tutorial-examples/
 
-DESIGN doc Link:
+https://www.youtube.com/playlist?list=PLC3y8-rFHvwhiQJD1di4eRVN30WWCXkg1
 
-https://docs.google.com/document/d/1Mjwg9ECoQ_ooC6w48MAPIrrww_IEhfjnvRYl_C1hu6Y/edit?usp=sharing
+https://www.youtube.com/watch?v=HY3O_wrvDsI
+
+In addition to these links, we also use external tools such as StackOverflow to help us write code more smoothly.
+## Difficulties ##
+
+## Evaluation/ Testing ##
+
