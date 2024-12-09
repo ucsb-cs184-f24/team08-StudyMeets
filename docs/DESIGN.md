@@ -1,7 +1,7 @@
-# StudyMeets DESIGN #
 ## Overview System Architecture ##
 ### Architecture Diagram ###
-![image](https://github.com/user-attachments/assets/60817874-bef2-4b06-ad57-e293cb1e7ee9)
+![image](https://github.com/user-attachments/assets/98057bd7-6aed-4a05-b62f-7eb73146710c)
+
 
 
 - **Frontend**: React Native for the mobile app interface.
@@ -9,8 +9,6 @@
 - **Backend**: Firebase services (Authentication, Firestore) for authentication, data storage, and real-time updates.
 
 - **Expo**: Platform for running and testing the app on multiple devices.
-
-- **User Roles**: Integration of different user roles (Group Creators and Group Joiners).
 
 ### Explanation ###
 - **Frontend**: Implements user interactions, including signing in, exploring groups, and managing study groups.
@@ -21,17 +19,79 @@
 
 
 ## Team Decisions ##
+### Summary ###
 - **Technology Stack Selection:** React Native was chosen for cross-platform development due to its flexibility and performance. Firebase was selected for authentication and database services because of its real-time capabilities and seamless integration with React Native.
 
 - **Feature Prioritization:** Decided to focus on core functionalities like group creation, exploration, and secure login before adding friend recommendations or college-specific events.
 
 - **Verification Methods:** Chose email domain-based verification for simplicity, with plans to expand to LinkedIn and campus networks in later iterations.
 
-- **Participant Limits:** Introduced group participant limits and distance-based restrictions for localizing events.
+### Details ###
+
+**10 - 14**
+
+Build the app skeleton, implement features like login, account creation, and user persistence, and set up Firebase for backend support. The team has finalized user stories, assigned tasks, and all issues are now in progress.
+
+
+**10 - 21**
+
+Address the Firebase configuration file roadblock and continue working on assigned issues. 
+
+**10 - 23**
+
+Resolve the Google OAuth issue and finalize the Firebase configuration file.
+
+**10 - 25**
+
+Continue to implement features like Google OAuth, group creation, and profile setup, and finalize navigation with tabs and screens. Several PRs have been submitted and approved.
+
+**10 - 28**
+
+Implement the Create Group feature, and research libraries and Firestore database integration. 
+
+**10 - 30**
+
+Focus on implementing features like the Create Group function, Google OAuth, profile page, and Firebase messaging for user notifications. The team is progressing well, resolving merge conflicts, and researching Firestore database integration.
+
+**11 - 1**
+
+Enhance the profile page by adding navigation and implementing the profile tab, while continuing to refine features like user group creation and deletion. Key progress includes implementing logout and password features, and connecting Firestore to user functionalities.
+
+**11 - 8**
+
+Continue developing the location selection feature using maps or device location, and implement the joining group feature with group display functionality. 
+
+**11 - 13**
+
+Complete HW4 and implement features such as retrieving more group information on click, a request join button, and selecting a study location from a map. The team is making progress on HW4 and related issues, with no significant roadblocks reported.
+
+**11 - 15**
+
+Implement sorting for groups, refine the UI, and begin writing tests, the design document, and the user manual. Progress is steady, with updated Kanban board tasks.
+
+**11 - 18**
+
+Implement recommended changes from the HW04 code review, enhance app navigation, update the profile page, and develop features such as search functionality and a dark theme.
+
+**11 - 20**
+
+Resolve merge conflicts, complete HW4, and set up testing despite challenges. Progress includes moving the profile tab, implementing a navigation framework for the settings tab, fixing login issues, and creating a manual and design.
+
+**11 - 22**
+
+Complete HW04, resolve conflicts during testing, and address the newly assigned issues. Progress includes creating tests for the profile and login pages, pushing PRs, and reviewing others, with no significant roadblocks except for some conflicts being addressed.
+
+**12 - 2**
+
+Optimize features like the Explore and Home pages, implement account deletion, improve the Friends tab, and explore adding a “when to meet” feature and tag updates using API classes. HW4 has been completed by all team members, with progress continuing on unit testing and PR approvals.
+
+**12 - 4**
+
+Finalize features such as meeting date/time setup, explore notifications, and fixing tags, as well as continuing with unit testing and updating the Explore page. Progress includes implementing account deletion and add friend components.
 
 ## User Experience (UX) Considerations ##
 ### High-Level Task/User Flow ###
-![image](https://github.com/user-attachments/assets/b3c06c84-8077-4914-8eb1-f5132d1332a2)
+![image](https://github.com/user-attachments/assets/2f0e91a2-6fcf-44f5-92ea-58c3da44cfb9)
 
 #### Task: Joining a Study Group ####
 - **Sign In:** User logs in or registers with a UCSB email address.
