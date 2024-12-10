@@ -220,6 +220,8 @@ https://www.youtube.com/playlist?list=PLC3y8-rFHvwhiQJD1di4eRVN30WWCXkg1
 
 https://www.youtube.com/watch?v=HY3O_wrvDsI
 
+https://developer.ucsb.edu/content/academic-curriculums
+
 In addition to these links, we also use external tools such as StackOverflow to help us write code more smoothly.
 ## Difficulties ##
 
