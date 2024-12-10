@@ -226,6 +226,8 @@ In addition to these links, we also use external tools such as StackOverflow to 
 ## Difficulties ##
 There was some difficulties with getting the UCSB API to work properly, https://chatgpt.com/ was used to help generate code for debugging. Specifically some subjects and classes were not being loaded, to solve this we decided to write up a list of the subject names directly from GOLD since this was not too long of a task and trivial. Using the debugging code we noticed that the classes that weren't being generated were different each time, so we would go through the API multiplie times to give it a few tries to load all information. This fixed the issue, which chatgpt initially suggested was due to an overload of information being requested at one time, and due to the way it was solved was most likely the case.
 
+At first, when we tried to write data to the Firestore database, anyone could write data to the database. Later, we began to investigate why this problem was occurring. After a group discussion, we finally changed the rules in Firestore to allow only verified users to write data. After the change, performance was as expected.
+
 
 ## Evaluation/ Testing ##
 
