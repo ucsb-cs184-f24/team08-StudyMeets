@@ -225,3 +225,4 @@ In addition to these links, we also use external tools such as StackOverflow to 
 
 ## Evaluation/ Testing ##
 
+- **JEST:** We used Jest to test the rendering and functionality of key components of our app. Run `npm test` to run the tests.
