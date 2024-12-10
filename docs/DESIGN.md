@@ -224,6 +224,8 @@ https://developer.ucsb.edu/content/academic-curriculums
 
 In addition to these links, we also use external tools such as StackOverflow to help us write code more smoothly.
 ## Difficulties ##
+There was some difficulties with getting the UCSB API to work properly, https://chatgpt.com/ was used to help generate code for debugging. Specifically some subjects and classes were not being loaded, to solve this we decided to write up a list of the subject names directly from GOLD since this was not too long of a task and trivial. Using the debugging code we noticed that the classes that weren't being generated were different each time, so we would go through the API multiplie times to give it a few tries to load all information. This fixed the issue, which chatgpt initially suggested was due to an overload of information being requested at one time, and due to the way it was solved was most likely the case.
+
 
 ## Evaluation/ Testing ##
 
