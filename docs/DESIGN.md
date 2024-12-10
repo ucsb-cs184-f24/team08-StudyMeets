@@ -225,4 +225,4 @@ In addition to these links, we also use external tools such as StackOverflow to 
 
 ## Evaluation/ Testing ##
 
-- **JEST:** We used Jest to test the rendering and functionality of key components of our app. Run `npm test` to run the tests.
+- **JEST:** We used Jest to test the rendering and functionality of key components of our app. We had trouble setting up Jest as it had compatibility issues with our setup using certain versions of react native and expo go. However, when we updated the Expo SDK, we were able to run the testing. You can run `npm test` to see the test results.
